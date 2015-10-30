@@ -1,0 +1,24 @@
+auto1
+engine: gasoline
+max_speed: 250
+engine_cc: 1980
+avg_consumption_urban: 11
+avg_speed_urban: 50
+avg_consumption: 8
+avg_speed: 100
+auto2
+engine: diesel
+max_speed: 230
+engine_cc: 1600
+avg_consumption_urban: 9
+avg_speed_urban: 50
+avg_consumption: 6
+avg_speed: 80
+auto3
+engine: hybrid
+max_speed: 190
+engine_cc: 1450
+avg_consumption_urban: 7
+avg_speed_urban: 50
+avg_consumption: 4
+avg_speed: 90
