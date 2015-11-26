@@ -3,9 +3,12 @@
 
 #include "stdafx.h"
 
+#include "Menu.h"
 
 int main()
 {
-    return 0;
+	Menu m(10);
+	m.addItem('0', "Exit");
+	return m.run();
 }
 

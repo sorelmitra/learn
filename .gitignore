@@ -2,3 +2,6 @@
 .DS_Store
 **/*.suo
 **/Debug
+**/ipch
+**/*.sdf
+
