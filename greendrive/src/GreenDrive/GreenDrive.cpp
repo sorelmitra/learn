@@ -8,13 +8,152 @@
 #include <iostream>
 #include <cctype>
 
+using namespace std;
+
+
+///// Car /////
+
+Car::Car()
+{
+	name = 0;
+	engineType = ENGINE_TYPE_UNDEFINED;
+	maxSpeed = 0;
+	displacement = 0;
+	urbanAverageConsumption = 0;
+	urbanAverageSpeed = 0;
+	averageConsumption = 0;
+	averageSpeed = 0;
+}
+
+Car::~Car()
+{
+	if (name) {
+		delete name;
+		name = 0;
+	}
+}
+
+void Car::setName(char * name)
+{
+	this->name = name;
+}
+
+char * Car::getName() const
+{
+	return name;
+}
+
+void Car::setEngineType(CarEngineTypes engineType)
+{
+	this->engineType = engineType;
+}
+
+CarEngineTypes Car::getEngineType() const
+{
+	return engineType;
+}
+
+void Car::setMaxSpeed(unsigned short maxSpeed)
+{
+	this->maxSpeed = maxSpeed;
+}
+
+unsigned short Car::getMaxSpeed() const
+{
+	return maxSpeed;
+}
+
+void Car::setDisplacement(unsigned short displacement)
+{
+	this->displacement = displacement;
+}
+
+unsigned short Car::getDisplacement() const
+{
+	return displacement;
+}
+
+void Car::setUrbanAverageConsumption(unsigned char urbanAverageConsumption)
+{
+	this->urbanAverageConsumption = urbanAverageConsumption;
+}
+
+unsigned char Car::getUrbanAverageConsumption() const
+{
+	return urbanAverageConsumption;
+}
+
+void Car::setUrbanAverageSpeed(unsigned short urbanAverageSpeed)
+{
+	this->urbanAverageSpeed = urbanAverageSpeed;
+}
+
+unsigned short Car::getUrbanAverageSpeed() const
+{
+	return urbanAverageSpeed;
+}
+
+void Car::setAverageConsumption(unsigned char averageConsumption)
+{
+	this->averageConsumption = averageConsumption;
+}
+
+unsigned char Car::getAverageConsumption() const
+{
+	return averageConsumption;
+}
+
+void Car::setAverageSpeed(unsigned short averageSpeed)
+{
+	this->averageSpeed = averageSpeed;
+}
+
+unsigned short Car::getAverageSpeed() const
+{
+	return averageSpeed;
+}
+
+ostream& operator<<(ostream& os, const Car &car)
+{
+	os << endl;
+	os << "Nume autovehicul:    " << car.getName() << endl;
+
+	os << "Motor:               ";
+	switch (car.getEngineType()) {
+	case ENGINE_TYPE_GASOLINE: os << "Benzina";
+	case ENGINE_TYPE_DIESEL: os << "Diesel";
+	case ENGINE_TYPE_HYBRID: os << "Hibrid";
+	case ENGINE_TYPE_ELECTRICAL: os << "Electric";
+	default: cout << "Necunoscut!";
+	}
+	os << endl;
+
+	os << "Viteza maxima:       " << car.getMaxSpeed() << endl;
+	os << "Cilindree:           " << car.getDisplacement() << endl;
+	os << "Consum mediu urban:  " << car.getUrbanAverageConsumption() << endl;
+	os << "Viteza medie urbana: " << car.getUrbanAverageSpeed() << endl;
+	os << "Consum mediu:        " << car.getAverageConsumption() << endl;
+	os << "Viteza medie:        " << car.getAverageSpeed() << endl;
+	os << endl;
+
+	return os;
+}
+
+
 ///// Main Menu /////
+
+Menu::Menu()
+{
+}
 
 int Menu::run()
 {
 	char c;
 	while (true) {
-		show();
+		prepareMenu("Meniu Principal");
+		cout << "A - Selectie autovehicul" << endl;
+		cout << "I - Iesire" << endl;
+		showMenuInput();
 		cin >> c;
 		switch(tolower(c)) {
 		case 'a': selectCar(); break;
@@ -23,40 +162,35 @@ int Menu::run()
 	}
 }
 
-void Menu::showInput()
+void Menu::showMenuInput()
 {
 	cout << "Alegeti optiunea > ";	
 }
 
-void Menu::prepareShow()
+void Menu::prepareMenu(char *title)
 {
 	cout << endl;
-}
-
-void Menu::show()
-{
-	prepareShow();
-	cout << "A - Selectie autovehicul" << endl;
-	cout << "I - Iesire" << endl;
-	showInput();
+	cout << "===== " << title << " =====" << endl;
+	cout << endl;
 }
 
 void Menu::selectCar()
 {
 	while (true) {
-		prepareShow();
+		prepareMenu("Selectie Autovehicule");
 		char opt = '0';
-		for (size_t i = 0; i < carsCount; i++) {
-			cout << opt++ << " - " cars[i].name << endl;
+		size_t i;
+		for (i = 0; i < carsCount; i++) {
+			cout << opt++ << " - " << cars[i].getName() << endl;
 		}
 		cout << "I - Iesire" << endl;
-		showInput();
+		showMenuInput();
 		
 		char c;
 		cin >> c;
 		if (c == 'i') return;
 		opt = '0';
-		for (size_t i = 0; i < carsCount; i++) {
+		for (i = 0; i < carsCount; i++) {
 			if (c == opt++) break;
 		}
 		
@@ -65,8 +199,31 @@ void Menu::selectCar()
 			continue;
 		}
 		
-		showCarOptions();
+		carOptions(i);
 	}
+}
+
+void Menu::carOptions(size_t carIndex)
+{
+	char c;
+	while (true) {
+		prepareMenu("Autovehicul");
+		cout << "A - Afisare date autovehicul" << endl;
+		cout << "T - Afisare trasee autovehicul" << endl;
+		cout << "I - Iesire" << endl;
+		showMenuInput();
+		cin >> c;
+		switch (tolower(c)) {
+		case 'a': cout << cars[carIndex]; break;
+		case 't': carRoutes(carIndex); break;
+		case 'i': return;
+		}
+	}
+}
+
+void Menu::carRoutes(size_t carIndex)
+{
+	cout << endl << "NOT IMPLEMENTED!" << endl;
 }
 
 
@@ -77,4 +234,3 @@ int main()
 	Menu m;
 	return m.run();
 }
-
