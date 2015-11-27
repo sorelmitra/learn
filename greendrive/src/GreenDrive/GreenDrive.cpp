@@ -2,6 +2,9 @@
 //
 
 #include "stdafx.h"
+
+#include "GreenDrive.h"
+
 #include <iostream>
 #include <cctype>
 
