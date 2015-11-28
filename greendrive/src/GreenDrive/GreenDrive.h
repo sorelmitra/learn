@@ -18,10 +18,12 @@ public:
 	Car();
 	~Car();
 
+	static void parse(std::string fname, Car *&cars, size_t &carsCount);
+
 	friend std::ostream& operator<<(std::ostream& os, const Car &car);
 
-	void setName(char *name);
-	char *getName() const;
+	void setName(std::string name);
+	std::string getName() const;
 	void setEngineType(CarEngineTypes engineType);
 	CarEngineTypes getEngineType() const;
 	void setMaxSpeed(unsigned short maxSpeed);
@@ -38,7 +40,7 @@ public:
 	unsigned short getAverageSpeed() const;
 
 private:
-	char *name;
+	std::string name;
 	CarEngineTypes engineType;
 	unsigned short maxSpeed;
 	unsigned short displacement;
@@ -53,7 +55,8 @@ public:
 	Menu();
 	int run();
 private:
-	void prepareMenu(char *title);
+	void readRequiredData();
+	void prepareMenu(std::string title);
 	void showMenuInput();
 	void selectCar();
 	void carOptions(size_t carIndex);

@@ -6,7 +6,9 @@
 #include "GreenDrive.h"
 
 #include <iostream>
+#include <fstream>
 #include <cctype>
+#include <string>
 
 using namespace std;
 
@@ -15,7 +17,7 @@ using namespace std;
 
 Car::Car()
 {
-	name = 0;
+	name = "";
 	engineType = ENGINE_TYPE_UNDEFINED;
 	maxSpeed = 0;
 	displacement = 0;
@@ -27,18 +29,29 @@ Car::Car()
 
 Car::~Car()
 {
-	if (name) {
-		delete name;
-		name = 0;
+}
+
+void Car::parse(std::string fname, Car *& cars, size_t & carsCount)
+{
+	ifstream ifs(fname);
+	if (!ifs.is_open()) {
+		throw runtime_error(string("Nu pot citi din fisierul '") + fname + "'");
+	}
+
+	enum ParseStates {WAIT, BEGIN_AUTO, IN_AUTO};
+	ParseStates state = WAIT;
+	string line;
+	while (getline(ifs, line)) {
+
 	}
 }
 
-void Car::setName(char * name)
+void Car::setName(string name)
 {
 	this->name = name;
 }
 
-char * Car::getName() const
+string Car::getName() const
 {
 	return name;
 }
@@ -116,7 +129,7 @@ unsigned short Car::getAverageSpeed() const
 ostream& operator<<(ostream& os, const Car &car)
 {
 	os << endl;
-	os << "Nume autovehicul:    " << car.getName() << endl;
+	os << "Nume autovehicul:    " << car.getName().c_str() << endl;
 
 	os << "Motor:               ";
 	switch (car.getEngineType()) {
@@ -144,10 +157,13 @@ ostream& operator<<(ostream& os, const Car &car)
 
 Menu::Menu()
 {
+	cars = 0;
+	carsCount = 0;
 }
 
 int Menu::run()
 {
+	readRequiredData();
 	char c;
 	while (true) {
 		prepareMenu("Meniu Principal");
@@ -162,15 +178,26 @@ int Menu::run()
 	}
 }
 
+void Menu::readRequiredData()
+{
+	try {
+		Car::parse("auto.txt", cars, carsCount);
+	}
+	catch (runtime_error e) {
+		cout << e.what() << endl;
+		cout << "Nu avem autovehicule in aplicatie." << endl;
+	}
+}
+
 void Menu::showMenuInput()
 {
 	cout << "Alegeti optiunea > ";	
 }
 
-void Menu::prepareMenu(char *title)
+void Menu::prepareMenu(string title)
 {
 	cout << endl;
-	cout << "===== " << title << " =====" << endl;
+	cout << "===== " << title.c_str() << " =====" << endl;
 	cout << endl;
 }
 
@@ -181,7 +208,7 @@ void Menu::selectCar()
 		char opt = '0';
 		size_t i;
 		for (i = 0; i < carsCount; i++) {
-			cout << opt++ << " - " << cars[i].getName() << endl;
+			cout << opt++ << " - " << cars[i].getName().c_str() << endl;
 		}
 		cout << "I - Iesire" << endl;
 		showMenuInput();
@@ -207,7 +234,7 @@ void Menu::carOptions(size_t carIndex)
 {
 	char c;
 	while (true) {
-		prepareMenu("Autovehicul");
+		prepareMenu(string("Autovehicul ") + cars[carIndex].getName());
 		cout << "A - Afisare date autovehicul" << endl;
 		cout << "T - Afisare trasee autovehicul" << endl;
 		cout << "I - Iesire" << endl;
