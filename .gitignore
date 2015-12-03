@@ -10,6 +10,10 @@ iOS
 java
 javascript/test.htm
 javascript/node.js/readwords
+javascript/angularjs/**
+javascript/node.js/censorify/**
+mono
+aspnet5
 make
 network
 objective-c
