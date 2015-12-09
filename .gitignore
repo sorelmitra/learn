@@ -9,9 +9,10 @@ gpb
 iOS
 java
 javascript/test.htm
-javascript/node.js/readwords
+javascript/node.js/censorify/readwords
 javascript/angularjs/**
-javascript/node.js/censorify/**
+**/node_modules/**
+**/*.tgz
 mono
 aspnet5
 make
