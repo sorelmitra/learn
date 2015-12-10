@@ -2,10 +2,48 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Launch app.js",
+			"name": "app",
 			"type": "node",
 			"request": "launch",
 			"program": "app.js",
+			"stopOnEntry": false,
+			"args": [],
+			"cwd": ".",
+			"runtimeExecutable": null,
+			"runtimeArgs": [
+				"--nolazy"
+			],
+			"env": {
+				"NODE_ENV": "development"
+			},
+			"externalConsole": false,
+			"sourceMaps": false,
+			"outDir": null
+		},
+		{
+			"name": "server_http",
+			"type": "node",
+			"request": "launch",
+			"program": "server_http.js",
+			"stopOnEntry": false,
+			"args": [],
+			"cwd": ".",
+			"runtimeExecutable": null,
+			"runtimeArgs": [
+				"--nolazy"
+			],
+			"env": {
+				"NODE_ENV": "development"
+			},
+			"externalConsole": false,
+			"sourceMaps": false,
+			"outDir": null
+		},
+		{
+			"name": "server_connect",
+			"type": "node",
+			"request": "launch",
+			"program": "server_connect.js",
 			"stopOnEntry": false,
 			"args": [],
 			"cwd": ".",
