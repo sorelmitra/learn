@@ -1,6 +1,69 @@
 #pragma once
 
 #include <iostream>
+#include <list>
+// #include <WinSock2.h> // for timeval
+
+class Parser
+{
+public:
+	static bool isEmpty(const std::string &line);
+	static bool parseProperty(const std::string &line, std::string &prop, std::string &value);
+	static std::string trim(std::string s);
+
+private:
+	Parser(); // you don't instantiate objects of this type
+
+	static std::string trimLeft(std::string s);
+	static std::string trimRight(std::string s);
+};
+
+class CarPosition
+{
+public:
+	CarPosition();
+	~CarPosition();
+
+	std::string getCarName() const;
+	void setCarName(std::string carName);
+	long long getMilliseconds() const;
+	void setMilliseconds(long long milliseconds);
+	double getLatitude() const;
+	void setLatitude(double latitude);
+	double getLongitude() const;
+	void setLongitude(double longitude);
+	unsigned short getSpeed() const;
+	void setSpeed(unsigned short speed);
+
+	friend std::ostream &operator<<(std::ostream &os, const CarPosition carPos);
+
+private:
+	std::string carName;
+	long long milliseconds;
+	double latitude;
+	double longitude;
+	unsigned short speed;
+};
+
+class Car;
+class Menu;
+
+class CarRoute
+{
+public:
+	CarRoute();
+	~CarRoute();
+
+	static void parse(std::string fname, Car *cars, size_t &carsCount);
+
+	std::list<CarPosition> &getPositions();
+
+private:
+	static Car *getCarByName(std::string name, Car *cars, size_t &carsCount);
+
+private:
+	std::list<CarPosition> positions;
+};
 
 enum CarEngineTypes {
 	ENGINE_TYPE_UNDEFINED = 0,
@@ -38,6 +101,20 @@ public:
 	unsigned char getAverageConsumption() const;
 	void setAverageSpeed(unsigned short averageSpeed);
 	unsigned short getAverageSpeed() const;
+	CarRoute &getRoute();
+	void setRoute(CarRoute route);
+
+	// Parsing "setters"
+	void setEngineType(std::string str);
+	void setMaxSpeed(std::string str);
+	void setDisplacement(std::string str);
+	void setUrbanAverageConsumption(std::string str);
+	void setUrbanAverageSpeed(std::string str);
+	void setAverageConsumption(std::string str);
+	void setAverageSpeed(std::string str);
+
+private:
+	static int countCars(std::string fname);
 
 private:
 	std::string name;
@@ -48,19 +125,24 @@ private:
 	unsigned short urbanAverageSpeed;
 	unsigned char averageConsumption;
 	unsigned short averageSpeed;
+
+	CarRoute route;
 };
 
 class Menu {
 public:
 	Menu();
 	int run();
+
 private:
 	void readRequiredData();
 	void prepareMenu(std::string title);
 	void showMenuInput();
+	char readUserInput();
 	void selectCar();
 	void carOptions(size_t carIndex);
 	void carRoutes(size_t carIndex);
+
 private:
 	size_t carsCount;
 	Car *cars;

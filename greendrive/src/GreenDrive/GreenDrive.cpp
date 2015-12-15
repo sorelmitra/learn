@@ -9,8 +9,216 @@
 #include <fstream>
 #include <cctype>
 #include <string>
+#include <iomanip>
 
 using namespace std;
+
+
+///// Parser /////
+
+bool Parser::isEmpty(const string & line)
+{
+	return (string::npos == line.find_first_not_of(" \t\n"));
+}
+
+bool Parser::parseProperty(const string & line, string & prop, string & value)
+{
+	size_t colonPos = line.find_first_of(":");
+	if (string::npos == colonPos) {
+		return false;
+	}
+
+	prop = trim(line.substr(0, colonPos));
+	value = trim(line.substr(colonPos + 1));
+	return true;
+}
+
+std::string Parser::trimLeft(std::string s)
+{
+	size_t pos = s.find_first_not_of(" \t\n");
+	if (string::npos == pos) {
+		return std::string();
+	}
+
+	return s.substr(pos);
+}
+
+std::string Parser::trimRight(std::string s)
+{
+	size_t pos = s.find_last_not_of(" \t\n");
+	if (string::npos == pos) {
+		return std::string();
+	}
+
+	return s.substr(0, pos + 1);
+}
+
+std::string Parser::trim(std::string s)
+{
+	return trimRight(trimLeft(s));
+}
+
+
+///// CarPosition /////
+
+CarPosition::CarPosition()
+{
+}
+
+CarPosition::~CarPosition()
+{
+}
+
+std::string CarPosition::getCarName() const
+{
+	return carName;
+}
+
+void CarPosition::setCarName(std::string carName)
+{
+	this->carName = carName;
+}
+
+long long CarPosition::getMilliseconds() const
+{
+	return milliseconds;
+}
+
+void CarPosition::setMilliseconds(long long milliseconds)
+{
+	this->milliseconds = milliseconds;
+}
+
+double CarPosition::getLatitude() const
+{
+	return latitude;
+}
+
+void CarPosition::setLatitude(double latitude)
+{
+	this->latitude = latitude;
+}
+
+double CarPosition::getLongitude() const
+{
+	return longitude;
+}
+
+void CarPosition::setLongitude(double longitude)
+{
+	this->longitude = longitude;
+}
+
+unsigned short CarPosition::getSpeed() const
+{
+	return speed;
+}
+
+void CarPosition::setSpeed(unsigned short speed)
+{
+	this->speed = speed;
+}
+
+ostream &operator<<(ostream &os, const CarPosition carPos)
+{
+	os << "Autovehicul:   " << carPos.getCarName() << endl;
+
+
+	os << "Timp (ms):     " << carPos.getMilliseconds() << endl;
+
+	os << "Latitudine:    " << setprecision(7) << carPos.getLatitude() << endl;
+	os << "Longitudine:   " << setprecision(7) << carPos.getLongitude() << endl;
+	os << "Viteza:        " << carPos.getSpeed() << endl;
+
+	return os;
+}
+
+
+///// CarRoute /////
+
+CarRoute::CarRoute()
+{
+	positions = list<CarPosition>();
+}
+
+CarRoute::~CarRoute()
+{
+}
+
+void CarRoute::parse(std::string fname, Car * cars, size_t & carsCount)
+{
+	ifstream ifs(fname);
+	if (!ifs.is_open()) {
+		throw runtime_error(string("Nu pot citi din fisierul '") + fname + "'");
+	}
+
+	cout << "Citim datele despre trasee ";
+
+	enum CAR_POS_STATE {CPS_NAME, CPS_TIME, CPS_LAT, CPS_LONG, CPS_SPEED };
+	string line;
+	CarPosition carPos;
+	CAR_POS_STATE state = CPS_NAME;
+	int n = 0;
+	while (getline(ifs, line)) {
+		switch (state)
+		{
+		case CPS_NAME:
+			carPos.setCarName(Parser::trim(line));
+			state = CPS_TIME;
+			continue;
+		case CPS_TIME:
+			carPos.setMilliseconds(stoll(line));
+			state = CPS_LAT;
+			continue;
+		case CPS_LAT:
+			carPos.setLatitude(stod(line));
+			state = CPS_LONG;
+			continue;
+		case CPS_LONG:
+			carPos.setLongitude(stod(line));
+			state = CPS_SPEED;
+			continue;
+		case CPS_SPEED:
+			carPos.setSpeed(stoi(line));
+			state = CPS_NAME;
+			break;
+		default:
+			cout << "EROARE: Stare necunoscuta " << state << endl;
+			continue;
+		}
+
+		Car *car = getCarByName(carPos.getCarName(), cars, carsCount);
+		if (car == 0) {
+			cout << "EROARE: Am pozitia unui autovehicul pe care nu-l am in lista: <" << carPos.getCarName() << ">" << endl;
+			continue;
+		}
+		car->getRoute().positions.push_back(carPos);
+		n++;
+
+		if (n % 10000 == 0) {
+			cout << ".";
+		}
+	}
+
+	cout << endl;
+	cout << "Am citit in total " << n << " pozitii pentru toate autovehiculele." << endl;
+}
+
+std::list<CarPosition> &CarRoute::getPositions()
+{
+	return positions;
+}
+
+Car * CarRoute::getCarByName(std::string name, Car * cars, size_t & carsCount)
+{
+	for (size_t i = 0; i < carsCount; i++) {
+		if (0 == name.compare(cars[i].getName())) {
+			return cars + i;
+		}
+	}
+
+	return 0;
+}
 
 
 ///// Car /////
@@ -38,12 +246,51 @@ void Car::parse(std::string fname, Car *& cars, size_t & carsCount)
 		throw runtime_error(string("Nu pot citi din fisierul '") + fname + "'");
 	}
 
-	enum ParseStates {WAIT, BEGIN_AUTO, IN_AUTO};
-	ParseStates state = WAIT;
-	string line;
-	while (getline(ifs, line)) {
+	int n = countCars(fname);
+	cars = new Car[n];
 
+	string line;
+	int i = -1;
+	while ((i < n) && getline(ifs, line)) {
+		string prop, value;
+		if (Parser::isEmpty(line)) {
+			continue;
+		}
+
+		if (!Parser::parseProperty(line, prop, value)) {
+			i++;
+			cars[i].setName(Parser::trim(line));
+			continue;
+		}
+
+		if (0 == prop.compare("engine")) {
+			cars[i].setEngineType(value);
+		}
+		else if (0 == prop.compare("max_speed")) {
+			cars[i].setMaxSpeed(value);
+		}
+		else if (0 == prop.compare("engine_cc")) {
+			cars[i].setDisplacement(value);
+		}
+		else if (0 == prop.compare("avg_consumption_urban")) {
+			cars[i].setUrbanAverageConsumption(value);
+		}
+		else if (0 == prop.compare("avg_speed_urban")) {
+			cars[i].setUrbanAverageSpeed(value);
+		}
+		else if (0 == prop.compare("avg_consumption")) {
+			cars[i].setAverageConsumption(value);
+		}
+		else if (0 == prop.compare("avg_speed")) {
+			cars[i].setAverageSpeed(value);
+		}
+		else {
+			cout << "EROARE: Proprietate autovehicul necunoscuta <" << prop << ">" << endl;
+		}
 	}
+
+	carsCount = i + 1;
+	cout << "S-au citit " << carsCount << " autovehicule din " << n << endl;
 }
 
 void Car::setName(string name)
@@ -126,6 +373,87 @@ unsigned short Car::getAverageSpeed() const
 	return averageSpeed;
 }
 
+CarRoute &Car::getRoute()
+{
+	return route;
+}
+
+void Car::setRoute(CarRoute route)
+{
+	this->route = route;
+}
+
+// Parsing "setters"
+
+void Car::setEngineType(std::string str)
+{
+	if (0 == str.compare("gasoline")) {
+		this->engineType = ENGINE_TYPE_GASOLINE;
+	} else if (0 == str.compare("diesel")) {
+		this->engineType = ENGINE_TYPE_DIESEL;
+	} else if (0 == str.compare("hybrid")) {
+		this->engineType = ENGINE_TYPE_HYBRID;
+	} else if (0 == str.compare("electrical")) {
+		this->engineType = ENGINE_TYPE_ELECTRICAL;
+	} else {
+		this->engineType = ENGINE_TYPE_UNDEFINED;
+		cout << "EROARE: Tip motor necunoscut <" << str << ">" << endl;
+	}
+}
+
+void Car::setMaxSpeed(std::string str)
+{
+	this->maxSpeed = std::stoi(str);
+}
+
+void Car::setDisplacement(std::string str)
+{
+	this->displacement = std::stoi(str);
+}
+
+void Car::setUrbanAverageConsumption(std::string str)
+{
+	this->urbanAverageConsumption = std::stoi(str);
+}
+
+void Car::setUrbanAverageSpeed(std::string str)
+{
+	this->urbanAverageSpeed = std::stoi(str);
+}
+
+void Car::setAverageConsumption(std::string str)
+{
+	this->averageConsumption = std::stoi(str);
+}
+
+void Car::setAverageSpeed(std::string str)
+{
+	this->averageSpeed = std::stoi(str);
+}
+
+int Car::countCars(std::string fname)
+{
+	ifstream ifs(fname);
+	if (!ifs.is_open()) {
+		throw runtime_error(string("Nu pot citi din fisierul '") + fname + "'");
+	}
+
+	int n = 0;
+	string line;
+	while (getline(ifs, line)) {
+		string prop, value;
+		if (Parser::isEmpty(line)) {
+			continue;
+		}
+		// Any line that is not a property and is not empty is a car name, thus increase cars count
+		if (!Parser::parseProperty(line, prop, value)) {
+			n++;
+		}
+	}
+
+	return n;
+}
+
 ostream& operator<<(ostream& os, const Car &car)
 {
 	os << endl;
@@ -133,19 +461,19 @@ ostream& operator<<(ostream& os, const Car &car)
 
 	os << "Motor:               ";
 	switch (car.getEngineType()) {
-	case ENGINE_TYPE_GASOLINE: os << "Benzina";
-	case ENGINE_TYPE_DIESEL: os << "Diesel";
-	case ENGINE_TYPE_HYBRID: os << "Hibrid";
-	case ENGINE_TYPE_ELECTRICAL: os << "Electric";
-	default: cout << "Necunoscut!";
+	case ENGINE_TYPE_GASOLINE: os << "Benzina"; break;
+	case ENGINE_TYPE_DIESEL: os << "Diesel"; break;
+	case ENGINE_TYPE_HYBRID: os << "Hibrid"; break;
+	case ENGINE_TYPE_ELECTRICAL: os << "Electric"; break;
+	default: cout << "Necunoscut!"; break;
 	}
 	os << endl;
 
 	os << "Viteza maxima:       " << car.getMaxSpeed() << endl;
 	os << "Cilindree:           " << car.getDisplacement() << endl;
-	os << "Consum mediu urban:  " << car.getUrbanAverageConsumption() << endl;
+	os << "Consum mediu urban:  " << (int)car.getUrbanAverageConsumption() << endl;
 	os << "Viteza medie urbana: " << car.getUrbanAverageSpeed() << endl;
-	os << "Consum mediu:        " << car.getAverageConsumption() << endl;
+	os << "Consum mediu:        " << (int)car.getAverageConsumption() << endl;
 	os << "Viteza medie:        " << car.getAverageSpeed() << endl;
 	os << endl;
 
@@ -164,13 +492,11 @@ Menu::Menu()
 int Menu::run()
 {
 	readRequiredData();
-	char c;
 	while (true) {
 		prepareMenu("Meniu Principal");
 		cout << "A - Selectie autovehicul" << endl;
 		cout << "I - Iesire" << endl;
-		showMenuInput();
-		cin >> c;
+		char c = readUserInput();
 		switch(tolower(c)) {
 		case 'a': selectCar(); break;
 		case 'i': return 0;
@@ -182,16 +508,25 @@ void Menu::readRequiredData()
 {
 	try {
 		Car::parse("auto.txt", cars, carsCount);
+		CarRoute::parse("telematics.txt", cars, carsCount);
 	}
 	catch (runtime_error e) {
 		cout << e.what() << endl;
-		cout << "Nu avem autovehicule in aplicatie." << endl;
 	}
 }
 
 void Menu::showMenuInput()
 {
 	cout << "Alegeti optiunea > ";	
+}
+
+char Menu::readUserInput()
+{
+	showMenuInput();
+	char c;
+	cin >> c;
+	cout << endl << "==========================================" << endl << endl;
+	return c;
 }
 
 void Menu::prepareMenu(string title)
@@ -211,10 +546,8 @@ void Menu::selectCar()
 			cout << opt++ << " - " << cars[i].getName().c_str() << endl;
 		}
 		cout << "I - Iesire" << endl;
-		showMenuInput();
-		
-		char c;
-		cin >> c;
+		char c = readUserInput();
+
 		if (c == 'i') return;
 		opt = '0';
 		for (i = 0; i < carsCount; i++) {
@@ -232,14 +565,12 @@ void Menu::selectCar()
 
 void Menu::carOptions(size_t carIndex)
 {
-	char c;
 	while (true) {
 		prepareMenu(string("Autovehicul ") + cars[carIndex].getName());
 		cout << "A - Afisare date autovehicul" << endl;
 		cout << "T - Afisare trasee autovehicul" << endl;
 		cout << "I - Iesire" << endl;
-		showMenuInput();
-		cin >> c;
+		char c = readUserInput();
 		switch (tolower(c)) {
 		case 'a': cout << cars[carIndex]; break;
 		case 't': carRoutes(carIndex); break;
@@ -250,7 +581,18 @@ void Menu::carOptions(size_t carIndex)
 
 void Menu::carRoutes(size_t carIndex)
 {
-	cout << endl << "NOT IMPLEMENTED!" << endl;
+	int n = 3;
+
+	cout << endl << "Afisam primele " << n << " pozitii" << endl << endl;
+	std::list<CarPosition> &positions = cars[carIndex].getRoute().getPositions();
+	for (std::list<CarPosition>::iterator it = positions.begin();
+			(n > 0) && (it != positions.end());
+			it++, n--) {
+		CarPosition carPos = *it;
+		cout << carPos << endl;
+	}
+
+	cout << endl << "Mai e de IMPLEMENTAT!" << endl;
 }
 
 
