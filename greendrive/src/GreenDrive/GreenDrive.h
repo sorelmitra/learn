@@ -45,6 +45,24 @@ private:
 	unsigned short speed;
 };
 
+class CarRouteSegment
+{
+public:
+	CarRouteSegment();
+	~CarRouteSegment();
+
+	CarPosition getStart();
+	void setStart(CarPosition pos);
+	CarPosition getEnd();
+	void setEnd(CarPosition pos);
+
+	friend std::ostream &operator<<(std::ostream &os, CarRouteSegment &segment);
+
+private:
+	CarPosition start;
+	CarPosition end;
+};
+
 class Car;
 class Menu;
 
@@ -57,6 +75,25 @@ public:
 	static void parse(std::string fname, Car *cars, size_t &carsCount);
 
 	std::list<CarPosition> &getPositions();
+
+	class iterator;
+	friend class iterator;
+	class iterator
+	{
+	public:
+		iterator(CarRoute &route, std::list<CarPosition>::iterator posIt);
+		bool operator!=(iterator other);
+		CarRouteSegment operator*();
+		iterator &operator++(int);
+
+	private:
+		CarRoute &route;
+		std::list<CarPosition>::iterator posIt;
+		CarRouteSegment segment;
+	};
+
+	iterator constantSpeedSegmentsBegin();
+	iterator constantSpeedSegmentsEnd();
 
 private:
 	static Car *getCarByName(std::string name, Car *cars, size_t &carsCount);

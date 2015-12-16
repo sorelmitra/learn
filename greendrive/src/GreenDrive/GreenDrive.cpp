@@ -62,6 +62,7 @@ std::string Parser::trim(std::string s)
 ///// CarPosition /////
 
 CarPosition::CarPosition()
+	: carName(""), milliseconds(0), latitude(0), longitude(0), speed(0)
 {
 }
 
@@ -131,6 +132,83 @@ ostream &operator<<(ostream &os, const CarPosition carPos)
 	os << "Viteza:        " << carPos.getSpeed() << endl;
 
 	return os;
+}
+
+
+///// CarRouteSegment /////
+
+CarRouteSegment::CarRouteSegment()
+{
+}
+
+CarRouteSegment::~CarRouteSegment()
+{
+}
+
+CarPosition CarRouteSegment::getStart()
+{
+	return start;
+}
+
+void CarRouteSegment::setStart(CarPosition pos)
+{
+	start = pos;
+}
+
+CarPosition CarRouteSegment::getEnd()
+{
+	return end;
+}
+
+void CarRouteSegment::setEnd(CarPosition pos)
+{
+	end = pos;
+}
+
+std::ostream &operator<<(std::ostream &os, CarRouteSegment &segment)
+{
+	os << "Viteza " << segment.start.getSpeed() << " km/h";
+	os << "; distanta (" << setprecision(7) << segment.end.getLatitude() - segment.start.getLatitude() << ", " << segment.end.getLongitude() - segment.start.getLongitude() << ") grade";
+	os << "; durata " << (segment.end.getMilliseconds() - segment.start.getMilliseconds()) / 1000 << " sec";
+	os << endl;
+	return os;
+}
+
+
+///// CarRoute::iterator /////
+
+CarRoute::iterator::iterator(CarRoute &route, std::list<CarPosition>::iterator posIt)
+	: posIt(posIt), route(route)
+{
+	if (posIt == route.positions.end()) {
+		return;
+	}
+
+	(*this)++;
+}
+
+CarRoute::iterator &CarRoute::iterator::operator++(int)
+{
+	segment.setStart(*posIt);
+	segment.setEnd(segment.getStart());
+	for (; posIt != route.positions.end(); posIt++) {
+		CarPosition pos = *posIt;
+		if (pos.getSpeed() != segment.getStart().getSpeed()) {
+			break;
+		}
+		segment.setEnd(pos);
+	}
+	return *this;
+}
+
+bool CarRoute::iterator::operator!=(iterator other)
+{
+	return posIt != other.posIt;
+}
+
+CarRouteSegment CarRoute::iterator::operator*()
+{
+	return segment;
 }
 
 
@@ -207,6 +285,16 @@ void CarRoute::parse(std::string fname, Car * cars, size_t & carsCount)
 std::list<CarPosition> &CarRoute::getPositions()
 {
 	return positions;
+}
+
+CarRoute::iterator CarRoute::constantSpeedSegmentsBegin()
+{
+	return CarRoute::iterator(*this, positions.begin());
+}
+
+CarRoute::iterator CarRoute::constantSpeedSegmentsEnd()
+{
+	return CarRoute::iterator(*this, positions.end());
 }
 
 Car * CarRoute::getCarByName(std::string name, Car * cars, size_t & carsCount)
@@ -581,15 +669,13 @@ void Menu::carOptions(size_t carIndex)
 
 void Menu::carRoutes(size_t carIndex)
 {
-	int n = 3;
+	cout << endl << "Afisam traseul pe segmente cu viteza constanta " << endl << endl;
 
-	cout << endl << "Afisam primele " << n << " pozitii" << endl << endl;
-	std::list<CarPosition> &positions = cars[carIndex].getRoute().getPositions();
-	for (std::list<CarPosition>::iterator it = positions.begin();
-			(n > 0) && (it != positions.end());
-			it++, n--) {
-		CarPosition carPos = *it;
-		cout << carPos << endl;
+	CarRoute &route = cars[carIndex].getRoute();
+	int n = 0;
+	for (CarRoute::iterator it = route.constantSpeedSegmentsBegin(); it != route.constantSpeedSegmentsEnd(); it++) {
+		CarRouteSegment segment = *it;
+		cout << "Segment " << ++n << ": " << segment << endl;
 	}
 
 	cout << endl << "Mai e de IMPLEMENTAT!" << endl;
