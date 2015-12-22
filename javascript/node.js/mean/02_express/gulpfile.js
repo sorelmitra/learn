@@ -8,6 +8,7 @@ gulp.task('default', function() {
 		env: {
 			PORT: 5001,
 			NODE_ENV: 'development'
+			//NODE_ENV: 'production'
 		},
 		ignore: [
 			'./node_modules/**', 
