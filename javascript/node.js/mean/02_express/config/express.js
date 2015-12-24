@@ -36,7 +36,9 @@ module.exports = function() {
     }));
 	
 	var route = require('../app/routes/index.server.routes'); // get our index routes
-	route(app); // this connects the route to the controller
+	route(app); // this connects the route to the corresponding controller
 	
+    require('../app/routes/users.server.routes')(app); // get our users routes, and connect them to the corresponding controller; shortcut version without a variable
+    
 	return app;
 };
