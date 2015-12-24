@@ -7,8 +7,13 @@ var mongoose = require('./config/mongoose');
 var port = process.env.PORT || 3000;
 
 var db = mongoose();
-var app = express();
-app.listen(port);
-module.exports = app;
+db.on('error', console.error.bind(console, 'database connection error:'));
 
-console.log("Listening on port " + port);
+db.on('open', function() {
+    var app = express();
+    app.listen(port);
+    module.exports = app;
+
+    console.log("Listening on port " + port);
+});
+
