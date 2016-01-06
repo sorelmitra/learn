@@ -5,3 +5,5 @@
 **/ipch
 **/*.sdf
 **/*.opensdf
+**/*.VC.opendb
+**/*.vcxproj.user
