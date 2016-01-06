@@ -18,90 +18,6 @@ private:
 	static std::string trimRight(std::string s);
 };
 
-class CarPosition
-{
-public:
-	CarPosition();
-	~CarPosition();
-
-	std::string getCarName() const;
-	void setCarName(std::string carName);
-	long long getMilliseconds() const;
-	void setMilliseconds(long long milliseconds);
-	double getLatitude() const;
-	void setLatitude(double latitude);
-	double getLongitude() const;
-	void setLongitude(double longitude);
-	unsigned short getSpeed() const;
-	void setSpeed(unsigned short speed);
-
-	friend std::ostream &operator<<(std::ostream &os, const CarPosition carPos);
-
-private:
-	std::string carName;
-	long long milliseconds;
-	double latitude;
-	double longitude;
-	unsigned short speed;
-};
-
-class CarRouteSegment
-{
-public:
-	CarRouteSegment();
-	~CarRouteSegment();
-
-	CarPosition getStart();
-	void setStart(CarPosition pos);
-	CarPosition getEnd();
-	void setEnd(CarPosition pos);
-
-	friend std::ostream &operator<<(std::ostream &os, CarRouteSegment &segment);
-
-private:
-	CarPosition start;
-	CarPosition end;
-};
-
-class Car;
-class Menu;
-
-class CarRoute
-{
-public:
-	CarRoute();
-	~CarRoute();
-
-	static void parse(std::string fname, Car *cars, size_t &carsCount);
-
-	std::list<CarPosition> &getPositions();
-
-	class iterator;
-	friend class iterator;
-	class iterator
-	{
-	public:
-		iterator(CarRoute &route, std::list<CarPosition>::iterator posIt);
-		bool operator!=(iterator other);
-		CarRouteSegment operator*();
-		iterator &operator++(int);
-
-	private:
-		CarRoute &route;
-		std::list<CarPosition>::iterator posIt;
-		CarRouteSegment segment;
-	};
-
-	iterator constantSpeedSegmentsBegin();
-	iterator constantSpeedSegmentsEnd();
-
-private:
-	static Car *getCarByName(std::string name, Car *cars, size_t &carsCount);
-
-private:
-	std::list<CarPosition> positions;
-};
-
 enum CarEngineTypes {
 	ENGINE_TYPE_UNDEFINED = 0,
 
@@ -138,8 +54,6 @@ public:
 	unsigned char getAverageConsumption() const;
 	void setAverageSpeed(unsigned short averageSpeed);
 	unsigned short getAverageSpeed() const;
-	CarRoute &getRoute();
-	void setRoute(CarRoute route);
 
 	// Parsing "setters"
 	void setEngineType(std::string str);
@@ -162,8 +76,6 @@ private:
 	unsigned short urbanAverageSpeed;
 	unsigned char averageConsumption;
 	unsigned short averageSpeed;
-
-	CarRoute route;
 };
 
 class Menu {
