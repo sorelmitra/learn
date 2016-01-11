@@ -1,8 +1,10 @@
 .DS_Store
 android
+aspnet5
 autotools
 c++
 cocoa
+ditaa
 dot
 embedded
 gpb
@@ -14,7 +16,6 @@ javascript/angularjs/**
 **/node_modules/**
 **/*.tgz
 mono
-aspnet5
 make
 network
 objective-c
