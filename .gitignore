@@ -16,6 +16,7 @@ javascript/angularjs/**
 javascript/ECMAScript
 **/node_modules/**
 **/*.tgz
+**/npm-debug.log*
 mono
 make
 network
