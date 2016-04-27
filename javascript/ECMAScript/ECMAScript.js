@@ -57,8 +57,7 @@ baz(); // 2 -- Whoa, closure was just observed, man.
 
 // Sorel: Calling bar via baz as above produces 2 because bar has a reference to variable "a". This reference is called "closure". This example and explanation is taken from the "You Don't Know JS" book, and it is consistent with my assumption of a reference-counting mechanism that allows closures to exist - Hmmm, although a few lines later the author calls this reference a "scope reference"
 
-console.log("I'm trying to access that variable that baz (which is a reference to bar) said to have a closure on");
-//console.log(a); // ReferenceError, a is not declared in this scope; although baz still has access to it thanks to its closure (=reference) on it
+// console.log("I'm trying to access that variable that baz (which is a reference to bar) said to have a closure on, a = ", a); // ReferenceError, a is not declared in this scope; although baz still has access to it thanks to its closure (=reference) on it
 
 
 // Another closure example from the YDKJS book - trying to print incremented numbers at 1-second intervals using setTimeout
@@ -123,4 +122,53 @@ var robot = Robot();
 robot.init("robo", "cleaning");
 robot.perform();
 
-robot.doInit("illegal", "illegal"); // Fires a TypeError exception: doInit is not accessible
+// robot.doInit("illegal", "illegal"); // Fires a TypeError exception: doInit is not accessible
+
+
+/**
+ * this
+ */
+
+
+var id = "not awesome";
+
+(function wrongTimeout1() {
+    var obj = {
+        id: "awesome 1",
+        cool: function coolFn() {
+            console.log( this.id );
+        }
+    };
+
+    obj.cool(); // awesome
+
+    setTimeout( obj.cool, 100 ); // not awesome (because of "this" binding)
+})();
+
+(function wrongTimeout2() {
+    var obj = {
+        id: "awesome 2",
+        cool: function coolFn() {
+            console.log( this.id );
+        },
+        coolTimeout: function coolTimeoutFn() {
+            setTimeout(this.cool, 100);
+        }
+    };
+
+    obj.coolTimeout(); // not awesome (because of "this" binding)
+})();
+
+(function rightTimeout() {
+    var obj = {
+        id: "awesome 3",
+        cool: function coolFn() {
+            console.log( this.id );
+        },
+        coolTimeout: function coolTimeoutFn() {
+            setTimeout(this.cool.bind(this), 100);
+        }
+    };
+
+    obj.coolTimeout(); // awesome 3 (because of correct "this" binding by using Function.prototype.bind)
+})();
