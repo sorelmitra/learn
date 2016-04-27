@@ -13,7 +13,6 @@ java
 javascript/test.htm
 javascript/node.js/censorify/readwords
 javascript/angularjs/**
-javascript/ECMAScript
 **/node_modules/**
 **/*.tgz
 **/npm-debug.log*
