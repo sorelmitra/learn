@@ -130,6 +130,8 @@ robot.perform();
  */
 
 
+// Quick sample about what "this" is NOT
+
 var id = "not awesome";
 
 (function wrongTimeout1() {
@@ -172,3 +174,41 @@ var id = "not awesome";
 
     obj.coolTimeout(); // awesome 3 (because of correct "this" binding by using Function.prototype.bind)
 })();
+
+
+// "this" is a binding made in the activation record (execution context) of a function. The activation record is created at the call-site of the function, and makes "this" to point to the object from where the function is called. In JavaScript, everything is an object (except simple primitives - string, number, boolean, null, and undefined), including the global script (variables declared in the global scope are actually part of the global object) and functions.
+
+// default binding
+function defaultBinding() {
+    console.log(this.defBind); // "this" points to the global object
+}
+var defBind = "(1) defBind is in fact <global object>.defBind (in browsers <global object> is window)";
+defaultBinding(); // "(1) ..."
+
+// default binding in strict mode
+function defaultBindingInStrictMode() {
+    "use strict";
+    console.log( this.defBind ); // "this" is undefined, because in strict mode the global object is not eligible for default binding
+}
+// defaultBindingInStrictMode(); // TypeError: this is undefined, because of strict mode
+(function immediatelyCalled() {
+    "use strict";
+    /*var*/ defBind = "(2) although we use strict mode here, the defaultBinding() function does not use strict mode, so 'this' is allowed to bind to the global object";
+    // Note: if we uncomment the "var" above, we will get at runtime the value of defBind "(1) ..." instead of "(2) ..." (!!!). Why? Because the IIFE creates its own scope, and putting "var" above will create a new variable in the scope of this IIFE. See below when using a normal function for an explanation.
+    defaultBinding();
+})();
+
+// default binding from another function
+function usingDefaultBinding() {
+    var defBind = "(3) I'm a function so I'm an object that can be passed as 'this'";
+    defaultBinding();
+}
+usingDefaultBinding(); // Will we get "(3) ..." ? NO!!! because not LEXICAL SCOPE is what determines "this" binding, but the OBJECT used when calling the function. In our case, although we call the function from usingDefaultBinding, we don't pass the usingDefaultBinding Function object when calling defaultBinding. So DEFAULT binding is performed.
+
+// default binding from another function
+function usingFunctionObjectBindingExplicitly() {
+    arguments.callee.defBind = "(4) Now we really pass the Function object as 'this'";
+    // Note: We want to pass the function object as "this", so we need defBind to be a part of that function object. If we say "var defBind = ..." above instead of "arguments.callee.defBind = ...", then defBind will be a variable partaining to the functions local LEXICAL SCOPE. So we need to make defBind part of the function object itself, so we use the above syntax 
+    defaultBinding.call(arguments.callee);
+}
+usingFunctionObjectBindingExplicitly();
