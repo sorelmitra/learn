@@ -178,7 +178,7 @@ var id = "not awesome";
 
 // "this" is a binding made in the activation record (execution context) of a function. The activation record is created at the call-site of the function, and makes "this" to point to the object from where the function is called. In JavaScript, everything is an object (except simple primitives - string, number, boolean, null, and undefined), including the global script (variables declared in the global scope are actually part of the global object) and functions.
 
-// default binding
+// 1. default binding
 function defaultBinding() {
     console.log(this.defBind); // "this" points to the global object
 }
@@ -212,3 +212,28 @@ function usingFunctionObjectBindingExplicitly() {
     defaultBinding.call(arguments.callee);
 }
 usingFunctionObjectBindingExplicitly();
+
+
+// 2. implicit binding, when calling from a context object
+
+function implicitBinding() {
+    console.log( this.a );
+}
+
+var obj = {
+    a: 2,
+    implicitBinding: implicitBinding
+};
+
+var obj2 = {
+    a: 42,
+    obj: obj
+};
+
+obj2.obj.implicitBinding(); // 2, only the last object matters
+
+var defaultBindingByMistake = obj.implicitBinding; // function reference/alias!
+
+var a = "oops, global"; // `a` also property on global object
+
+defaultBindingByMistake(); // "oops, global", because we call it without a context object
