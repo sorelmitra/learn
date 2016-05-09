@@ -62,32 +62,43 @@ baz(); // 2 -- Whoa, closure was just observed, man.
 
 // Another closure example from the YDKJS book - trying to print incremented numbers at 1-second intervals using setTimeout
 
-console.log("Try 1 I'm not counting numbers correctly");
+var timeout;
+
+timeout = 100;
+setTimeout(function log1() {
+    console.log("Try 1 I'm not counting numbers correctly")
+}, timeout);
 for (var i=1; i<=5; i++) {
     setTimeout( function timer(){
         console.log("Try 1 No %d", i);
-    }, i*100 );
+    }, timeout + i );
 }
 // The above code does not count correctly, because each call to setTimeout gives it a new function called "timer", and each "timer" functions have a closure on the same "i" variable. Whenever a "timer" function is called, it uses whatever value is in "i" at that time. By the time the for loop finishes, no timer function would have been called (not even if the interval would be 0). So when all timer functions are called, i is already 6
 
 // Let's fix it. The idea is to create a new scope for each "timer" function, scope that would make sure each "timer" function retains a reference to a variable with the proper value. To achieve this we use an Immediately Invoked Function Expression (IIFE), that creates a new scope. In this new scope we declare a new variable that has its value set to i's value. Because the IIFE is executed right-away, it will save in j the value of i at the moment of creating the timer. And since in the "timer" function we now use j, it will have the correct value. Since each time the loop is entered a new IIFE is created and executed, we effectively have 5 IIFEs, which create 5 scopes, each one with a "j" variable and a "timer" function passed to setTimeout
 // In ECMAScript 6 and above, we would have achieved the same efect *without* and IIFE but replacing "var j" with "let j". "let" turns a scopeless block into a scope (normally, only function blocks have a scope)
-console.log("Try 2 Now I'm counting numbers correctly");
+timeout = 200;
+setTimeout(function log2() {
+    console.log("Try 2 Now I'm counting numbers correctly")
+}, timeout);
 for (var i=1; i<=5; i++) {
     (function createAVariableInANewScope() {
         var j = i; // use "let" instead of "var" here and the code works without the createAVariableInANewScope function declaration
         setTimeout( function timer(){
             console.log("Try 2 No %d", j); // Must use j here, as j is set to the current value of i, and it will keep its value for the "timer" function
-        }, i*100 ) // I don't need to use j here as this expression is executed right away. I need to use j only in the function that will be executed later, function that will make use of the closured variable
+        }, timeout + i ) // I don't need to use j here as this expression is executed right away. I need to use j only in the function that will be executed later, function that will make use of the closured variable
     })();
 }
 
 // As stated above, in ECMAScript 6 we can use "let" to declare j and solve the problem without the need for an IIFE. Even better, if we use "let" in the for loop, the variable "i" will be declared not just once for the loop, but once for each iteration, setting it with the right value. This way the original code works in ECMAScript 6 if we just replace "var" with "let":
-console.log("Try 3 I'm counting numbers correctly using 'let' in ECMAScript 6");
+timeout = 300;
+setTimeout(function log3() {
+    console.log("Try 3 I'm counting numbers correctly using 'let' in ECMAScript 6")
+}, timeout);
 for (let i=1; i<=5; i++) {
     setTimeout( function timer(){
         console.log("Try 3 No %d", i);
-    }, i*100 );
+    }, timeout + i );
 }
 
 
@@ -144,7 +155,7 @@ var id = "not awesome";
 
     obj.cool(); // awesome
 
-    setTimeout( obj.cool, 100 ); // not awesome (because of "this" binding)
+    setTimeout( obj.cool, 400 ); // not awesome (because of "this" binding)
 })();
 
 (function wrongTimeout2() {
@@ -154,7 +165,7 @@ var id = "not awesome";
             console.log( this.id );
         },
         coolTimeout: function coolTimeoutFn() {
-            setTimeout(this.cool, 100);
+            setTimeout(this.cool, 500);
         }
     };
 
@@ -168,7 +179,7 @@ var id = "not awesome";
             console.log( this.id );
         },
         coolTimeout: function coolTimeoutFn() {
-            setTimeout(this.cool.bind(this), 100);
+            setTimeout(this.cool.bind(this), 600);
         }
     };
 
@@ -216,13 +227,13 @@ usingFunctionObjectBindingExplicitly();
 
 // 2. implicit binding, when calling from a context object
 
-function implicitBinding() {
-    console.log( this.a );
+function showA() {
+    console.log("a is ", this.a);
 }
 
 var obj = {
     a: 2,
-    implicitBinding: implicitBinding
+    showA: showA
 };
 
 var obj2 = {
@@ -230,10 +241,36 @@ var obj2 = {
     obj: obj
 };
 
-obj2.obj.implicitBinding(); // 2, only the last object matters
+obj2.obj.showA(); // 2, only the last object matters
 
-var defaultBindingByMistake = obj.implicitBinding; // function reference/alias!
+var defaultBindingByMistake = obj.showA; // function reference/alias!
 
 var a = "oops, global"; // `a` also property on global object
 
 defaultBindingByMistake(); // "oops, global", because we call it without a context object
+
+setTimeout(obj.showA, 700); // "oops, global", because setTimeout() has a function reference which it calls without a context object
+
+// 3. explicit binding
+
+showA.call(obj); // 2
+showA.call(obj2); // 42
+
+// Hard binding pattern
+function showAOfObj() {
+    return showA.apply(obj, arguments);
+}
+
+showAOfObj(); // 2
+setTimeout(showAOfObj, 710); // 2, because of hard binding: showAOfObj() always passes obj as "this"
+
+// Hard binding helper
+function bind(func, obj) {
+    return function() { // we return a function, as our purpose is to have a function that always has "this" set to obj
+        return func.apply(obj, arguments); // the function we return simply calls the function we receive as the first argument with all arguments
+    }
+}
+
+setTimeout(bind(showA, obj2), 720); // 42, because the hard binding helper bind() will always call showA() with a "this" set to obj2
+
+setTimeout(showA.bind(obj2), 730); // 42, this time using Function.prototype.bind(), introduced in ECMAScript 5
