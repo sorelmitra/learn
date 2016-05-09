@@ -189,6 +189,7 @@ var id = "not awesome";
 
 // "this" is a binding made in the activation record (execution context) of a function. The activation record is created at the call-site of the function, and makes "this" to point to the object from where the function is called. In JavaScript, everything is an object (except simple primitives - string, number, boolean, null, and undefined), including the global script (variables declared in the global scope are actually part of the global object) and functions.
 
+
 // 1. default binding
 function defaultBinding() {
     console.log(this.defBind); // "this" points to the global object
@@ -251,6 +252,7 @@ defaultBindingByMistake(); // "oops, global", because we call it without a conte
 
 setTimeout(obj.showA, 700); // "oops, global", because setTimeout() has a function reference which it calls without a context object
 
+
 // 3. explicit binding
 
 showA.call(obj); // 2
@@ -274,3 +276,42 @@ function bind(func, obj) {
 setTimeout(bind(showA, obj2), 720); // 42, because the hard binding helper bind() will always call showA() with a "this" set to obj2
 
 setTimeout(showA.bind(obj2), 730); // 42, this time using Function.prototype.bind(), introduced in ECMAScript 5
+
+// Function.prototype.bind() can also be used for default arguments
+function sum(a, b) {
+    console.log("the sum is", a + b);
+}
+var s = sum.bind(null, 4); // "this" is set to null, 'cause we don't care for it, we just use the default arguments
+s(3); // 7
+
+
+// 4. "new" binding
+
+function dummy() {
+    this.a = 57;
+}
+
+var d = new dummy(); // "new" does the following: 1) creates a new object; 2) sets it's prototype (not used here); 3) sets "this" to point to the newly created object for the dummy() function; 4) makes dummy() return the newly created object (unless dummy() returns something else)
+console.log("my dummy is", d.a);
+
+
+// Precedence of bindings
+
+// explicit has precedence over implicit
+obj.showA.call(obj2); // 42; explicit binding has precedence over implicit binding; although we called showA via obj, it uses obj2 as "this"
+
+var dummyObj = {
+    a: 5,
+    dummy: dummy
+};
+
+d = new dummyObj.dummy(); // 57
+console.log("'new' has precedence over implicit binding: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a);
+
+// d = new dummyObj.dummy.call(obj2); // TypeError: new and call/apply cannot be used together
+
+var f = dummy.bind(dummyObj);
+d = new f();
+console.log("'new' has precedence over hard (explicit) binding: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a); // 57
+
+// Precedence of bindings: new, explicit, implicit, default
