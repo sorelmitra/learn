@@ -252,6 +252,8 @@ defaultBindingByMistake(); // "oops, global", because we call it without a conte
 
 setTimeout(obj.showA, 700); // "oops, global", because setTimeout() has a function reference which it calls without a context object
 
+// another default binding by mistake
+(obj2.showA = obj.showA)(); // "oops, global", as "this" points to the global object. Why did it get to the global object? Because the result value of the assignment expression p.foo = o.foo is a reference to just the underlying function object. As such, the effective call-site is just foo(), not p.foo() or o.foo() as you might expect
 
 // 3. explicit binding
 
@@ -277,13 +279,20 @@ setTimeout(bind(showA, obj2), 720); // 42, because the hard binding helper bind(
 
 setTimeout(showA.bind(obj2), 730); // 42, this time using Function.prototype.bind(), introduced in ECMAScript 5
 
-// Function.prototype.bind() can also be used for default arguments
-function sum(a, b) {
-    console.log("the sum is", a + b);
+// Function.prototype.bind() can also be used for default arguments or "partial function application"
+function sum(a, b, c) {
+    console.log("the sum is", a + b + c);
 }
-var s = sum.bind(null, 4); // "this" is set to null, 'cause we don't care for it, we just use the default arguments
-s(3); // 7
+// s4() is a partial function application of sum(): s4(b, c) = sum(4, b, c)
+// Note that partial function application is different than (and not a subset of, as YDKJS says) currying: if bind() would produce currying, then s4 would return another function (say s43) that would have the parameter for b fixed (say to 3). Calling s43(c) would return the sum 4+3+c.
+var s4 = sum.bind(null, 4); // "this" is set to null, 'cause we don't care for it, we just use the default arguments
+s4(3, 2); // 9
 
+// Setting "this" to null can be dangerous. If you ever use that against a function call (for instance, a third-party library function that you don't control), and that function does make a "this" reference, the default binding rule means it might inadvertently reference (or worse, mutate!) the global object (window in the browser).
+// A safer way to do this is to create an empty object, specifically for this purpose. It might be a good idea to name it ø (option+o on a Mac keyboard)
+var ø = Object.create(null);
+var saferS4 = sum.bind(ø, 4);
+saferS4(3, 2); // 9
 
 // 4. "new" binding
 
