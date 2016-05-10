@@ -1,10 +1,12 @@
-/**
+/*****************************************************************
+ * 
  * Closures
- */
+ * 
+ *****************************************************************/
 
 function makeAdder(increment) {
     // The function "add" has access to the "increment" variable (it has a closure to that variable); this variable is accessible to "add" function even after the makeAdder function has finished
-    // Sorel: I think we can think of this as a sort of reference counting: when makeAdder is invoked, it creates the "increment" variable (as a parameter) and sets its refcount to 1; when function add is created and returned, because it uses the "increment" variable, its refcount is set to 2; when makeAdder exits, its refcount is decremented, going back to 1; since it's not 0, the variable is kept and is available inside the "add" function object
+    // From "Thinking in Java": A closure is a callable thing that retains information from the scope in which it was created
     // Multiple calls to makeAdder create multiple instances of the "add" function
     function add(to) {
         var sum = to + increment;
@@ -39,7 +41,7 @@ adder[1](9); // call plusTen's increment changer directly from the array returne
 plusTen(7); // Now we've ruined plusTen, too: it adds 9 to 7
 
 
-// Demonstration that a function has a "closure" on the variables in its scope, even when those variables are gone once their scope is finished
+//// Demonstration that a function has a "closure" on the variables in its scope, even when those variables are gone once their scope is finished
 
 function foo() {
     var a = 2;
@@ -54,13 +56,12 @@ function foo() {
 var baz = foo();
 
 baz(); // 2 -- Whoa, closure was just observed, man.
-
-// Sorel: Calling bar via baz as above produces 2 because bar has a reference to variable "a". This reference is called "closure". This example and explanation is taken from the "You Don't Know JS" book, and it is consistent with my assumption of a reference-counting mechanism that allows closures to exist - Hmmm, although a few lines later the author calls this reference a "scope reference"
+// Calling bar via baz as above produces 2 because bar is a callable thing (a function) that retains information (e.g. variables) from the scope in which it was created (the scope of foo())
 
 // console.log("I'm trying to access that variable that baz (which is a reference to bar) said to have a closure on, a = ", a); // ReferenceError, a is not declared in this scope; although baz still has access to it thanks to its closure (=reference) on it
 
 
-// Another closure example from the YDKJS book - trying to print incremented numbers at 1-second intervals using setTimeout
+//// Another closure example from the YDKJS book - trying to print incremented numbers at 1-second intervals using setTimeout
 
 var timeout;
 
@@ -102,7 +103,7 @@ for (let i=1; i<=5; i++) {
 }
 
 
-// Closures used to create modules
+//// Closures used to create modules
 
 function Robot() {
     var name;
@@ -136,12 +137,14 @@ robot.perform();
 // robot.doInit("illegal", "illegal"); // Fires a TypeError exception: doInit is not accessible
 
 
-/**
- * this
- */
+/*****************************************************************
+ * 
+ * "this"
+ * 
+ *****************************************************************/
 
 
-// Quick sample about what "this" is NOT
+//// What "this" is NOT
 
 var id = "not awesome";
 
@@ -155,7 +158,7 @@ var id = "not awesome";
 
     obj.cool(); // awesome
 
-    setTimeout( obj.cool, 400 ); // not awesome (because of "this" binding)
+    setTimeout( obj.cool, 400 ); // not awesome. "this" is NOT a reference to the "class" the function is "member of", because JavaScript is NOT Object-Oriented (at least at the time of this writing)
 })();
 
 (function wrongTimeout2() {
@@ -169,7 +172,7 @@ var id = "not awesome";
         }
     };
 
-    obj.coolTimeout(); // not awesome (because of "this" binding)
+    obj.coolTimeout(); // not awesome. Trying to call setTimeout from "inside" the "class" yields the same result, for the same reason: JS is NOT OO
 })();
 
 (function rightTimeout() {
@@ -183,14 +186,14 @@ var id = "not awesome";
         }
     };
 
-    obj.coolTimeout(); // awesome 3 (because of correct "this" binding by using Function.prototype.bind)
+    obj.coolTimeout(); // awesome 3. As is explained below, it works correctly because of "this" binding by using Function.prototype.bind()
 })();
 
 
 // "this" is a binding made in the activation record (execution context) of a function. The activation record is created at the call-site of the function, and makes "this" to point to the object from where the function is called. In JavaScript, everything is an object (except simple primitives - string, number, boolean, null, and undefined), including the global script (variables declared in the global scope are actually part of the global object) and functions.
 
 
-// 1. default binding
+//// 1. default binding
 function defaultBinding() {
     console.log(this.defBind); // "this" points to the global object
 }
@@ -226,7 +229,7 @@ function usingFunctionObjectBindingExplicitly() {
 usingFunctionObjectBindingExplicitly();
 
 
-// 2. implicit binding, when calling from a context object
+//// 2. implicit binding, when calling from a context object
 
 function showA() {
     console.log("a is ", this.a);
@@ -255,7 +258,8 @@ setTimeout(obj.showA, 700); // "oops, global", because setTimeout() has a functi
 // another default binding by mistake
 (obj2.showA = obj.showA)(); // "oops, global", as "this" points to the global object. Why did it get to the global object? Because the result value of the assignment expression p.foo = o.foo is a reference to just the underlying function object. As such, the effective call-site is just foo(), not p.foo() or o.foo() as you might expect
 
-// 3. explicit binding
+
+//// 3. explicit binding
 
 showA.call(obj); // 2
 showA.call(obj2); // 42
@@ -294,7 +298,8 @@ var ø = Object.create(null);
 var saferS4 = sum.bind(ø, 4);
 saferS4(3, 2); // 9
 
-// 4. "new" binding
+
+//// 4. "new" binding
 
 function dummy() {
     this.a = 57;
@@ -304,7 +309,7 @@ var d = new dummy(); // "new" does the following: 1) creates a new object; 2) se
 console.log("my dummy is", d.a);
 
 
-// Precedence of bindings
+//// Precedence of bindings
 
 // explicit has precedence over implicit
 obj.showA.call(obj2); // 42; explicit binding has precedence over implicit binding; although we called showA via obj, it uses obj2 as "this"
@@ -323,4 +328,72 @@ var f = dummy.bind(dummyObj);
 d = new f();
 console.log("'new' has precedence over hard (explicit) binding: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a); // 57
 
-// Precedence of bindings: new, explicit, implicit, default
+//// Precedence of bindings: new, explicit, implicit, default
+
+
+/*****************************************************************
+ * 
+ * Objects
+ * 
+ *****************************************************************/
+
+// There are six primitive types: number, boolean, string, null, undefined, object.
+// Leaving null and undefined aside, this means that everything that's not a number, boolean or string, is an object. So a function is an object, a callable one.
+
+// YDKJS does not define what is a JavaScript object. Since some well-known languages that have objects are OO languages (e.g. C++, Java, Python), the common assumption might be that JS is OO too. It's NOT OO, as the above discussion on "this" has pointed out. So, what's an object in JS?
+
+// Try my own definition: a JS object is a structure that can have data and functions, and which is passed around by reference.
+// YDKJS mentions that the contents of an object consist of values (any type) stored at specifically named locations, which we call properties. It also mentions that: The engine stores values in implementation-dependent ways, and may very well not store them in some object container. What is stored in the container are these property names, which act as pointers (technically, references) to where the values are stored.
+
+// So a Definition: An object is a data structure that contains references to values of any type. These references are called properties. The values and the object itself with its references content are stored by the Engine in an implementation-dependent way. The object is passed around by reference.
+
+// Built-in objects: Number, Boolean, String, Object, Function; Array, Date, RegExp, Error
+// Although they might have the appearance of types or "classes", they are NOT.
+// Instead, they are FUNCTIONS.
+
+
+//// Primitive Types and their Corresponding Objects
+
+function showTypeofAndValue(x, msg) {
+    var s;
+    if ( (msg == null) || (msg === undefined) ) {
+        s = "x";
+    } else {
+        s = msg;
+    }
+    console.log(s, "is a", typeof x, "and has the value", x);
+}
+var n;
+
+// primitive number type
+n = 2;
+showTypeofAndValue(n, "n"); // number 2
+// Number is actually a function that returns the primitive number type
+n = Number(3);
+showTypeofAndValue(n, "now n"); // number 3
+
+// Because of the "new" operator seen above, the Number() function can also be called as a constructor (but not a "class" constructor)
+n = new Number(4);
+showTypeofAndValue(n, "again, n"); // Number {4}
+// This can be explained if we remember that "new" constructs a new object, sets its prototype (that's where Number is coming from), sets "this" to the newly created object, and calls the given function (in this case Number) making it return the new object (instead of its primitive type number)
+
+// primitive types are not objects, but we can call methods of their corresponding object type on them. How come?
+var pi = 3.1415926;
+showTypeofAndValue(pi, "pi"); // it is a primitive number type
+console.log("pi is a %s with the value ~ %s", typeof pi, pi.toFixed(2)); // when we call a function of the corresponding object type, the Engine coerces the primitive type to the corresponding type; it automatically creates an object of that type (in our case Number), for that call ONLY; we don't have access to that object in our code, and it is garbage collected after our function call; our variable still remains a primitive number
+
+// console.log("pi is a %s with the string value %s", typeof pi, pi.big()); // TypeError: pi.big is not a function; so we can't call functions of an object type that does not correspond to this primitive type
+
+(function invokedRightAway() {
+    // We can, however, "hijack" the object created by the Engine when calling functions of an object type that correspond to a primitive
+    // "use strict"; // but not in strict mode
+    String.prototype.returnMe = function() {
+        return this;
+    }
+    
+    var sPrimitive = "abc";
+    var sObject = sPrimitive.returnMe();  
+    
+    showTypeofAndValue(sPrimitive, "sPrimitive"); // string abc
+    showTypeofAndValue(sObject, "sObject"); // object abc
+})();
