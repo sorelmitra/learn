@@ -342,10 +342,10 @@ console.log("'new' has precedence over hard (explicit) binding: dummyObj's a is 
 
 // YDKJS does not define what is a JavaScript object. Since some well-known languages that have objects are OO languages (e.g. C++, Java, Python), the common assumption might be that JS is OO too. It's NOT OO, as the above discussion on "this" has pointed out. So, what's an object in JS?
 
-// Try my own definition: a JS object is a structure that can have data and functions, and which is passed around by reference.
+// Try my own definition: a JS object is a structure that can have data and functions, and which is passed around by reference. - this is not very accurate, as an object is closer to a hash (dictionary) than to a data structure
 // YDKJS mentions that the contents of an object consist of values (any type) stored at specifically named locations, which we call properties. It also mentions that: The engine stores values in implementation-dependent ways, and may very well not store them in some object container. What is stored in the container are these property names, which act as pointers (technically, references) to where the values are stored.
 
-// So a Definition: An object is a data structure that contains references to values of any type. These references are called properties. The values and the object itself with its references content are stored by the Engine in an implementation-dependent way. The object is passed around by reference.
+// So a DEFINITION: An object is a collection of named references to values of any type. These references are called properties. The values and the object itself with its references content are stored by the Engine in an implementation-dependent way. The object is passed around by reference.
 
 // Built-in objects: Number, Boolean, String, Object, Function; Array, Date, RegExp, Error
 // Although they might have the appearance of types or "classes", they are NOT.
