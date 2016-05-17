@@ -574,3 +574,33 @@ for (var v of x) { // ECMAScript 6: call the iterator automatically via for ... 
     console.log("x property value", v);
 }
 
+
+/*****************************************************************
+ * 
+ * Prototypes
+ * 
+ *****************************************************************/
+
+var anotherObject = {
+    a: 2
+};
+
+var myObject = Object.create( anotherObject ); // anotherObject is the prototype of myObject
+console.log("Property from the prototype chain", anotherObject.a, myObject.a, anotherObject.hasOwnProperty( "a"), myObject.hasOwnProperty("a"));
+
+myObject.a++; // oops, implicit shadowing! This translates to myObject.a = myObject.a + 1, which, by the rules described at the [[Put]] operation, shadows anotherObject.a, setting it's value to anotherObject.a + 1
+
+console.log("implicit shadowing: %d %d %s", anotherObject.a, myObject.a, myObject.hasOwnProperty("a"));
+
+
+//// Constructor
+function Foo() {
+    // ...
+}
+var a = new Foo();
+console.log("prototype's constructor %s, constructed object's constructor %s", Foo.prototype.constructor === Foo, a.constructor === Foo);
+
+Foo.prototype = {};
+a = new Foo(); // oops, now a's "constructor" is no longer Foo's prototype's constructor, but Object's prototype's constructor
+console.log("prototype's constructor %s, constructed object's constructor %s, Object's prototype constructor %s", Foo.prototype.constructor === Foo, a.constructor === Foo, a.constructor === Object.prototype.constructor);
+// What happened? a.constructor resolves in a's prototype chain. It resolves to a.prototype.constructor, which in the first case is Foo.prototype.constructor, but in the second case we overrriden Foo.prototype to an empty object, meaning that now Foo.prototype no longer has a "constructor" property, so a.constructor [[Get]] operation goes further in the chain, ending at Object.prototype, which DOES have a "constructor" property.
