@@ -338,6 +338,7 @@ console.log("'new' has precedence over hard (explicit) binding: dummyObj's a is 
  *****************************************************************/
 
 // There are six primitive types: number, boolean, string, null, undefined, object.
+// ECMAScript 6 adds a new primitive type: Symbol
 // Leaving null and undefined aside, this means that everything that's not a number, boolean or string, is an object. So a function is an object, a callable one.
 
 // YDKJS does not define what is a JavaScript object. Since some well-known languages that have objects are OO languages (e.g. C++, Java, Python), the common assumption might be that JS is OO too. It's NOT OO, as the above discussion on "this" has pointed out. So, what's an object in JS?
@@ -397,3 +398,179 @@ console.log("pi is a %s with the value ~ %s", typeof pi, pi.toFixed(2)); // when
     showTypeofAndValue(sPrimitive, "sPrimitive"); // string abc
     showTypeofAndValue(sObject, "sObject"); // object abc
 })();
+
+
+//// ECMAScript 6: Computed property names and new primitive data type: Symbol
+var prefix = "foo";
+var myObject = {
+    [prefix + "bar"]: "hello",
+    [prefix + "baz"]: "world",
+    [Symbol.something]: "I'm a symbol-keyed property"
+};
+console.log(myObject["foobar"], myObject["foobaz"], myObject[Symbol.something]);
+
+
+//// Arrays
+var myArray = [ "foo", 42, "bar" ];
+myArray.baz = "Arrays are full-fledged objects, so I can add named properties on an array, although this is not recommended.";
+console.log("My array has length %d. Some values: %s %s.", myArray.length, myArray[0], myArray[2]);
+console.log(myArray.baz);
+myArray["4"] = "baz";
+console.log("oops, \"4\" was coerced to 4, so we ended up with an array of length %d (item at position 3 was added, too, and is %s)", myArray.length, myArray[3]); // ... and is undefined)
+
+
+//// Object copies
+function anotherFunction() { /*..*/ }
+var anotherObject = {
+    c: true
+};
+var anotherArray = [];
+var myObject = {
+    a: 2,
+    b: anotherObject,   // reference, not a copy!
+    c: anotherArray,    // another reference!
+    d: anotherFunction
+};
+anotherArray.push( anotherObject, myObject ); // circular reference!
+console.log(myObject, myObject.c[0], myObject.c[1]);
+
+// ECMAScript 6: Shallow object copy
+var newObj = Object.assign( {}, myObject );
+console.log("newObj has exactly references to the same objects as myObject: %s %s %s",
+    newObj.b === anotherObject,
+    newObj.c === anotherArray,
+    newObj.d === anotherFunction); // we can also see here how to display data types for which there's no string substitution %: use %s and type coercion will do the rest
+
+
+//// Property descriptors
+var myObject = {
+    a: 2,
+    b: 7
+};
+
+myObject.a = 3;
+console.log(" I changed a property that's by default writable: %d", myObject.a);
+
+Object.defineProperty( myObject, "a", {
+    value: myObject.a, // I can use it's previous value
+    writable: false, // not writable
+    configurable: false, // not configurable. This is a one-way road, you cannot revert it!
+    enumerable: true // whether it appears in for ... in loops and other enumerations
+} ); // This property also happens to be an object CONSTANT (non-writable, non-configurable)
+
+myObject.a = 5; // useless, no change will be perfomed
+console.log(" I changed a property that's NOT writable anymore: %d", myObject.a);
+// Object.defineProperty( myObject, "a", {value: 6, writable: true, configurable: true, enumerable: true} ); // TypeError, can't configure a non-configurable property
+
+
+//// "delete" operator: it attempts to delete a property on an object. IF that was the last reference to that object, the object might actually be garbage collected. BUT there's NO resembling of C++'s delete operator
+delete myObject.a; // a non configurable property cannot be deleted
+console.log(" I deleted a property that's not configurable: %d", myObject.a);
+
+
+//// Immutability
+
+myObject = {
+    a: 8,
+    b: 9
+};
+
+Object.preventExtensions(myObject); // Immutability Level 1: Prevent adding new properties
+// Note that I cannot say myObject.preventExtensions() because this method is part of Object, not of Object.prototype. If it were the latter case, then I could call it via myObject, because delegation would look it up and find it in myObject's prototype, which is Object.prototype
+myObject.a = 10;
+myObject.c = 6;
+console.log("I added a property on an object that prevents extensions: %s, I also modified an existing property: %d", myObject.c, myObject.a);
+
+Object.seal(myObject); // Immutability Level 2: Level 1 + Prevent configuring its properties
+myObject.a = 11;
+console.log("I modified a property on a sealed object: %d", myObject.a);
+
+// Object.defineProperty( myObject, "b", {value: 6, writable: true, configurable: true, enumerable: true} ); // TypeError: now b is not configurable because of the seal() call
+
+Object.freeze(myObject); // Immutability Level 3: Level 2 + Prevent modifying its properties
+myObject.b = 12;
+console.log("I modified a property on a frozen object: %d", myObject.b);
+
+
+//// [[Get]] and [[Put]]
+/*
+These are two built-in operations that are used whenever accessing object properties.
+[[Get]] returns the property that was requested to be accesed on the object with this algorithm:
+- If a property with this name is found on the current object, it is returned
+- Else, if a property with this name is found in the prototype chain, it is returned
+- Else, it returns undefined
+[[Put]] attempts to save the requested property on the given object, with the following algorithm:
+- If a setter with the same name is found on this object, call it
+- Else, if a non-writable property with the same name is found on this object, then adding it on this object is disallowed (silently in normal mode, with error in strict mode)
+- Else, if a writable property with the same name is found in the prototype chain, it is added on this object, shadowing the existing one
+- Else, if a non-writable property with the same name is found in the prototype chain, then adding it on this object is disallowed (silently in normal mode, with error in strict mode)
+- Else, if a setter is found in the prototype chain, it is called
+- Else (no property with the same name is found, anywhere) it is added to the current object
+The first three rules refer to this object, the last three ones refer to its prototype chain.
+*/
+
+var someObj = {
+    a: undefined // undefined doesn't necessarily mean that the property does not exist
+};
+console.log("Distinguishing between undefined property or property explicitly set to undefined requires a method call: a is %s, b is %s, a is%s own property, b is%s own property",
+    someObj.a, // undefined by authoring
+    someObj.b, // undefined as returned from the [[Get]] operation
+    someObj.hasOwnProperty("a") ? "" : " not", // Object.prototype.hasOwnProperty()
+    Object.prototype.hasOwnProperty.call(someObj, "b") ? "" : " not"); // another way of calling hasOwnProperty (useful for objects that don't have a prototype, or whose prototype does not go back to Object)
+
+
+//// Getters and Setters
+
+var x = {
+    get a() { // getter defined in the literal notation
+        return this._a; // use "this" to make sure its bound to this object rather than a global variable
+    },
+    set a(v) {
+        this._a = v;
+    }
+}
+
+Object.defineProperty(x, "b", {
+    get: function() { // getter defined via defineProperty()
+        return 7;
+    },
+    enumerable: true // otherwise it won't appear in the Enumeration for ... in below
+});
+
+x.a = 8; // calls a's setter
+console.log(x.a, x.b); // calls the getters for a and b
+
+
+//// Enumeration
+for (var k in x) { // using keys
+    console.log("x[%s]=%s", k, x[k]);
+}
+
+//// ECMAScript 6: iteration
+var arr = [1, 2, 3, 4];
+var it = arr[Symbol.iterator](); // iterator is a function defined on Arrays, accessible via Symbol.iterator
+console.log("array iterator returns", it.next(), it.next(), it.next(), it.next(), it.next());
+
+Object.defineProperty( x, Symbol.iterator, {
+    enumerable: false,
+    writable: false,
+    configurable: true,
+    value: function() {
+        var o = this;
+        var idx = 0;
+        var ks = Object.keys( o );
+        return {
+            next: function() {
+                return {
+                    value: o[ks[idx++]],
+                    done: (idx > ks.length)
+                };
+            }
+        };
+    }
+} );
+
+for (var v of x) { // ECMAScript 6: call the iterator automatically via for ... of (equivalent to var it = x[Symbol.iterator]; it.next() ...)
+    console.log("x property value", v);
+}
+
