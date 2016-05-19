@@ -147,6 +147,8 @@ void lista_citire(char *fname)
 
 int nr_pagini = 0;
 int nr_utiliz = 0;
+// Pe randuri, utilizatorii - fiecare rand un utilizator
+// Pe coloane, paginile - fiecare coloana reprezinta o pagina din aplicatia web
 int **pagini_per_utiliz;
 
 void matr_citire(char *fname)
