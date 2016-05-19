@@ -81,22 +81,6 @@ int lista_sterge(struct trafic_date trafic)
 	return 0;
 }
 
-void lista_afis(struct nod_lista *r)
-{
-	r = lista_cap;
-	if (r == NULL)
-	{
-		return;
-	}
-	printf("Trafic date utilizatori {Mb upload, Mb download}\n");
-	while (r != NULL)
-	{
-		printf("utiliz %d {%d, %d}\n", r->trafic.index_utiliz, r->trafic.upload, r->trafic.download);
-		r = r->next;
-	}
-	printf("\n");
-}
-
 int lista_nr_elem()
 {
 	struct nod_lista *n;
@@ -108,6 +92,30 @@ int lista_nr_elem()
 		c++;
 	}
 	return c;
+}
+
+void lista_afis()
+{
+	struct nod_lista *r = lista_cap;
+	if (r == NULL)
+	{
+		return;
+	}
+	// conversie lista in vector
+	int n = lista_nr_elem();
+	struct trafic_date *trafice = (struct trafic_date *)malloc(sizeof(struct trafic_date) * n);
+	int i = 0;
+	while (r != NULL)
+	{
+		trafice[i++] = r->trafic;
+		r = r->next;
+	}
+	// afisare vector
+	printf("Trafic date utilizatori {Mb upload, Mb download}\n");
+	for (i = 0; i < n; i++) {
+		printf("utiliz %d {%d, %d}\n", trafice[i].index_utiliz, trafice[i].upload, trafice[i].download);
+	}
+	printf("\n");
 }
 
 void lista_citire(char *fname)
@@ -129,5 +137,5 @@ void lista_citire(char *fname)
 int main()
 {
 	lista_citire("C:\\trafic.txt");
-	lista_afis(lista_cap);
+	lista_afis();
 }
