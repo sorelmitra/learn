@@ -492,14 +492,14 @@ myObject.b = 12;
 console.log("I modified a property on a frozen object: %d", myObject.b);
 
 
-//// [[Get]] and [[Put]]
+//// [[Get]] and [[Set]]
 /*
 These are two built-in operations that are used whenever accessing object properties.
 [[Get]] returns the property that was requested to be accesed on the object with this algorithm:
 - If a property with this name is found on the current object, it is returned
 - Else, if a property with this name is found in the prototype chain, it is returned
 - Else, it returns undefined
-[[Put]] attempts to save the requested property on the given object, with the following algorithm:
+[[Set]] attempts to save the requested property on the given object, with the following algorithm:
 - If a setter with the same name is found on this object, call it
 - Else, if a non-writable property with the same name is found on this object, then adding it on this object is disallowed (silently in normal mode, with error in strict mode)
 - Else, if a writable property with the same name is found in the prototype chain, it is added on this object, shadowing the existing one
@@ -581,26 +581,85 @@ for (var v of x) { // ECMAScript 6: call the iterator automatically via for ... 
  * 
  *****************************************************************/
 
+/*
+From the ECMAScript 6 specification: "All ordinary objects have an internal slot called [[Prototype]]. The value of this internal slot is either null or an object and is used for implementing inheritance. Data properties of the [[Prototype]] object are inherited (are visible as properties of the child object) for the purposes of get access, but not for set access. Accessor properties are inherited for both get access and set access." Actually inheritance may be a wrong word here, as there's no class to inherit from. It's just that [[Prototype]] is a reference to another object, whose properties are accessible via the current object by means of the internal [[Get]] and [[Set]] operations.
+*/
+
 var anotherObject = {
-    a: 2
+    a: 2,
+    b: "hi",
+    f: function() {
+        console.log("a is %d, b is %s", this.a, this.b);
+    }
 };
 
-var myObject = Object.create( anotherObject ); // anotherObject is the prototype of myObject
+var myObject = Object.create( anotherObject ); // anotherObject is the prototype of myObject. myObject's [[Prototype]] now points to anotherObject
 console.log("Property from the prototype chain", anotherObject.a, myObject.a, anotherObject.hasOwnProperty( "a"), myObject.hasOwnProperty("a"));
+myObject.f(); // call function from the prototype. Note that "this" is bound to myObject, and that the properties a, b, f are actually part of anotherObject. The internal [[Get]] operation resolves them by inspecting the prototype chain
 
 myObject.a++; // oops, implicit shadowing! This translates to myObject.a = myObject.a + 1, which, by the rules described at the [[Put]] operation, shadows anotherObject.a, setting it's value to anotherObject.a + 1
 
 console.log("implicit shadowing: %d %d %s", anotherObject.a, myObject.a, myObject.hasOwnProperty("a"));
 
+console.log("accesing an object's prototype:", Object.getPrototypeOf(myObject));
+
 
 //// Constructor
+// All functions, being objects, have their [[Prototype]]. Function's prototype are accessible via the "prototype" property.
+// From ECMAScript 6 Spec: "Unless otherwise specified every built-in function object has the %FunctionPrototype% object (19.2.3) as the initial value of its [[Prototype]] internal slot. The value of Function.prototype is %FunctionPrototype%, the intrinsic Function prototype object (19.2.3)."
 function Foo() {
     // ...
 }
 var a = new Foo();
-console.log("prototype's constructor %s, constructed object's constructor %s", Foo.prototype.constructor === Foo, a.constructor === Foo);
+console.log("prototype's constructor %s, constructed object's constructor %s prototype %s, instance of %s", Foo.prototype.constructor === Foo, a.constructor === Foo, Object.isProto, a instanceof Foo);
+// instanceof answers the following question: in the entire [[Prototype]] chain of a, does the object arbitrarily pointed to by Foo.prototype ever appear?
 
 Foo.prototype = {};
 a = new Foo(); // oops, now a's "constructor" is no longer Foo's prototype's constructor, but Object's prototype's constructor
 console.log("prototype's constructor %s, constructed object's constructor %s, Object's prototype constructor %s", Foo.prototype.constructor === Foo, a.constructor === Foo, a.constructor === Object.prototype.constructor);
 // What happened? a.constructor resolves in a's prototype chain. It resolves to a.prototype.constructor, which in the first case is Foo.prototype.constructor, but in the second case we overrriden Foo.prototype to an empty object, meaning that now Foo.prototype no longer has a "constructor" property, so a.constructor [[Get]] operation goes further in the chain, ending at Object.prototype, which DOES have a "constructor" property.
+
+
+/*****************************************************************
+ * 
+ * Behavior Delegation vs "class" with "pseudo-polymorfism" vs ECMAScript 6 class
+ * 
+ *****************************************************************/
+
+// Demo: Implement a general Widget and a specific Button with all three mechanisms
+// Use jQuery for DOM and CSS manipulation
+
+//// Get jQuery into our DOM and wait for it to be loaded
+function jQueryLoader(handler) {
+    var jqScriptElem = document.createElement("script");
+    jqScriptElem.setAttribute("lang", "javascript");
+    jqScriptElem.setAttribute("src", "node_modules/jquery/dist/jquery.js");
+    document.getElementsByTagName("head")[0].appendChild(jqScriptElem);
+
+    function waitForJQLoading(f) {
+        if (typeof jQuery == undefined) {
+            setTimeout(waitForJQLoading, 1000);
+            return;
+        }
+        handler();
+    }
+    setTimeout(waitForJQLoading, 1000);
+}
+
+function whenJQueryIsReady() {
+    
+    // Because we need to wait for jQuery to load, all our code is called async, so wrap it up in a function called below via jQueryLoader
+    
+    // jQuery loaded, say hi
+    $("body").append($("<p>").text("Hi there from jQuery"));
+    $("p").first().css("font-weight", "bold");
+
+
+    //// 1. Widget and Button with classic JS "class"
+
+    function Widget() {
+    }
+
+}
+
+jQueryLoader(whenJQueryIsReady);
