@@ -1,7 +1,12 @@
 #include "stdafx.h"
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+///////////////////////////////////////////////////////////
+// lista - Trafic date
+///////////////////////////////////////////////////////////
 
 struct trafic_date {
 	int index_utiliz;
@@ -116,13 +121,14 @@ void lista_afis()
 		printf("utiliz %d {%d, %d}\n", trafice[i].index_utiliz, trafice[i].upload, trafice[i].download);
 	}
 	printf("\n");
+	free(trafice);
 }
 
 void lista_citire(char *fname)
 {
 	FILE *f = NULL;
 	if (0 != fopen_s(&f, fname, "rt")) {
-		printf("Nu pot deschide fisierul %s", fname);
+		printf("Nu pot deschide fisierul %s\n", fname);
 		return;
 	}
 	char buf[32];
@@ -134,8 +140,72 @@ void lista_citire(char *fname)
 	fclose(f);
 }
 
+
+///////////////////////////////////////////////////////////
+// matrice - Pagini deschise per utilizator
+///////////////////////////////////////////////////////////
+
+int nr_pagini = 0;
+int nr_utiliz = 0;
+int **pagini_per_utiliz;
+
+void matr_citire(char *fname)
+{
+	FILE *f = NULL;
+	if (0 != fopen_s(&f, fname, "rt")) {
+		printf("Nu pot deschide fisierul %s\n", fname);
+		return;
+	}
+	char buf[32];
+	// fisierul are formatul: prima linie - nr pagini; a doua linie - nr utilizatori; liniile urmatoare: de cate ori s-a accesat fiecare pagina. Fiecare linie corespunde unui utilizator
+	fgets(buf, 31, f);
+	sscanf_s(buf, "%d", &nr_pagini);
+	fgets(buf, 31, f);
+	sscanf_s(buf, "%d", &nr_utiliz);
+	pagini_per_utiliz = (int **)malloc(nr_utiliz * sizeof(int *));
+	for (int i = 0; i < nr_utiliz; i++) {
+		pagini_per_utiliz[i] = (int *)malloc(nr_pagini * sizeof(int *));
+	}
+	int i = 0;
+	int j = 0;
+	while (fgets(buf, 31, f)) {
+		int x;
+		if (sscanf_s(buf, "%d", &x) == EOF) {
+			continue;
+		}
+		pagini_per_utiliz[i][j] = x;
+		j++;
+		if (j >= nr_pagini) {
+			j = 0;
+			i++;
+		}
+		if (i >= nr_utiliz) {
+			break;
+		}
+	}
+	fclose(f);
+}
+
+void matr_afis()
+{
+	if (nr_utiliz == 0) {
+		return;
+	}
+	printf("Pagini deschise per utilizator\n");
+	for (int i = 0; i < nr_utiliz; i++) {
+		for (int j = 0; j < nr_pagini; j++) {
+			printf("%3d ", pagini_per_utiliz[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
 int main()
 {
 	lista_citire("C:\\trafic.txt");
 	lista_afis();
+
+	matr_citire("C:\\pagini.txt");
+	matr_afis();
 }
