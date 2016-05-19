@@ -157,7 +157,7 @@ void matr_citire(char *fname)
 		return;
 	}
 	char buf[32];
-	// fisierul are formatul: prima linie - nr pagini; a doua linie - nr utilizatori; liniile urmatoare: de cate ori s-a accesat fiecare pagina. Fiecare linie corespunde unui utilizator
+	// fisierul are formatul: prima linie - nr pagini; a doua linie - nr utilizatori; liniile urmatoare: de cate ori s-a accesat pagina curenta. Fiecare linie corespunde unei pagini. O linie goala separa utilizatorii
 	fgets(buf, 31, f);
 	sscanf_s(buf, "%d", &nr_pagini);
 	fgets(buf, 31, f);
