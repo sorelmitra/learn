@@ -650,15 +650,95 @@ function whenJQueryIsReady() {
     
     // Because we need to wait for jQuery to load, all our code is called async, so wrap it up in a function called below via jQueryLoader
     
-    // jQuery loaded, say hi
-    $("body").append($("<p>").text("Hi there from jQuery"));
-    $("p").first().css("font-weight", "bold");
+    // jQuery loaded, say a green bold hi
+    $("body").append($("<p>").text("Hi there from jQuery").css("font-weight", "bold").css("color", "darkgreen"));
 
 
     //// 1. Widget and Button with classic JS "class"
 
-    function Widget() {
-    }
+    (function classicJSClass() {
+        function Widget(width, height) {
+            this.width = width || 50;
+            this.height = height || 50;
+            this.$elem = null; // our jQuery HTML element that will represent the widget
+        }
+        
+        // base class render function: put our element where specified and apply its properties
+        Widget.prototype.render = function($where) { // prefixed "where" with $ so that I know this function expects a jQuery element
+            this.$elem.css({
+                width: this.width + "px",
+                height: this.height + "px"
+            }).appendTo($where);
+        }
+        
+        function Button(width, height, label) {
+            Widget.call(this, width, height);
+            this.label = label;
+            this.$elem = $("<button>").text(label);
+            this.$elem.bind("click", Button.prototype.onClick.bind(this)); // YKDJS has this line in Button.prototype.render(), but I'm not sure this is "rendering". In the OOLO version (Objects Linked-to Other Objects, as oppsed to Object Oriented) I moved this to the equivalent of "render", as it seems to fit better there
+        }
+        
+        // inherit from the Widget class
+        Button.prototype = Object.create(Widget.prototype);
+        
+        // derived class render function: call base class version
+        Button.prototype.render = function($where) {
+            this.$elem.css({
+                "font-size": "11pt"
+            })
+            Widget.prototype.render.call(this, $where);
+        }
+        
+        Button.prototype.onClick = function() {
+            alert("I'm a button created using a classic JS 'class' approach: " + this.label);
+        }
+
+        var b1 = new Button(150, 30, "Classic JS Class");
+        b1.render($("body"));
+    })();
+    
+    
+    //// 2. Widget and Button with ECMAScript 6 class syntax
+    
+    (function ECMAScript6Class() {
+        class Widget {
+            constructor(width, height) { // equivalent of function Widget from above
+                this.width = width || 50;
+                this.height = height || 50;
+                this.$elem = null; // our jQuery HTML element that will represent the widget            
+            }
+            
+            render($where) {
+                this.$elem.css({
+                    width: this.width + "px",
+                    height: this.height + "px"
+                }).appendTo($where);
+            }
+        }
+        
+        class Button extends Widget {
+            constructor(width, height, label) {
+                super(width, height);
+                this.label = label;
+                this.$elem = $("<button>").text(label);
+                this.$elem.bind("click", this.onClick.bind(this)); // YKDJS has this line in Button.prototype.render(), but I'm not sure this is "rendering". In the OOLO version (Objects Linked-to Other Objects, as oppsed to Object Oriented) I moved this to the equivalent of "render", as it seems to fit better there
+            }
+        
+            render($where) {
+                this.$elem.css({
+                    "font-size": "11pt"
+                })
+                Widget.prototype.render.call(this, $where);
+            }
+            
+            onClick() {
+                alert("I'm a button created using ECMAScript 6 classes: " + this.label);
+            }
+        }
+ 
+        var b1 = new Button(180, 30, "ECMAScript 6 Class");
+        b1.render($("body"));
+    })();
 
 }
 
