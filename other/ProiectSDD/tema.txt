@@ -1,0 +1,62 @@
+Salut,
+
+Uite ce update a postat un coleg pe facebook on legatura cu proiectul sdd...acum seara a pus:
+
+**Proiect SDD**
+
+Am vorbit cu domnul profesor Alin Zamfiroiu legat de proiect. L-am rugat sa ne ofere mai multe detalii, eventual un barem, pentru ca în prezentare avem mult prea pu?ine detalii. Mi-a raspuns ca înca nu este definitivat baremul, dar, în principiu, îl intereseaza:
+
+- 4 structuri diferite (vector, matrice, lista, arbore, hashtable, avl, heap) - nu ia în calcul daca sunt 2 din aceea?i categorie (ex: lista simplu înlan?uita - lista dublu înlan?uita);
+
+- la fiecare structura sa avem: inserare, parcurgere ?i ?tergere;
+
+- sa avem o transpunere (ex: sa luam valorile dintr-un vector ?i sa le inseram într-o lista dublu înlan?uita).
+
+O seara frumoasa!
+
+Cam nasoala treaba.....
+On May 15, 2016 9:14 PM, "Sorel Mitra" <sorelmitra@yahoo.com> wrote:
+
+    https://github.com/sorelmitra/edu.git
+
+    other/ProiectSDD
+
+    Am 4 structuri, afisare utilizatori, 3 filtre.
+    Datele sunt hard-codate in program.
+    Nu am citire din fisier. O poti face cu scanf_s, sunt doar stringuri si numere intregi.
+    Mai mult nu cred ca reusesc sa fac sapt. asta :)
+
+    Sorel
+
+>     On 12 May 2016, at 09:44, Spiridon Bogdan <spiridon.bogdan@gmail.com> wrote:
+>
+>     nr .click-uri
+>     nr.accesari
+>     nr aplicatii rulate
+>     grad ocupare memorie
+>     grad ocupare cpu
+>     cantiate de date in download
+>     cantitate de date in upload
+>     cantitate date scrisa pe HDD
+>
+>     e ok asa ?
+>
+>
+>     2016-05-12 9:08 GMT+03:00 Sorel Mitra <sorelmitra@yahoo.com>:
+>
+>         Alege tu minim 8 date de memorat (nr click-uri, nr. accesari, etc), fa o lista si trimite-mi-o.
+>
+>         > On 20 Apr 2016, at 10:33, Spiridon Bogdan <spiridon.bogdan@gmail.com> wrote:
+>         >
+>         > Salut,
+>         >
+>         > Azi nu sunt la birou  dar m-am gandit sa iti trimit specificatiile proiectului de la structuri de date care cel mai probabil va avea deadline undeva intre 28 mai si 4 iunie...
+>         >
+>         > Specificatii:
+>         >
+>         > Sa se realizeze o aplicatie care citeste dintr-un fisier date cu privire la interactiunea utilizatorilor cu o aplicatie web, din punct de vedere al numarului de pagini deschise, numarul de click-uri, pozitia mouseului pe ecran si altele considerate de voi importante.
+>         > Alegeti minim 4 structuri adecvate in care sa memoratii informatiile din fisier.
+>         > Structura fisierului precum si datele stocate despre comportamentul utilizatorilor este la alegerea fiecarui student.
+>         > Aplicatia permite afisarea anumitor informatii dupa filtre sau pe utilizator.
+>         > Sa aiba cel putin o transformare dintr-o structura in alta
+>         >
