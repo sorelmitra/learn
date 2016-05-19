@@ -4,6 +4,7 @@
 #include<stdlib.h>
 
 struct trafic_date {
+	int index_utiliz;
 	int upload;
 	int download;
 };
@@ -37,17 +38,18 @@ void lista_adauga(struct trafic_date trafic)
 {
 	if (lista_cap == NULL) {
 		lista_inserare(trafic);
+		return;
 	}
 
-	struct nod_lista *temp, *right;
+	struct nod_lista *temp, *p;
 	temp = (struct nod_lista *)malloc(sizeof(struct nod_lista));
 	temp->trafic = trafic;
-	right = (struct nod_lista *)lista_cap;
-	while (right->next != NULL)
-		right = right->next;
-	right->next = temp;
-	right = temp;
-	right->next = NULL;
+	p = (struct nod_lista *)lista_cap;
+	while (p->next != NULL)
+		p = p->next;
+	p->next = temp;
+	p = temp;
+	p->next = NULL;
 }
 
 int lista_sterge(struct trafic_date trafic)
@@ -57,7 +59,7 @@ int lista_sterge(struct trafic_date trafic)
 	prev = NULL;
 	while (temp != NULL)
 	{
-		if (temp->trafic.download == trafic.download)
+		if (temp->trafic.index_utiliz == trafic.index_utiliz)
 		{
 			if (temp == lista_cap)
 			{
@@ -86,9 +88,10 @@ void lista_afis(struct nod_lista *r)
 	{
 		return;
 	}
+	printf("Trafic date utilizatori {Mb upload, Mb download}\n");
 	while (r != NULL)
 	{
-		printf("{%d %d}", r->trafic.upload, r->trafic.download);
+		printf("utiliz %d {%d, %d}\n", r->trafic.index_utiliz, r->trafic.upload, r->trafic.download);
 		r = r->next;
 	}
 	printf("\n");
@@ -117,7 +120,7 @@ void lista_citire(char *fname)
 	char buf[32];
 	struct trafic_date trafic;
 	while (fgets(buf, 31, f)) {
-		sscanf_s(buf, "%d, %d", &(trafic.upload), &(trafic.download));
+		sscanf_s(buf, "%d: %d, %d", &(trafic.index_utiliz), &(trafic.upload), &(trafic.download));
 		lista_adauga(trafic);
 	}
 	fclose(f);
