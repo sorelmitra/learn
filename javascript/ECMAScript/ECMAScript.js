@@ -739,6 +739,46 @@ function whenJQueryIsReady() {
         var b1 = new Button(180, 30, "ECMAScript 6 Class");
         b1.render($("body"));
     })();
+    
+    
+    //// 3. Widget and Button with Behavior Delegation
+    
+    (function behaviorDelegation() {
+        var Widget = { // Widget is just an object with a couple of functions and data. We could have created it with Object.create() for consistency with the way we create Button below
+            init: function (width, height) {
+                this.width = width || 50;
+                this.height = height || 50;
+                this.$elem = null; // our jQuery HTML element that will represent the widget            
+            },
+            placeAndStyle: function($where) {
+                 this.$elem.css({
+                    width: this.width + "px",
+                    height: this.height + "px"
+                }).appendTo($where);
+           }
+        };
+        
+        var Button = Object.create(Widget); // Button has Widget as its [[Prototype]], so now it can call to Widget functions directly
+        Button.setup = function(width, height, label) {
+            this.init(width, height);
+            this.label = label;
+            this.$elem = $("<button>").text(label);
+        }
+        Button.build = function($where) {
+            this.$elem.css({
+                "font-size": "11pt"
+            })
+            this.$elem.bind("click", this.onClick.bind(this));
+            this.placeAndStyle($where);
+        }
+        Button.onClick = function() {
+            alert("I'm a button created using ECMAScript 6 classes: " + this.label);
+        }
+        
+        var b1 = Object.create(Button); // b1 has Button as its [[Prototype]], so now it can call Widget and Button functions directly
+        b1.setup(180, 30, "Behavior Delegation");
+        b1.build($("body"));
+    })();
 
 }
 
