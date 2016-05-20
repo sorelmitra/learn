@@ -797,3 +797,43 @@ var some = {
 };
 //console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1)); // ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" syntax doStuff(a) {} actually resolves to doStuff: function() {}, so its an anonymous function, you cannot call it. In this case it is fixed by saying some.doStuff(a + 1); in the function recursive call, but in some other cases it might not be that simple.
 
+
+/*****************************************************************
+ * 
+ * Types & Grammar
+ * 
+ *****************************************************************/
+
+function showTypeof(x) {
+    console.log("typeof", x, "is", typeof x);
+}
+
+showTypeof(42);
+showTypeof("42");
+showTypeof(true);
+showTypeof(undefined);
+showTypeof({a: 2});
+showTypeof(null); // surprise: "object", due to an old JS bug that wasn't fixed long enough so that a lot of code depends on it
+showTypeof(Symbol()); // "symbol", new ECMAScript 6 type
+showTypeof(function() {}); // "function", although a function is an object
+
+console.log(function(a, b) {}.length); // 2; a function has a length property specifying the number of parameters it accepts
+
+// In JavaScript, types are associated with VALUES, not VARIABLES
+var showMyType;  showTypeof(showMyType); // it has no value - but this actually means it has the "undefined" value
+showMyType = 42;   showTypeof(showMyType); // number
+showMyType = "ab";  showTypeof(showMyType); // string
+
+// console.log(someUndeclaredVariable); // ReferenceError. Although the message might be confusing, actually this means the variable is "undeclared", as opposed to being declared and "undefined"
+
+// We can however use typeof to verify if a variable or function is declared or not. This behavior exists in order to allow checking for existence of variables in the code.
+console.log(typeof someUndeclaredVariable); // suprise: "undefined"
+
+// undefined cannot be compared with boolean (coercion allowed), but testing it for trueness (or falseness) is allowed and works fine
+console.log("'undefined' coerces to 'boolean': %s %s; but applying ! (not) on it gives us %s", undefined == true, undefined == false, !undefined);
+
+console.log("window.DEBUG", window.DEBUG); // undefined
+// an undefined value can be tested for trueness or falseness
+if (!window.DEBUG) {
+    console.log("window.DEBUG is undefined, which we saw earlier that is not equal to either true or false, but still the code got here");
+}
