@@ -783,3 +783,17 @@ function whenJQueryIsReady() {
 }
 
 jQueryLoader(whenJQueryIsReady);
+
+
+//// ECMAScript 6 nicer syntax for object functions - has drawbacks, too
+
+var some = {
+    doStuff(a) {
+        if (a > 4) {
+            return a;
+        }
+        doStuff(a + 1); // oops, the Engine doesn't know who's doStuff(). See commented console.log() below
+    }
+};
+//console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1)); // ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" syntax doStuff(a) {} actually resolves to doStuff: function() {}, so its an anonymous function, you cannot call it. In this case it is fixed by saying some.doStuff(a + 1); in the function recursive call, but in some other cases it might not be that simple.
+
