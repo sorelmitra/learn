@@ -203,6 +203,86 @@ void matr_afis()
 	printf("\n");
 }
 
+
+///////////////////////////////////////////////////////////
+// arbore binar sortat - nr. accesari aplicatie
+///////////////////////////////////////////////////////////
+
+struct accesari_app {
+	int index_utiliz;
+	int nr_acces;
+};
+
+struct arb_nod {
+	struct accesari_app acc;
+	struct arb_nod *st;
+	struct arb_nod *dr;
+};
+
+struct arb_nod *rad = NULL;
+
+struct arb_nod *arb_creaza_nod(struct accesari_app acc, struct arb_nod *st, struct arb_nod *dr)
+{
+	struct arb_nod *an = (struct arb_nod *)malloc(sizeof(struct arb_nod));
+	an->acc = acc;
+	an->st = st;
+	an->dr = dr;
+	return an;
+}
+
+struct arb_nod *arb_inser(struct arb_nod *rad, struct accesari_app acc)
+{
+	if (rad == NULL) {
+		rad = arb_creaza_nod(acc, NULL, NULL);
+		return rad;
+	}
+
+	if (acc.nr_acces < rad->acc.nr_acces) {
+		rad->st = arb_inser(rad->st, acc);
+		return rad;
+	}
+
+	rad->dr = arb_inser(rad->dr, acc);
+	return rad;
+}
+
+void arb_scd(struct arb_nod *rad)
+{
+	if (rad == NULL) {
+		return;
+	}
+	if (rad->st != NULL) {
+		arb_scd(rad->st);
+	}
+	printf("utiliz %d: %d accesari\n", rad->acc.index_utiliz, rad->acc.nr_acces);
+	if (rad->dr != NULL) {
+		arb_scd(rad->dr);
+	}
+}
+
+void arb_afis() 
+{
+	printf("Utilizatorii sortati in ordinea nr. de accesari aplicatie\n");
+	arb_scd(rad);
+	printf("\n");
+}
+
+void arb_citire(char *fname)
+{
+	FILE *f = NULL;
+	if (0 != fopen_s(&f, fname, "rt")) {
+		printf("Nu pot deschide fisierul %s\n", fname);
+		return;
+	}
+	char buf[16];
+	struct accesari_app acc;
+	// fisierul are formatul: fiecare linie - de cate ori a accesat un utilizator applicatia
+	while (fgets(buf, 31, f)) {
+		sscanf_s(buf, "%d %d", &(acc.index_utiliz), &(acc.nr_acces));
+		rad = arb_inser(rad, acc);
+	}
+}
+
 int main()
 {
 	lista_citire("C:\\trafic.txt");
@@ -210,4 +290,7 @@ int main()
 
 	matr_citire("C:\\pagini.txt");
 	matr_afis();
+
+	arb_citire("C:\\accesari.txt");
+	arb_afis();
 }
