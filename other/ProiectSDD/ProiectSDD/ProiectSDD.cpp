@@ -219,7 +219,7 @@ struct arb_nod {
 	struct arb_nod *dr;
 };
 
-struct arb_nod *rad = NULL;
+struct arb_nod *arb_rad = NULL;
 
 struct arb_nod *arb_creaza_nod(struct accesari_app acc, struct arb_nod *st, struct arb_nod *dr)
 {
@@ -246,6 +246,54 @@ struct arb_nod *arb_inser(struct arb_nod *rad, struct accesari_app acc)
 	return rad;
 }
 
+struct arb_nod *arb_min(struct arb_nod *rad)
+{
+	struct arb_nod *p = rad;
+	while (p->st != NULL) {
+		p = p->st;
+	}
+	return p;
+}
+
+struct arb_nod *arb_sterge(struct arb_nod *rad, struct accesari_app acc)
+{
+	if (rad == NULL) {
+		return NULL;
+	}
+
+	if (acc.nr_acces < rad->acc.nr_acces) {
+		rad->st = arb_sterge(rad->st, acc);
+		return rad;
+	}
+
+	if (acc.nr_acces > rad->acc.nr_acces) {
+		rad->dr = arb_sterge(rad->dr, acc);
+		return rad;
+	}
+
+	if (rad->st == NULL) {
+		struct arb_nod *temp = rad->dr;
+		free(rad);
+		return temp;
+	}
+	
+	if (rad->dr == NULL) {
+		struct arb_nod *temp = rad->st;
+		free(rad);
+		return temp;
+	}
+
+	// Gaseste min arbore dreapta
+	struct arb_nod *temp = arb_min(rad->dr);
+
+	// Copiaza min arbore dreapta in nodul curent
+	rad->acc.nr_acces = temp->acc.nr_acces;
+
+	// Sterge min din arbore dreapta
+	rad->dr = arb_sterge(rad->dr, temp->acc);
+	return rad;
+}
+
 void arb_scd(struct arb_nod *rad)
 {
 	if (rad == NULL) {
@@ -263,7 +311,7 @@ void arb_scd(struct arb_nod *rad)
 void arb_afis() 
 {
 	printf("Utilizatorii sortati in ordinea nr. de accesari aplicatie\n");
-	arb_scd(rad);
+	arb_scd(arb_rad);
 	printf("\n");
 }
 
@@ -279,7 +327,7 @@ void arb_citire(char *fname)
 	// fisierul are formatul: fiecare linie - de cate ori a accesat un utilizator applicatia
 	while (fgets(buf, 31, f)) {
 		sscanf_s(buf, "%d %d", &(acc.index_utiliz), &(acc.nr_acces));
-		rad = arb_inser(rad, acc);
+		arb_rad = arb_inser(arb_rad, acc);
 	}
 }
 
