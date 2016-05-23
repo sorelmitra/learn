@@ -837,3 +837,13 @@ console.log("window.DEBUG", window.DEBUG); // undefined
 if (!window.DEBUG) {
     console.log("window.DEBUG is undefined, which we saw earlier that is not equal to either true or false, but still the code got here");
 }
+
+// Wrapper objects for primitive types are just that - wrapper objects. The VALUE is still the immutable primitive, so trying to wrap the number in a Number() to allow changing it fails:
+function changeSome(x) {
+    x = x + 1; // if x is a Number(), what happens here is a de-wrapping: the primitive value is incremented and reassigned-back. This doesn't modify the original variable, which is still passed by VALUE
+    console.log("I changed x to", x); // 3
+}
+var a = 2;
+var b = new Number( a ); // or equivalently `Object(a)`
+changeSome( b );
+console.log("Did I change b?", b == 3); // 2, not 3
