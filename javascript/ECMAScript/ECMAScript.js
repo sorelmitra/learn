@@ -636,12 +636,17 @@ function jQueryLoader(handler) {
     jqScriptElem.setAttribute("src", "node_modules/jquery/dist/jquery.js");
     document.getElementsByTagName("head")[0].appendChild(jqScriptElem);
 
+    var count = 0;
     function waitForJQLoading(f) {
-        if (typeof jQuery == undefined) {
-            setTimeout(waitForJQLoading, 1000);
+        if (++count > 9) {
+            console.log("jQuery did not load in %d seconds", count);
             return;
         }
-        handler();
+        try {
+            handler();
+        } catch(ReferenceError) {
+            setTimeout(waitForJQLoading, 1000);            
+        }
     }
     setTimeout(waitForJQLoading, 1000);
 }
@@ -847,3 +852,13 @@ var a = 2;
 var b = new Number( a ); // or equivalently `Object(a)`
 changeSome( b );
 console.log("Did I change b?", b == 3); // 2, not 3
+
+
+//// the || and && operators are not logical ones, but selectors - they select one of their values (much like "or" in Perl)
+
+var c = "a";
+
+var d1 = a && b && c;
+console.log("&& selects operands, in this case it selected a:", d1);
+var d2 = Boolean(a && b && c);
+console.log("to get a similar behavior as in C, we need to wrap the expression in Boolean():", d1);
