@@ -642,11 +642,11 @@ function jQueryLoader(handler) {
             console.log("jQuery did not load in %d seconds", count);
             return;
         }
-        try {
-            handler();
-        } catch(ReferenceError) {
-            setTimeout(waitForJQLoading, 1000);            
+        if (typeof jQuery == "undefined") { // What we are doing here? If we would check for undefined without quotes, it will only catch the situation when jQuery is NOT DECLARED. But if jQuery is declared (I don't know how would that happen) and undefined, typeof would return "undefined". When the variable is declared, typeof always returns a string. Now, the test we have catches all situations because of type coercion: if jQuery is declared but is undefined, typeof returns "undefined". If jQuery is not declared, typeof returns undefined, which will be coerced to string "undefined"...
+            setTimeout(waitForJQLoading, 1000);
+            return;
         }
+        handler();
     }
     setTimeout(waitForJQLoading, 1000);
 }
