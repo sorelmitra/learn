@@ -859,6 +859,6 @@ console.log("Did I change b?", b == 3); // 2, not 3
 var c = "a";
 
 var d1 = a && b && c;
-console.log("&& selects operands, in this case it selected a:", d1);
+console.log("&& selects operands, in this case it selected c:", d1);
 var d2 = Boolean(a && b && c);
-console.log("to get a similar behavior as in C, we need to wrap the expression in Boolean():", d1);
+console.log("to get a similar behavior as in C, we need to wrap the expression in Boolean():", d2);
