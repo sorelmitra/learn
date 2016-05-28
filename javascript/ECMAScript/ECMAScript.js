@@ -843,6 +843,31 @@ if (!window.DEBUG) {
     console.log("window.DEBUG is undefined, which we saw earlier that is not equal to either true or false, but still the code got here");
 }
 
+// Numbers
+var a = Number.MAX_VALUE;
+var b = a + 1; // woops, still a value, not Infinity; you have to overflow MAX_VALUE more to obtain Infinity
+var c = -a -1; // woops, still a value, not -Infinity
+var d = 1/0; // Infinity, not some error
+var e = -1/0; // -Infinity, not some error
+var f = 1/b; // 0? close to it but  not quite
+var g = 0/-3; // -0 (!) -0 exists to allow games which have a negative speed that reaches 0 still detect the previous direction of motion
+
+console.log("My special numbers are", a, b, c, d, e, f, g);
+console.log("-0 as - string:", "" + -0, ";- JSON", JSON.stringify(-0), ";- as parsed JSON", JSON.parse("-0"));
+
+function isNegZero(n) { // because -0 === 0, you have to provide a special function to detect it
+    n = Number( n );
+    return (n === 0) && (1 / n === -Infinity);
+}
+console.log("am I -0?", isNegZero( -0 ), isNegZero( 0 / -3 ), isNegZero( 0 ));
+
+var a = 2 / "hi"; // Nan
+var b = NaN;
+console.log(" NaN is not equal to itself:", a === b);
+console.log("I have to do special checks to test both:",
+    a !== a ? b !== b : false,
+    "or use Object.is():", Object.is(a, b));
+
 // Wrapper objects for primitive types are just that - wrapper objects. The VALUE is still the immutable primitive, so trying to wrap the number in a Number() to allow changing it fails:
 function changeSome(x) {
     x = x + 1; // if x is a Number(), what happens here is a de-wrapping: the primitive value is incremented and reassigned-back. This doesn't modify the original variable, which is still passed by VALUE
@@ -854,11 +879,130 @@ changeSome( b );
 console.log("Did I change b?", b == 3); // 2, not 3
 
 
+//// Natives - i.e. Built-ins. Some of them are object wrappers
+
+var a = new String("42");
+showTypeof(a);
+console.log("a's prototype is", Object.getPrototypeOf(a), "[[Class]] of a is", Object.prototype.toString.call(a));
+
+// There's no need to use object wrappers directly. Moreover, there are gotchas:
+var a = new Boolean( false );
+if (!a) {
+    console.log( "Oops" ); // never runs
+}
+
+// Unboxing object wrappers values:
+console.log("my value is", a.valueOf());
+// Arrays
+var arr1 = new Array(3); // don't use empty slots, as they don't work well with all Array functions
+console.log("array of length 3 with empty slots", arr1);
+
+var arr2 = [undefined, undefined, undefined]; // better this way, instead of empty slots we have undefined values
+console.log("array of length 3 with manually set undefined values", arr2);
+var arr3 = Array.apply(null, {length: 3}); // same as arr2, but produced by Function.prototype.apply(). The second argument of apply() should be an array, and we provided an array with empty slots (!). But because of the way apply() works, we end up with an array of undefined values. apply() iterates over its second argument (say arr), accesing elements arr[i]. Because no element was defined, it ends up calling Array(undefined, undefined, undefined)
+console.log("array of length 3 with undefined values produced by Array.apply()", arr3);
+
+console.log("map with empty slots produces empty slots:", arr1.map(function(val, i) {return i;}));
+console.log("map with undefined values works:", arr2.map(function(val, i) {return i;}));
+
+// RegExp
+console.log("abbc abbd".replace(/(b+)c/, '$1E'));
+console.log(/.(?=c)/.exec("abc adc"));
+
+// Date
+var d = new Date();
+console.log("The date is", d, d.getTime(), Date.now());
+
+// ECMAScript 6 Symbol
+var s = Symbol("i'm a symbol");
+showTypeofAndValue(s);
+
+
+//// JSON converting & parsing
+console.log("I'm a JSON stringified - string: %s, number: %d", JSON.stringify("abc"), JSON.stringify(42));
+console.log("I'm a JSON stringified object", JSON.stringify({a: 42, b: "abc", c: true}));
+var o = {
+    a: 42,
+    b: "abc",
+    d: function() {},
+    toJSON: function() { // we can design our own JSON-ify method that needs to return an object that's used by JSON
+        return {a: this.a, b: this.b, c: false}; // you can even include non-existent properties
+    }
+}
+console.log("I'm a JSON stringified object with custom toJSON()", JSON.stringify(o));
+
+console.log("I'm a JSON stringified object with a replacer", 
+    JSON.stringify(o, function(k, v) {
+        if (k !== "a") { // o.toJSON() excludes d, here we also exclude a
+            return v;
+        }
+    })); // the replacer could also be an array with the names of the properties to be included in JSON
+
+
+//// Boolean Falsy values
+
+function falsyTruthy(x) {
+    if (x) {
+        console.log(x, "is truthy");
+    } else {
+        console.log(x, "is falsy");
+    }
+}
+
+// The falsy values
+falsyTruthy(undefined);
+falsyTruthy(null);
+falsyTruthy(0);
+falsyTruthy(-0);
+falsyTruthy(NaN);
+falsyTruthy(false);
+falsyTruthy("");
+
+// Everything else is truthy...
+falsyTruthy([]);
+falsyTruthy({});
+
+// ...except some falsy objects from the browser or JS engine
+falsyTruthy(document.all); // falsy to suggest it's deprecated
+
+//// Explicit Coercion
+
+var a = 34;
+var d = new Date();
+console.log("Explicit Coercion",
+    Number("43.4"),
+    Number("gh"),
+    String(34),
+    a.toString(), // explicit-implicit: a is first converted to Number, then toString() is called on that
+    +"23", // +something converts that something to a number
+    -"23", // -something does the same
+    +d,
+    ~"Hello".indexOf("lo"), // ~3 which is -4, which is truthy - some use it for doing checks (!)
+    parseInt("58", 10), // explicit conversion; always specify the base when using parseInt()
+    Boolean(undefined),
+    !!undefined, // !something converts that something to a boolean but flips the value; !!something flips it back
+    !![],
+    ""
+    );
+
+
+//// Explicit Coercion
+
+console.log("Implicit Coercion",
+    "");
+
+
 //// the || and && operators are not logical ones, but selectors - they select one of their values (much like "or" in Perl)
 
+var a = new Boolean(false);
+var b = 6;
 var c = "a";
 
-var d1 = a && b && c;
+var d1 = a && b && c; // && selects the second operand if the expression is true, the first operand otherwise
 console.log("&& selects operands, in this case it selected c:", d1);
-var d2 = Boolean(a && b && c);
-console.log("to get a similar behavior as in C, we need to wrap the expression in Boolean():", d2);
+
+var d2 = Boolean(a && b && c); // && behaves te same, but wrapping it in Boolean converts it to true/false
+console.log("to get the same bool result as in C++, we need to wrap the expression in Boolean():", d2);
+
+var d3 = a || b || c; // || selects the first operand if the expression is true, the second operand otherwise
+console.log("|| selects operands, in this case it selected a:", d3);
