@@ -1006,3 +1006,43 @@ console.log("to get the same bool result as in C++, we need to wrap the expressi
 
 var d3 = a || b || c; // || selects the first operand if the expression is true, the second operand otherwise
 console.log("|| selects operands, in this case it selected a:", d3);
+
+
+//// grammar
+
+// switch uses strict comparison ===, so we can trick it by using == ourserlves...
+var a = "42";
+switch (true) {
+    case a == 10:
+        console.log( "10 or '10'" );
+        break;
+    case a == 42:
+        console.log( "42 or '42'" );
+        break;
+    default:
+        // never gets here
+}
+
+// ...but be careful to always return a boolean value, otherwise the strict comparison will fail
+
+// this is wrong
+var a = "hello world";
+var b = 10;
+switch (true) {
+    case (a || b == 10): // || operator selects its operands, so the result of this expression is truthy, but not true
+        // never gets here
+        break;
+    default:
+        console.log( "Oops" );
+}
+
+// this is correct
+var a = "hello world";
+var b = 10;
+switch (true) {
+    case !!(a || b == 10): // we explicitly coerce the result of this expression to boolean
+        console.log( "Right" );
+        break;
+    default:
+        // never gets here
+}
