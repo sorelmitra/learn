@@ -1046,3 +1046,144 @@ switch (true) {
     default:
         // never gets here
 }
+
+
+//// browser-specific things
+
+if (window) {
+    window.onload = function browserInit() {
+        // Putting an ID to an HTML element defines a JS variable with the name equal to that ID and value an object of specific HTML prototype
+        console.log("This is a variable from HTML:", htmlVar, Object.getPrototypeOf(htmlVar));
+    }
+}
+
+
+/*****************************************************************
+ * 
+ * Event Loop and Job Queue
+ * 
+ *****************************************************************/
+
+//// Event Loop
+
+/*
+JS has a concurency model based on the Event Loop.
+The Event Loop is something like that (from MDN):
+while(queue.waitForMessage()){
+  queue.processNextMessage();
+}
+queue.waitForMessage waits synchronously for a message to arrive if there is none currently. When a message is available, it is executed.
+Each message has a function (callback) associated with it (it can be undefined or null). If the function is defined, it is called.
+Each message must execute completely before another message can be taken out of the queue.
+
+As I get it, the entire JavaScript script is executed in the same way - if it wouldn't finish fast, then no other events would be possible.
+
+Messages are placed in the event loop by:
+- browsers in response to various events (script loaded, server data arrived, button clicked, etc). The callbacks are provided by your app (the script itself, by registering a function with an AJAX request, with a button's onclick, etc.)
+- your own app by calling setTimeout(fn, 0)
+*/
+
+// Uncomment this to prove that the entire script is ran on the Event Loop. The scripts will not be executed until the browser detects the blockage and offers to stop the script.
+// while(true) {}
+
+
+//// Job Queue
+
+/*
+ECMAScript 6 also has a Job Queue. This is a mechanism to put messages in the Event Loop queue in the FRONT, instead of at the end of the queue. This allows for the Promise mechanism to exist - when a promise is resolved, the corresponding callback is called asynchronously by using the Job Queue.
+*/
+
+
+/*****************************************************************
+ * 
+ * Fake Promise-like code - values
+ * 
+ *****************************************************************/
+
+/* Suppose we want to add x and y when one or both could get their values somewhere later (maybe async). Rather than doing ugly checks in a loop, waiting for both of them to get their values, we write a mechanism that allows us to be informed async when both values are available:
+*/
+
+// Get the value of x when it is avaliable - simulate by setting a timeout instead of running some AJAX request. When x becomes available - i.e. the timeout expires - call a callback function with the value of x
+function fetchX(cb) {
+    setTimeout(function() {
+        cb(3);
+    }, 1100);
+}
+
+// See fetchX above
+function fetchY(cb) {
+    setTimeout(function() {
+        cb(7);
+    }, 1100);
+}
+
+// We have getX and getY functions, that we call in order to get our x and y value. Both functions receive a callback that they call when the x, respectively y values are available.
+// We also have a cb callback that we call when the sum is ready
+function add(getX, getY, cb) {
+    var x, y; // undefined, will be initialized later by calling getX and getY
+    
+    getX(function gotX(xVal) { // call getX() which will call our calback when the x value is available. Note that our callback has a closure over both x and y. It is a good practice to name all functions - they will be more easily seen in call stacks and debuggers
+        x = xVal; // the x value is availabe, copy it in x
+        if (y !== undefined) { // if y value is available too, then do the sum, otherwise we just keep the closure over x available
+            cb(x + y);
+        }
+    });
+    getY(function gotY(yVal) { // similarly as above, but for y this time
+        y = yVal;
+        if (x !== undefined) {
+            cb(x + y);
+        }
+    });
+    
+    // when both callbacks provided to getX and getY will have been called, both x and y will have values. In either case we call the callback with the sum value
+}
+
+// use our async adding function
+add(fetchX, fetchY, function showSum(sum) {
+    console.log("The sum computed from async-got values is", sum);
+});
+
+
+/*****************************************************************
+ * 
+ * Fake Promise-like code - completion events
+ * 
+ *****************************************************************/
+
+// We have an async function that, when it completes, it can return information on the way it completed: with success or error, in both cases providing some data - useful data for success, error info for error. We want to listen for this information without the "callback hell" - having control over when our callback would be called
+
+
+// We have to make our "promise" global - as opposed to real ECMAScript 6 Promises
+var o = {
+    value: undefined
+};
+
+// This function returns a "promise" that has two "events" associated: success and error. To make it async, it uses setTimeout(). To provide success/error cases it tests for a random number. On the success case, the error "event" is empty, and viceversa.
+function doWork() {
+    
+    if ((o.value = Math.random()) < 0.5) {
+        // success case
+        setTimeout(function() {
+            o.success(o.value);
+        }, 1200);
+        return o;
+    }
+    
+    // error case
+    setTimeout(function() {
+        o.error("My number was too large: " + o.value)
+    }, 1200);
+    return o;
+}
+
+var fakePromise = doWork();
+fakePromise.success = function(val) {
+    console.log("Fake promise success:", val);
+}
+fakePromise.error = function(err) {
+    console.log(err);
+}
+
+/* Note that this approach does not do actual inversion of control - it's more of a syntactic example of how real promises work. Our success and error functions are still called whenever the doWork() function pleases.
+With real promises, we control when our code is called.
+*/
