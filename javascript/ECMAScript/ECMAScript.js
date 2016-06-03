@@ -1249,9 +1249,13 @@ With real promises, we control when our code is called.
 
 // We return a promise that x will get a value
 function fetchX(cb) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) { // this is the worker function, called before the Promise() constructor returns the promise object
         setTimeout(function() {
-            resolve(5);
+            if (Math.random() < 0.5) {
+                resolve(5); // resolve() is the function we call when our promise was resolved (e.g. an AJAX request got its response back) - in this case we use a random value for testing
+            } else {
+                reject("x: my random number was too big"); // reject() is used for when the promise cannot be resolved - in our case, the random number was too big
+            }
         }, 1300);
     });
 }
@@ -1260,7 +1264,11 @@ function fetchX(cb) {
 function fetchY(cb) {
     return new Promise(function(resolve, reject) {
         setTimeout(function() {
-            resolve(7);
+            if (Math.random() < 0.5) {
+                resolve(7);
+            } else {
+                reject("y: my random number was too big");
+            }
         }, 1400);
     });
 }
@@ -1272,7 +1280,34 @@ function add(xPromise, yPromise) {
         }); // this function actually returns another promise - that the sum is ready
 }
 
-add(fetchX(), fetchY())
-    .then(function(sum) {
+// Call add(), which returns a Promise, and chain the .then() function
+add(fetchX(), fetchY()).then(
+    function(sum) {
         console.log("The sum with real Promises is", sum);
-    });
+    },
+    function(err) {
+        console.log("The promise was rejected:", err);
+    }
+);
+
+// retain the promise and watch it
+var promise = add(fetchX(), fetchY());
+
+// We can watch the promise later, many times: it is immutable, and it will retain its value no matter how many times we watch it
+promise.then(
+    function(sum) {
+        console.log("1st: The sum with a promise var is", sum);
+    },
+    function(err) {
+        console.log("1st: The promise was rejected:", err);
+    }
+);
+
+promise.then(
+    function(sum) {
+        console.log("2nd: The sum with a promise var is", sum);
+    },
+    function(err) {
+        console.log("2nd: The promise was rejected:", err);
+    }
+);
