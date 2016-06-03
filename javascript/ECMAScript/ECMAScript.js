@@ -1394,3 +1394,53 @@ p1.then( function(v){
 p2.then( function(v){
     console.log( v );
 } );
+
+
+//// Never resolving a Promise
+
+var p4 = new Promise(function(resolve, reject) {
+    console.log("I'm not planning to resolve or reject this promise");
+});
+
+// Will never get called, nor the resolve, nor the reject callbacks
+p4.then(
+    function() {
+        console.log("You resolved the promise!");
+    },
+    function() {
+        console.log("You rejected the promise!");
+    }
+);
+
+// Resolves after a timeout
+var timerPromise = new Promise(function(resolve, reject) {
+    setTimeout(function() {
+        resolve("Me, the timer promise, resolved");
+    }, 2000);
+});
+
+// Promise.race() creates a "race" between an array of promises: which one resolves first, that one's response will be passed to the resolve/reject functions
+Promise.race([p4, timerPromise]).then(
+    function(something) {
+        console.log(something);
+    }
+);
+
+
+//// Throwing errors while trying to resolve a promise
+
+// Throwing an error while trying to resolve a promise will result in the reject function being called, with the exception as the argument
+
+var p4 = new Promise(function(resolve, reject) {
+    someUndefinedFunction(); // throws an error
+    resolve("I'll never get here, as I'm trying to call some undefined function");
+});
+
+p4.then(
+    function(msg) {
+        console.log(msg);
+    },
+    function(err) {
+        console.log("I got this error from a Promise:", err);
+    }
+);
