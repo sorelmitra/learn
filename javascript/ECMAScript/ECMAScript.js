@@ -1245,6 +1245,9 @@ With real promises, we control when our code is called.
  * 
  *****************************************************************/
 
+
+//// Basic Promises
+
 // The same add example, but with promises
 
 // We return a promise that x will get a value
@@ -1311,3 +1314,24 @@ promise.then(
         console.log("2nd: The promise was rejected:", err);
     }
 );
+
+
+//// Is it a Promise?
+
+function isPromise(p) {
+    if (
+        p !== null &&
+        (
+            typeof p === "object" ||
+            typeof p === "function"
+        ) &&
+        typeof p.then === "function"
+    ) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+console.log("Did we get a promise (duck typing)?", isPromise(promise));
