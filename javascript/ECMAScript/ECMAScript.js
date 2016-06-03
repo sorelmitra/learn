@@ -1237,3 +1237,42 @@ fakePromise.error = function(err) {
 /* Note that this approach does not do actual inversion of control - it's more of a syntactic example of how real promises work. Our success and error functions are still called whenever the doWork() function pleases.
 With real promises, we control when our code is called.
 */
+
+
+/*****************************************************************
+ * 
+ * Promises
+ * 
+ *****************************************************************/
+
+// The same add example, but with promises
+
+// We return a promise that x will get a value
+function fetchX(cb) {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve(5);
+        }, 1300);
+    });
+}
+
+// See fetchX above
+function fetchY(cb) {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve(7);
+        }, 1400);
+    });
+}
+
+function add(xPromise, yPromise) {
+    return Promise.all([xPromise, yPromise]) // this creates a promise that waits on the x & y promises
+        .then(function(values) { // when the promise is done, we can handle the success/error cases with two functions
+            return values[0] + values[1];
+        }); // this function actually returns another promise - that the sum is ready
+}
+
+add(fetchX(), fetchY())
+    .then(function(sum) {
+        console.log("The sum with real Promises is", sum);
+    });
