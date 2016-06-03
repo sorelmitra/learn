@@ -1498,3 +1498,47 @@ Promise.resolve(evilPromise)
         console.log( err );
     }
 );
+
+
+//// Chaining Promises
+
+/*
+Every time you call then(..) on a Promise, it creates and returns a new Promise, which we can chain with.
+Whatever value you return from the then(..) call's fulfillment callback (the first parameter) is automatically set as the fulfillment of the chained Promise (from the first point).
+*/
+
+var p = Promise.resolve( 2189 );
+
+var p2 = p.then( function(v){
+    console.log( v );
+
+    // fulfill `p2` by doubling the value
+    return v * 2;
+} );
+
+// chain off `p2`
+p2.then( function(v){
+    console.log( v );
+} );
+
+
+//// Chaining Promises with Asynchrony
+
+var p = Promise.resolve( 3421 );
+
+p.then( function(v){
+    console.log( v );
+
+    // create a promise to return
+    return new Promise( function(resolve,reject){
+        // introduce asynchrony!
+        setTimeout( function(){
+            // fulfill with double value
+            resolve( v * 2 );
+        }, 1600 );
+    } );
+} )
+.then( function(v){
+    // runs after the delay in the previous step
+    console.log( v );
+} );
