@@ -939,9 +939,10 @@ console.log("I'm a JSON stringified object with a replacer",
     })); // the replacer could also be an array with the names of the properties to be included in JSON
 
 
-//// Boolean Falsy values
+//// Boolean Falsy values & Implicit Conversion to Boolean
 
 function falsyTruthy(x) {
+    // Check if x is falsy; also exhibits implicit conversion to boolean
     if (x) {
         console.log(x, "is truthy");
     } else {
@@ -982,15 +983,50 @@ console.log("Explicit Coercion",
     Boolean(undefined),
     !!undefined, // !something converts that something to a boolean but flips the value; !!something flips it back
     !![],
+    String(Symbol("cool")),
     ""
     );
 
 
-//// Explicit Coercion
+//// Implicit Coercion
 
 console.log("Implicit Coercion",
+    "42" + "0",
+    "42" + 0, 
+    0 + "42", // "042": if one of the operands is a string, the other one is converted to string
+    [1,2] + [3,4], // "1,23,4": both are first converted to strings
+    "" + 507, // to string
+    507 + "", // idem
+    "3.14" - 0, // to number: "-" is only defined for numbers
+    [5] - [3], // 2: each array is converted to string, then each string is converted to number
+    true + 3, // 4: "true" is converted to number (1) first
+    [] + 0,
+    //"" + Symbol("cool"), // TypeError: implicit coercion to Symbol is not allowed
+    "42.7" == 42.7, // in case of comparison, string is converted to number
+    "42" == true, // oops: false: true is first converted to number, so is "42", so: 41 == 1 is false!
+    "42" == false, // false again, for the same reason: it coerces to 42 == 0 which is false
+    "0" == false, // true: 0 == 0
+    // so never use such comparisons; instead use if (a) - implicit conversion to Boolean - or if(!!a) - implicit conversion to Boolean -
+    null == undefined,
+    undefined == null,
+    [42].valueOf(),
+    "42" == [42], // true, because when objects are involved they are converted to primitive first, so this coerces to "42" == 42, i.e. 42 == 42 which is true
+    [4, 2].valueOf(),
+    "42" == [4, 2], 
+    "less or greater than",
+    "42" < [43],
+    [43] > "42",
+    [43] < "42",
     "");
 
+var oldNumberValueOf = Number.prototype.valueOf;
+Number.prototype.valueOf = function() {
+    return 3;
+};
+console.log("I hijacked Number's valueOf():", new Number( 2 ) == 3); // true: Because == coerces Number to number using valueOf(), it calls my function above...
+
+Number.prototype.valueOf = oldNumberValueOf; // restore valueOf()
+console.log("I put back Number's valueOf():", new Number( 2 ) == 3); // false, as expected  
 
 //// the || and && operators are not logical ones, but selectors - they select one of their values (much like "or" in Perl)
 
@@ -998,11 +1034,25 @@ var a = new Boolean(false);
 var b = 6;
 var c = "a";
 
-var d1 = a && b && c; // && selects the second operand if the expression is true, the first operand otherwise
+var d1 = a && b && c; // && tests the first operand as boolean: it selects the second operand if the test is true, the first operand otherwise
 console.log("&& selects operands, in this case it selected c:", d1);
 
 var d2 = Boolean(a && b && c); // && behaves te same, but wrapping it in Boolean converts it to true/false
 console.log("to get the same bool result as in C++, we need to wrap the expression in Boolean():", d2);
 
-var d3 = a || b || c; // || selects the first operand if the expression is true, the second operand otherwise
+var d3 = a || b || c; // || tests the first operand as boolean: it selects the first operand if the expression is true, the second operand otherwise
 console.log("|| selects operands, in this case it selected a:", d3);
+
+// || as default values
+function sayHi(x, y) {
+    x = x || "World";
+    y = y || "Hello,";
+    console.log(y, x);
+}
+sayHi();
+sayHi("Sorel");
+sayHi("", "Oops default param wrong"); // oops, "" is falsy, so if we wanted to display an empty string, we got it wrong!
+
+// && as shortcut for if() {}
+var a = new Boolean(false);
+a && sayHi("Boolean is truthy 'cause it's an object");
