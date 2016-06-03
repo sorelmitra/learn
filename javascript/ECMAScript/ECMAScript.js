@@ -1278,6 +1278,7 @@ function fetchY(cb) {
 
 function add(xPromise, yPromise) {
     return Promise.all([xPromise, yPromise]) // this creates a promise that waits on the x & y promises
+        // Promise.prototype.then() registers the provided callbacks to be called when the promise is resolved/rejected. It also returns the promise - so we can chain .then() calls.
         .then(function(values) { // when the promise is done, we can handle the success/error cases with two functions
             return values[0] + values[1];
         }); // this function actually returns another promise - that the sum is ready
@@ -1335,3 +1336,61 @@ function isPromise(p) {
 }
 
 console.log("Did we get a promise (duck typing)?", isPromise(promise));
+
+
+//// Order of Promise calls
+
+// Promise callbacks are called in the order of their registration - see the .then() explanation above
+
+function doSomething() {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve();
+        }, 1500);
+    });
+}
+
+var p = doSomething();
+p.then( function(){
+    p.then( function(){
+        console.log( "C" );
+    } );
+    console.log( "A" );
+} );
+p.then( function(){
+    console.log( "B" );
+} ); // A B C, because the registered callbacks are called in the order of registration: A and B are registered synchronously first, while C is registered only when the async call of A happens
+
+
+//// Resolving a promise via another one
+
+var p3 = new Promise( function(resolve,reject){
+    resolve( "B" );
+} );
+
+var p1 = new Promise( function(resolve,reject){
+    resolve( p3 );
+    /*
+    Here, we resolve this promise via another one (i.e. p3). This means that we actually watch p3 for completion, and only then resolve our own. It's as if we would have written:
+    */
+    /*
+    p3.then(function() {
+        resolve.apply(this, arguments);
+    },
+    function() {
+        reject.apply(this, arguments);
+    })
+    */
+} );
+
+var p2 = new Promise( function(resolve,reject){
+    resolve( "A" );
+} );
+
+// Although both A and B are resolved immediately, the order of calls here is A B, because A is resolved via another promise, which introduces another asynchrony level
+p1.then( function(v){
+    console.log( v );
+} );
+p2.then( function(v){
+    console.log( v );
+} );
