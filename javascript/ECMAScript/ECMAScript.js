@@ -1542,3 +1542,26 @@ p.then( function(v){
     // runs after the delay in the previous step
     console.log( v );
 } );
+
+
+/*****************************************************************
+ * 
+ * ECMAScript 6: Generators
+ * 
+ *****************************************************************/
+
+// Calling yield() in a function turns it into a generator - it returns an iterator, and each call to iterator.next() executes a chunk of code
+
+/* Uncomment this if you have an ECMAScript 6 JS Engine
+
+function *generateSome(){
+    console.log("Generator - Step 1");
+    yield();
+    console.log("Generator - Step 2");
+}
+
+var it = generateSome();
+it.next();
+it.next();
+
+*/
