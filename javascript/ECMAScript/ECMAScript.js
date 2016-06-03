@@ -1427,7 +1427,7 @@ Promise.race([p4, timerPromise]).then(
 );
 
 
-//// Throwing errors while trying to resolve a promise
+//// Throwing Errors with Promises
 
 // Throwing an error while trying to resolve a promise will result in the reject function being called, with the exception as the argument
 
@@ -1442,5 +1442,59 @@ p4.then(
     },
     function(err) {
         console.log("I got this error from a Promise:", err);
+    }
+);
+
+// Throwing an error when handling a promise
+p1.then(
+    function(v) {
+        someUndefinedFunction(); // throws an error - is it lost?
+        // - the error is not lost, but is captured via the promise that p1.then() returns
+        console.log( v );
+    }
+).then(
+    function(v) {
+        console.log("You won't see this message");
+    },
+    function(err) {
+        console.log("I got this error from the promise returned by the handler of p1:", err);
+    }
+);
+
+
+//// Trusting Unknown Promises
+
+// If we have some library that it seems to be returning Promises but we're not sure whether they're real Promises (and duck typing won't help because they use "then"), we can wrap those promises into Promise.resolve()
+
+// If a Promise-like thing is passed to Promise.resolve(), it will listen on it and return a promise insted.
+// If a real Promise is passed to Promise.resolve(), it will just return it back (or the behavior is the same, which doesn't matter)
+
+var evilPromise = {
+    then: function(cb,errcb) {
+        cb( 42 );
+        errcb( "evil laugh" );
+    }
+}; // oops, not quite a promise: it calls both resolve and reject!
+
+evilPromise
+.then(
+    function fulfilled(val){
+        console.log( val ); // 42
+    },
+    function rejected(err){
+        // oops, shouldn't have run
+        console.log( err ); // evil laugh
+    }
+); // surprise
+
+// Avoid the surprise:
+Promise.resolve(evilPromise)
+.then(
+    function fulfilled(val){
+        console.log( val ); // 42
+    },
+    function rejected(err){
+        // will not run
+        console.log( err );
     }
 );
