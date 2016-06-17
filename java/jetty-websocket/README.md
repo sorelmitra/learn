@@ -14,7 +14,7 @@ A few general considerations first:
 
 Below are the steps I followed.
 
-1. Generate the correct self-signed certificates by using the commands from [here](http://stackoverflow.com/questions/4008837/configure-ssl-on-jetty)
+1) Generate the correct self-signed certificates by using the commands from [here](http://stackoverflow.com/questions/4008837/configure-ssl-on-jetty)
 
 The above link has an example on how to generate correct self-signed certificates. (If you have CA-signed certificates, the procedure is somewhat different, I think.)
 
@@ -28,15 +28,15 @@ I'm pasting the commands here for ease of access. Please pay attention to always
     openssl pkcs12 -inkey jetty.key -in jetty.crt -export -out jetty.pkcs12
     keytool -importkeystore -srckeystore jetty.pkcs12 -srcstoretype PKCS12 -destkeystore keystore
 
-2. Have the correct code for HTTPS in Jetty.
+2) Have the correct code for HTTPS in Jetty.
 
 There are some resources on the web that show how to do HTTPS with Jetty, but for me only one worked, and it is [here](http://stackoverflow.com/questions/14362245/programatically-configure-ssl-for-jetty-9-embedded).
 
-3. Have the correct code for handling contexts.
+3) Have the correct code for handling contexts.
 
 This one was tough - the example code from the Jetty documentation page did not work for me.
 What worked was [this](http://wiki.eclipse.org/Jetty/Tutorial/Embedding_Jetty#Setting_Contexts). This tutorial also enlightened me on the fact that I might have conflicts if I try to use the same path for HTTP and WS.
 
-4. Finally, have the correct code for WebSocket
+4) Finally, have the correct code for WebSocket
 
 I've found correct WebSocket code [here](https://github.com/jetty-project/embedded-jetty-websocket-examples). The one that has what we need is `native-jetty-websocket-example`.
