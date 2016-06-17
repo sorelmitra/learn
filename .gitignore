@@ -9,7 +9,10 @@ dot
 embedded
 gpb
 iOS
-java
+java/jetty-websocket/jetty-websocket.iml
+java/events
+java/spring
+java/various
 javascript/test.htm
 javascript/node.js/censorify/readwords
 javascript/angularjs/**
