@@ -6,7 +6,7 @@ Design Patterns folosite per cerințe
 
 Chain of Responsibility
 
-Fiecare specialist este un Responsabil din lanț. Mașina este trecută pe la fiecare specialist din lanț, care își face verificările și completează în lista de reparații.
+Fiecare specialist este un responsabil din lanț (InspectorMasina). Mașina este trecută pe la fiecare specialist din lanț, care își face verificările și completează în lista de reparații.
 
 În plus:
 
