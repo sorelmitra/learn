@@ -1,0 +1,57 @@
+# Specify active profile or any other environment variable in several ways:
+# - Via Java's -Dspring.profiles.active= ; remember to place it BEFORE the JAR name
+# - By setting an environment variable in the OS
+# - Directly in this file as below
+spring:
+  profiles:
+    active: default
+
+---
+
+# Active if no profile is specified
+server:
+  port: 7070
+
+greet:
+  recipient: Default
+  message: Hello, by default
+
+---
+
+# Active only if specified
+spring:
+  profiles: development
+
+server:
+  port: 9090
+
+greet:
+  recipient: Hacker
+  message: Gee, developer
+
+---
+
+# Active only if specified
+spring:
+  profiles: production
+
+server:
+  port: 8080
+
+greet:
+  recipient: Customer
+  message: Yo, user
+
+---
+
+# Active only if specified
+spring:
+  profiles: test
+
+server:
+  port: 8080
+
+greet:
+  recipient: Test
+  message: Hi, test
+
