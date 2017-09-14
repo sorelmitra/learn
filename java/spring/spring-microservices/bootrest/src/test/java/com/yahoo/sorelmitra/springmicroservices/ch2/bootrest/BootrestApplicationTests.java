@@ -3,18 +3,21 @@ package com.yahoo.sorelmitra.springmicroservices.ch2.bootrest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class BootrestApplicationTests {
-
+	@Autowired
+	TestRestTemplate restTemplate;
+	
 	@Test
 	public void testGreeting() {
-		RestTemplate restTemplate = new RestTemplate();
-		Greet greet = restTemplate.getForObject("http://localhost:8080", Greet.class);
+		Greet greet = restTemplate.getForObject("/", Greet.class);
 		Assert.assertEquals("Greetings, you", greet.getMessage());
 		Assert.assertEquals("Visitor", greet.getRecipient());
 	}
