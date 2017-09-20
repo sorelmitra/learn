@@ -15,6 +15,11 @@ server:
 greet:
   recipient: Default
   message: Hello, by default
+ 
+security:
+  user:
+    name: user
+    password: password
 
 ---
 
