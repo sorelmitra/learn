@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>boatdirectory</name>
-	<description>Sample app with Spring Cload for Consul</description>
+	<description>Sample app with Spring Cloud for Consul</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
