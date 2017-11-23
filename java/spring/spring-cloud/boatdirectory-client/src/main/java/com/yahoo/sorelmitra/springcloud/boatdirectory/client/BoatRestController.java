@@ -23,16 +23,11 @@ import org.springframework.web.client.RestTemplate;
 public class BoatRestController {
 	private static Logger LOGGER = Logger.getLogger(BoatRestController.class);
 
-	RestTemplate restTemplate = new RestTemplate();
-	
 	@Autowired
-	DiscoveryClient discoveryClient;
-	
-	@Value("${app.service.name}")
-	String serviceName;
+	private RestTemplate loadBalancedRestTemplate;
 	
 	@Value("${app.service.path}")
-	String servicePath;
+	private String servicePath;
 	
 	@GetMapping("/boats/names")
 	public String[] getBoatNames() {
@@ -40,24 +35,13 @@ public class BoatRestController {
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
 		try {
-			String url = getServiceUrl();
-			LOGGER.info("URL: " + url);
-			ResponseEntity<String[]> response = restTemplate.exchange(url, HttpMethod.GET, request, String[].class);
+			LOGGER.info("URL: " + servicePath);
+			ResponseEntity<String[]> response = loadBalancedRestTemplate.exchange(servicePath, HttpMethod.GET, request, String[].class);
 			return response.getBody();
-		} catch (RestClientException | ServiceException e) {
+		} catch (RestClientException e) {
 			LOGGER.error("ERROR", e);
 			return new String[] {"ERROR: " + e.getMessage()};
 		}
-	}
-
-	private String getServiceUrl() throws ServiceException {
-		List<ServiceInstance> serviceInstances = discoveryClient.getInstances(serviceName);
-		if (serviceInstances.size() < 1) {
-			throw new ServiceException("Could not find in Consul the service with name " + serviceName);
-		}
-		ServiceInstance serviceInstance = serviceInstances.get(0);
-		String url = serviceInstance.getUri().toString() + servicePath;
-		return url;
 	}
 
 	private HttpHeaders prepareAuthorization() {
