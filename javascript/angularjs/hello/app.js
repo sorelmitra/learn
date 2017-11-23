@@ -1,10 +1,14 @@
-var app = angular.module('store', []);
+/**
+ * 
+ */
 
-function MyCtrl($scope) {
-  $scope.visible = true;
+var app = angular.module('MyApp', []);
 
-  $scope.toggle = function() {
-    $scope.visible = !$scope.visible;
-  };
-}
-
+app.controller('MyCtrl', function($scope) {
+	
+	$scope.visible = true;
+	
+	$scope.toggle = function() {
+		$scope.visible = !$scope.visible;
+	}
+});

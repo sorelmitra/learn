@@ -1,15 +1,15 @@
-<!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-    <script src="app.js"></script>
-  </head>
-  <body ng-app>
-    <div ng-controller="MyCtrl">
-      <button ng-click="toggle()">Toggle</button>
-      <p ng-show="visible">Hello World!</p>
-    </div>
-  </body>
-</html>
 
+<head>
+<title>Hello, World</title>
+<script type="text/javascript" src="scripts/node_modules/angular/angular.js"></script>
+<script src="scripts/app/app.js"></script>
+</head>
+
+<body ng-app="MyApp">
+	<div ng-controller="MyCtrl">
+		<button ng-click="toggle()">Toggle</button>
+		<p ng-show="visible">Hello World!</p>
+	</div>
+</body>
+</html>
