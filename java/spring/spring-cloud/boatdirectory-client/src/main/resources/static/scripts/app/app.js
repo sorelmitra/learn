@@ -4,13 +4,14 @@
 
 var app = angular.module('MyApp', []);
 
-app.controller('MyCtrl', function($scope, $http) {
+app.controller('MyCtrl', function($scope, $http, $location) {
 	
 	$scope.boatNames = [];
 	
 	$scope.request = function() {
 		$scope.error = "";
-		$http.get('http://localhost:8080/rest/boats/names')
+		baseUrl = $location.protocol() + '://'+ $location.host() +':'+  $location.port();
+		$http.get(baseUrl + '/rest/boats/names')
 			.then(function(response) {
 				$scope.boatNames = response.data;
 			}, function(reason) {
