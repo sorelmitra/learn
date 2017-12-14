@@ -1,0 +1,11 @@
+spring:
+  session:
+    store-type: jdbc
+  datasource:
+    username: sa
+    password: sa
+
+logging:
+  level:
+    org.springframework.boot: info
+    liquibase: trace

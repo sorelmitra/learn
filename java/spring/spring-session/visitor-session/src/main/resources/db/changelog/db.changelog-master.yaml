@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Avaya
+      changes:
+        - sql: CREATE SCHEMA visitor;
+  - changeSet:
+      id: 2
+      author: Avaya
+      changes:
+        - createTable:
+            schemaName: visitor
+            tableName: state
+            columns:
+              - column:
+                  name: id
+                  type: char(30)
+              - column:
+                  name: state
+                  type: char(30)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_msg_timestamp
+                  type: date
+                  constraints:
+                    nullable: false
