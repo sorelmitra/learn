@@ -1,7 +1,10 @@
 spring:
   session:
     store-type: jdbc
+    jdbc:
+      table-name: visitor.state
   datasource:
+    url: jdbc:h2:mem:appdb
     username: sa
     password: sa
 
