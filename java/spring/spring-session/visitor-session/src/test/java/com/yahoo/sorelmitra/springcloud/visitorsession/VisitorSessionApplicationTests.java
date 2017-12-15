@@ -70,8 +70,7 @@ public class VisitorSessionApplicationTests {
 	public void sessionCreated() {
 		JdbcOperationsSessionRepository jdbcOperationsSessionRepository = new JdbcOperationsSessionRepository(source, new DataSourceTransactionManager(source));
 		jdbcOperationsSessionRepository.setTableName(tableName);
-		SessionRepository<? extends Session> repository = jdbcOperationsSessionRepository;
-		visitorRepository.setRepository(repository);
+		visitorRepository.setRepository(jdbcOperationsSessionRepository);
 		String id = visitorRepository.saveSession();
 		Session session = visitorRepository.getRepository().getSession(id);
 		Assert.assertEquals("12", session.getAttribute("id"));
