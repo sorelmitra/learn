@@ -10,18 +10,68 @@ databaseChangeLog:
       changes:
         - createTable:
             schemaName: visitor
-            tableName: state
+            tableName: SESSION
             columns:
               - column:
-                  name: id
-                  type: char(30)
-              - column:
-                  name: state
-                  type: char(30)
+                  name: SESSION_ID
+                  type: CHAR(36)
                   constraints:
                     nullable: false
               - column:
-                  name: last_msg_timestamp
-                  type: date
+                  name: CREATION_TIME
+                  type: BIGINT
                   constraints:
                     nullable: false
+              - column:
+                  name: LAST_ACCESS_TIME
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: MAX_INACTIVE_INTERVAL
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: PRINCIPAL_NAME
+                  type: VARCHAR(100)
+        - addPrimaryKey:
+            schemaName: visitor
+            tableName: SESSION
+            columnNames: SESSION_ID
+            constraintName: SPRING_SESSION_PK
+  - changeSet:
+      id: 3
+      author: Avaya
+      changes:
+        - createTable:
+            schemaName: visitor
+            tableName: SESSION_ATTRIBUTES
+            columns:
+              - column:
+                  name: SESSION_ID
+                  type: CHAR(36)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ATTRIBUTE_NAME
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ATTRIBUTE_BYTES
+                  type: BYTEA
+        - addPrimaryKey:
+            constraintName: SPRING_SESSION_ATTRIBUTES_PK
+            schemaName: visitor
+            tableName: SESSION_ATTRIBUTES
+            columnNames: SESSION_ID, ATTRIBUTE_NAME
+        - addForeignKeyConstraint:
+            constraintName: SPRING_SESSION_ATTRIBUTES_FK
+            baseTableSchemaName: visitor
+            baseTableName: SESSION_ATTRIBUTES
+            baseColumnNames: SESSION_ID
+            referencedTableSchemaName: visitor
+            referencedTableName: SESSION
+            referencedColumnNames: SESSION_ID
+            onDelete: CASCADE

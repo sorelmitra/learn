@@ -9,7 +9,6 @@ import java.sql.Types;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ public class VisitorSessionApplicationTests {
 
 	@Before
 	public void setUp() {
-		sqlCheckTableEmptyState = "SELECT * FROM visitor.state";
+		sqlCheckTableEmptyState = "SELECT * FROM visitor.SESSION";
 	}
 	
 	@After
@@ -59,13 +58,14 @@ public class VisitorSessionApplicationTests {
 	public void tablesCreated() throws SQLException {
 		ResultSet rs = runStatement(sqlCheckTableEmptyState, true);
 		ResultSetMetaData metaData = rs.getMetaData();
-		Assert.assertEquals(3, metaData.getColumnCount());
+		Assert.assertEquals(5, metaData.getColumnCount());
 		Assert.assertEquals(Types.CHAR, metaData.getColumnType(1));
-		Assert.assertEquals(Types.CHAR, metaData.getColumnType(2));
-		Assert.assertEquals(Types.DATE, metaData.getColumnType(3));
+		Assert.assertEquals(Types.BIGINT, metaData.getColumnType(2));
+		Assert.assertEquals(Types.BIGINT, metaData.getColumnType(3));
+		Assert.assertEquals(Types.INTEGER, metaData.getColumnType(4));
+		Assert.assertEquals(Types.VARCHAR, metaData.getColumnType(5));
 	}
 	
-	@Ignore
 	@Test
 	public void sessionCreated() {
 		JdbcOperationsSessionRepository jdbcOperationsSessionRepository = new JdbcOperationsSessionRepository(source, new DataSourceTransactionManager(source));
@@ -75,6 +75,8 @@ public class VisitorSessionApplicationTests {
 		String id = visitorRepository.saveSession();
 		Session session = visitorRepository.getRepository().getSession(id);
 		Assert.assertEquals("12", session.getAttribute("id"));
+		Assert.assertEquals("INCOMING", session.getAttribute("state"));
+		Assert.assertEquals("2017-12-14 15:22:00", session.getAttribute("last_msg_timestamp"));
 	}
 
 	private ResultSet runStatement(String sqlString, boolean isQuery) throws SQLException {

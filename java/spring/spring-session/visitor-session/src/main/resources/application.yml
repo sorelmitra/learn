@@ -2,7 +2,7 @@ spring:
   session:
     store-type: jdbc
     jdbc:
-      table-name: visitor.state
+      table-name: visitor.SESSION
   datasource:
     url: jdbc:h2:mem:appdb
     username: sa
