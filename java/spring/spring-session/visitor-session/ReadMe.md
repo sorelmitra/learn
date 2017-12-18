@@ -11,9 +11,13 @@ Research on Spring Session:
 1) Have the ability to query by our own field: failure.
 
 a, b) Find all sessions by attribute value: Succeeded with point iii), below.
+
 JdbcOperationsSessionRepository offers a findByIndexNameAndIndexValue() that would be able to search by a single attribute designated to be "principal name". Still:
+
 i) Cannot be done outside of JdbcOperationsSessionRepository, because its findByIndexNameAndIndexValue() returns a Map<String, JdbcSession>
+
 ii) Don't bother to extend from JdbcOperationsSessionRepository, because they made sure JdbcSession isn't visible in extended classes either...
+
 iii) Extend from class JdbcOperationsSessionRepository with a class that resides in the same package (thus it can see JdbcSession): It works, but it's not nice. You have to wrap the call to findByIndexNameAndIndexValue() in another method that would then iterate over the map and fill in another map with the same key and the value converted from JdbcSession to Session.
 
 c) Extend from Session to add more fields to it: Cannot be done.
