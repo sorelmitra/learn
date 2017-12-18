@@ -16,7 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.jdbc.JdbcOperationsSessionRepository;
@@ -33,31 +36,28 @@ public class VisitorSessionApplicationTests {
 	private static final Logger LOG = LoggerFactory.getLogger(VisitorSessionApplicationTests.class);
 	
 	private String sqlCheckTableEmptyState;
-	private PreparedStatement ps = null;
+	private JdbcTemplate jdbcTemplate;
 	
 	@Autowired
 	private HikariDataSource source;
 	
-	@Autowired
-	private VisitorRepository visitorRepository;
-
 	@Value("${spring.session.jdbc.table-name}")
 	private String tableName;
 
 	@Before
 	public void setUp() {
 		sqlCheckTableEmptyState = "SELECT * FROM visitor.SESSION";
+		jdbcTemplate = new JdbcTemplate(source);
 	}
 	
 	@After
 	public void tearDown() throws SQLException {
-		closePs();
 	}
 	
 	@Test
 	public void tablesCreated() throws SQLException {
-		ResultSet rs = runStatement(sqlCheckTableEmptyState, true);
-		ResultSetMetaData metaData = rs.getMetaData();
+		SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sqlCheckTableEmptyState);
+		SqlRowSetMetaData metaData = rowSet.getMetaData();
 		Assert.assertEquals(5, metaData.getColumnCount());
 		Assert.assertEquals(Types.CHAR, metaData.getColumnType(1));
 		Assert.assertEquals(Types.BIGINT, metaData.getColumnType(2));
@@ -68,39 +68,24 @@ public class VisitorSessionApplicationTests {
 	
 	@Test
 	public void sessionCreated() {
-		JdbcOperationsSessionRepository jdbcOperationsSessionRepository = new JdbcOperationsSessionRepository(source, new DataSourceTransactionManager(source));
+		JdbcOperationsSessionRepository jdbcOperationsSessionRepository =
+			new JdbcOperationsSessionRepository(
+				source, new DataSourceTransactionManager(source));
 		jdbcOperationsSessionRepository.setTableName(tableName);
-		visitorRepository.setRepository(jdbcOperationsSessionRepository);
-		String id = visitorRepository.saveSession();
-		Session session = visitorRepository.getRepository().getSession(id);
+		SessionRepository repo = jdbcOperationsSessionRepository;
+
+		Session toSave = repo.createSession();
+		toSave.setAttribute("id", "12");
+		toSave.setAttribute("state", "INCOMING");
+		toSave.setAttribute("last_msg_timestamp", "2017-12-14 15:22:00");
+
+		repo.save(toSave);
+		
+		Session session = repo.getSession(toSave.getId());
+		
 		Assert.assertEquals("12", session.getAttribute("id"));
 		Assert.assertEquals("INCOMING", session.getAttribute("state"));
 		Assert.assertEquals("2017-12-14 15:22:00", session.getAttribute("last_msg_timestamp"));
-	}
-
-	private ResultSet runStatement(String sqlString, boolean isQuery) throws SQLException {
-		ResultSet rs = null;
-		try {
-			LOG.info("Connected to " + source.getJdbcUrl() + "; running SQL " + sqlString);
-			closePs();
-			ps = source.getConnection().prepareStatement(sqlString);
-			if (isQuery) {
-				rs = ps.executeQuery();
-			} else {
-				ps.executeUpdate();
-			}
-			LOG.info("SQL " + sqlString + " executed successfully");
-		} finally {
-			source.close();
-		}
-
-		return rs;
-	}
-
-	private void closePs() throws SQLException {
-		if (ps != null) {
-			ps.close();
-		}
 	}
 
 	public HikariDataSource getSource() {
