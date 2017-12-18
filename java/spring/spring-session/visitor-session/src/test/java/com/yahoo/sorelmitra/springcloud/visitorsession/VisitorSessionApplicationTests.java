@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -20,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
+import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.jdbc.JdbcOperationsSessionRepository;
@@ -68,24 +70,34 @@ public class VisitorSessionApplicationTests {
 	
 	@Test
 	public void sessionCreated() {
-		JdbcOperationsSessionRepository jdbcOperationsSessionRepository =
-			new JdbcOperationsSessionRepository(
+		MyJdbcOperationsSessionRepository jdbcOperationsSessionRepository =
+			new MyJdbcOperationsSessionRepository(
 				source, new DataSourceTransactionManager(source));
 		jdbcOperationsSessionRepository.setTableName(tableName);
+		// Notice the ugly warning
 		SessionRepository repo = jdbcOperationsSessionRepository;
 
+		// Can't do this, VisitorSession and JdbcSession are on separate hierachies from Session:
+		// VisitorSession toSave = (VisitorSession) repo.createSession();
 		Session toSave = repo.createSession();
 		toSave.setAttribute("id", "12");
 		toSave.setAttribute("state", "INCOMING");
 		toSave.setAttribute("last_msg_timestamp", "2017-12-14 15:22:00");
 
+		// Notice the ugly warning
 		repo.save(toSave);
 		
+		// Can't do this, VisitorSession and JdbcSession are on separate hierachies from Session:
+		// VisitorSession session = (VisitorSession) repo.getSession(toSave.getId());
 		Session session = repo.getSession(toSave.getId());
 		
 		Assert.assertEquals("12", session.getAttribute("id"));
 		Assert.assertEquals("INCOMING", session.getAttribute("state"));
 		Assert.assertEquals("2017-12-14 15:22:00", session.getAttribute("last_msg_timestamp"));
+		
+		// Can't do this, JdbcSession is not visible: Map<String, JdbcSession> touristSessions = jdbcOperationsSessionRepository.findByIndexNameAndIndexValue(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, "tourist");
+		Map<String, Session> touristSessions = jdbcOperationsSessionRepository.getAllSessionsWithPrincipalName("tourist");
+		Assert.assertEquals(null, touristSessions); // Can't access JdbcSession, not even in the extended class
 	}
 
 	public HikariDataSource getSource() {
