@@ -1,6 +1,10 @@
-Attempts to use Spring Session in the way that's not recommended in their docs: Use one of the SessionRepository implementations directly, with a target to be able to search for a custom Session field.
+Attempts to use Spring Session in the way that's not recommended in their docs: Use one of the SessionRepository implementations directly rather than HttpSession with its wide support.
 
-Apart from a fiew small classes, all of the relevant code is in the unit tests.
+The target was to be able to search for a custom Session field.
+
+*Note: The Spring Session [docs](https://docs.spring.io/spring-session/docs/current/reference/html5/ Spring Session docs) strongly steer you towards using HttpSession.*
+
+Apart from a few small classes, all of the relevant code is in the unit tests.
 
 Result: I did find something that works, but it's not nice, as you have to extend from one of Spring's SessionRepository implementation with a class that resides in the same package, then iterate over a map to convert all repo's specific Session implementation to the Session interface itself.
 
