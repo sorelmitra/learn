@@ -24,6 +24,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
+import org.springframework.session.jdbc.FriendOfJdbcSessionRepo;
 import org.springframework.session.jdbc.JdbcOperationsSessionRepository;
 import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -70,16 +71,31 @@ public class VisitorSessionApplicationTests {
 	
 	@Test
 	public void sessionCreated() {
+		/* Useless: can't access JdbcSession from MyJdbcOperationsSessionRepository
 		MyJdbcOperationsSessionRepository jdbcOperationsSessionRepository =
-			new MyJdbcOperationsSessionRepository(
-				source, new DataSourceTransactionManager(source));
+				new MyJdbcOperationsSessionRepository(
+					source, new DataSourceTransactionManager(source));
+		*/
+		FriendOfJdbcSessionRepo jdbcOperationsSessionRepository =
+				new FriendOfJdbcSessionRepo(
+					source, new DataSourceTransactionManager(source));
 		jdbcOperationsSessionRepository.setTableName(tableName);
 		// Notice the ugly warning
 		SessionRepository repo = jdbcOperationsSessionRepository;
 
 		// Can't do this, VisitorSession and JdbcSession are on separate hierachies from Session:
 		// VisitorSession toSave = (VisitorSession) repo.createSession();
+
 		Session toSave = repo.createSession();
+		toSave.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, "tourist");
+		repo.save(toSave);
+		
+		toSave = repo.createSession();
+		toSave.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, "businessman");
+		repo.save(toSave);
+		
+		toSave = repo.createSession();
+		toSave.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, "tourist");
 		toSave.setAttribute("id", "12");
 		toSave.setAttribute("state", "INCOMING");
 		toSave.setAttribute("last_msg_timestamp", "2017-12-14 15:22:00");
@@ -95,9 +111,8 @@ public class VisitorSessionApplicationTests {
 		Assert.assertEquals("INCOMING", session.getAttribute("state"));
 		Assert.assertEquals("2017-12-14 15:22:00", session.getAttribute("last_msg_timestamp"));
 		
-		// Can't do this, JdbcSession is not visible: Map<String, JdbcSession> touristSessions = jdbcOperationsSessionRepository.findByIndexNameAndIndexValue(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, "tourist");
 		Map<String, Session> touristSessions = jdbcOperationsSessionRepository.getAllSessionsWithPrincipalName("tourist");
-		Assert.assertEquals(null, touristSessions); // Can't access JdbcSession, not even in the extended class
+		Assert.assertEquals(2, touristSessions.size());
 	}
 
 	public HikariDataSource getSource() {
