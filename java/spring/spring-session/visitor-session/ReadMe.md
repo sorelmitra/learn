@@ -2,7 +2,7 @@ Attempts to use Spring Session in the way that's not recommended in their docs: 
 
 The target was to be able to search for a custom Session field.
 
-*Note: The Spring Session [docs](https://docs.spring.io/spring-session/docs/current/reference/html5/ Spring Session docs) strongly steer you towards using HttpSession.*
+*Note: The Spring Session [docs](https://docs.spring.io/spring-session/docs/current/reference/html5/ "Spring Session Docs") strongly steer you towards using HttpSession.*
 
 Apart from a few small classes, all of the relevant code is in the unit tests.
 
