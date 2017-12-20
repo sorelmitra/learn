@@ -8,26 +8,25 @@ import java.util.Map;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
-import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NomadMapSessionDAO extends AbstractSessionDAO {
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(NomadMapSessionDAO.class);
 
 	private Map<Serializable, Session> sessions;
-	
+
 	public NomadMapSessionDAO() {
 		sessions = new HashMap<Serializable, Session>();
 	}
-	
+
 	@Override
 	public Collection<Session> getActiveSessions() {
 		LinkedList<Session> activeSessions = new LinkedList<Session>();
 		for (Serializable id : sessions.keySet()) {
-			SimpleSession s = (SimpleSession) sessions.get(id);
+			NomadSession s = (NomadSession) sessions.get(id);
 			if (!s.isValid()) {
 				continue;
 			}
@@ -41,7 +40,7 @@ public class NomadMapSessionDAO extends AbstractSessionDAO {
 
 	@Override
 	protected Serializable doCreate(Session arg0) {
-		SimpleSession s = (SimpleSession) arg0;
+		NomadSession s = (NomadSession) arg0;
 		Serializable id = generateSessionId(s);
 		s.setId(id);
 		sessions.put(id, s);
@@ -58,14 +57,14 @@ public class NomadMapSessionDAO extends AbstractSessionDAO {
 
 	@Override
 	public void update(Session arg0) throws UnknownSessionException {
-		SimpleSession s = (SimpleSession) arg0;
+		NomadSession s = (NomadSession) arg0;
 		sessions.put(s.getId(), s);
 		LOG.info("Updated session " + s.getId());
 	}
 
 	@Override
 	public void delete(Session arg0) {
-		SimpleSession s = (SimpleSession) arg0;
+		NomadSession s = (NomadSession) arg0;
 		sessions.remove(s.getId());
 		LOG.info("Deleted session " + s.getId());
 	}
