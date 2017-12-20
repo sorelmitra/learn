@@ -4,6 +4,7 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.SessionFactory;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
@@ -29,8 +30,15 @@ public class ShiroConfiguration {
 	@Bean
 	public SessionManager sessionManager() {
 		DefaultSessionManager sessionManager = new DefaultSessionManager();
+		sessionManager.setSessionFactory(sessionFactory());
 		sessionManager.setSessionDAO(sessionDao());
 		return sessionManager;
+	}
+
+	@Bean
+	public SessionFactory sessionFactory() {
+		NomadSessionFactory sessionFactory = new NomadSessionFactory();
+		return sessionFactory;
 	}
 
 	@Bean
