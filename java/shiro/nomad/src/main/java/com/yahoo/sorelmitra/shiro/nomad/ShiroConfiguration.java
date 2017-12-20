@@ -3,7 +3,9 @@ package com.yahoo.sorelmitra.shiro.nomad;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,21 +20,21 @@ public class ShiroConfiguration {
 	}
 
 	@Bean
-	public DefaultSessionManager sessionManager() {
+	public SessionManager sessionManager() {
 		DefaultSessionManager sessionManager = new DefaultSessionManager();
 		sessionManager.setSessionDAO(sessionDao());
 		return sessionManager;
 	}
 
 	@Bean
-	public EnterpriseCacheSessionDAO sessionDao() {
-		EnterpriseCacheSessionDAO sessionDAO = new EnterpriseCacheSessionDAO();
+	public SessionDAO sessionDao() {
+		NomadMapSessionDAO sessionDAO = new NomadMapSessionDAO();
 		sessionDAO.setSessionIdGenerator(sessionIdGenerator());
 		return sessionDAO;
 	}
 
 	@Bean
-	public NomadSessionIdGenerator sessionIdGenerator() {
+	public SessionIdGenerator sessionIdGenerator() {
 		return new NomadSessionIdGenerator();
 	}
 
