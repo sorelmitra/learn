@@ -10,14 +10,18 @@ import org.apache.shiro.subject.Subject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+/*
+   Base class, should not be ran by itself.
+   Instead, inherit an empty class from it and set these annotations:
+   @RunWith(SpringRunner.class)
+   @SpringBootTest
+   @ActiveProfiles(profiles = "<profile-name>")
+ */
+@Ignore
 public class NomadApplicationTests {
 
 	@Autowired
