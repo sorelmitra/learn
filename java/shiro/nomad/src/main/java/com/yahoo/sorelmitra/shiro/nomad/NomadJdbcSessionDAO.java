@@ -11,10 +11,14 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class NomadJdbcSessionDAO extends AbstractSessionDAO {
 
 	private static Logger LOG = LoggerFactory.getLogger(NomadJdbcSessionDAO.class);
+
+	@Autowired
+	NomadRepository repository;
 
 	@Override
 	public Collection<Session> getActiveSessions() {
@@ -38,26 +42,29 @@ public class NomadJdbcSessionDAO extends AbstractSessionDAO {
 		NomadSession s = (NomadSession) arg0;
 		Serializable id = generateSessionId(s);
 		s.setId(id);
-		LOG.info("Created session " + id);
+		repository.save(s);
+		LOG.info("Created session " + id + ": " + s);
 		return id;
 	}
 
 	@Override
 	protected Session doReadSession(Serializable id) {
-		Session s = null;
-		LOG.info("Read session " + id);
+		Session s = repository.findOne(id);
+		LOG.info("Read session " + id + ": " + s);
 		return s;
 	}
 
 	@Override
 	public void update(Session arg0) throws UnknownSessionException {
 		NomadSession s = (NomadSession) arg0;
-		LOG.info("Updated session " + s.getId());
+		repository.save(s);
+		LOG.info("Updated session " + s.getId() + ": " + s);
 	}
 
 	@Override
 	public void delete(Session arg0) {
 		NomadSession s = (NomadSession) arg0;
-		LOG.info("Deleted session " + s.getId());
+		repository.delete(s);
+		LOG.info("Deleted session: " + s);
 	}
 }

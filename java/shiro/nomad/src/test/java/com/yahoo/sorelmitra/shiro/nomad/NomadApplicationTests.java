@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /*
@@ -23,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Ignore
 public class NomadApplicationTests {
+
+	private static Logger LOG = LoggerFactory.getLogger(NomadApplicationTests.class);
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -60,10 +64,11 @@ public class NomadApplicationTests {
 	public void testExpireSession() throws InterruptedException {
 		try {
 			session.setTimeout(100);
+			LOG.info("set timeout to 100ms");
 			Thread.sleep(150);
+			LOG.info("getting session after timeout expiry");
 			Session storedSession = sessionManager.getSession(new DefaultSessionKey(session.getId()));
-			Assert.assertNotNull(storedSession);
-			Assert.fail();
+			Assert.assertNull(storedSession);
 		} catch (ExpiredSessionException e) {
 			Assert.assertTrue(e.getMessage().contains("has expired"));
 		}

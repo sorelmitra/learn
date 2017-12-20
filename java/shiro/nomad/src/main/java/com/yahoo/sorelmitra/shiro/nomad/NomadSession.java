@@ -1,6 +1,7 @@
 package com.yahoo.sorelmitra.shiro.nomad;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -23,6 +24,15 @@ public class NomadSession extends SimpleSession {
 
 	@Id
 	private Serializable id;
+	private long timeout;
+
+	public long getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
+	}
 
 	public NomadSession() {
 		super();
@@ -40,4 +50,28 @@ public class NomadSession extends SimpleSession {
 		this.id = id;
 	}
 
+	@Override
+	public String toString() {
+		return "id: " + getId() + ", started: " + millis(getStartTimestamp()) + ", last access: "
+				+ millis(getLastAccessTime()) + ", stopped: " + millis(getStopTimestamp());
+	}
+
+	private long millis(Date timestamp) {
+		if (timestamp == null) {
+			return 0;
+		}
+		return timestamp.toInstant().toEpochMilli();
+	}
+
+	@Override
+	public void setLastAccessTime(Date lastAccessTime) {
+		LOG.info("set last access time to " + millis(lastAccessTime) + ": " + this);
+		super.setLastAccessTime(lastAccessTime);
+	}
+
+	@Override
+	public void touch() {
+		LOG.info("touched: " + this);
+		super.touch();
+	}
 }

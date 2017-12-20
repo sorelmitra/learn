@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class ShiroConfiguration {
 
 	public static final String DAO_IMPL_TYPE_MAP = "map";
+	public static final String DAO_IMPL_TYPE_JDBC = "jdbc";
 
 	@Value("${shiro.config.session.daoimpl}")
 	private String sessionDaoImplType;
@@ -49,6 +50,10 @@ public class ShiroConfiguration {
 			NomadMapSessionDAO mapSessionDao = new NomadMapSessionDAO();
 			mapSessionDao.setSessionIdGenerator(sessionIdGenerator());
 			sessionDao = mapSessionDao;
+		} else if (sessionDaoImplType.equalsIgnoreCase(DAO_IMPL_TYPE_JDBC)) {
+			NomadJdbcSessionDAO jdbcSessionDao = new NomadJdbcSessionDAO();
+			jdbcSessionDao.setSessionIdGenerator(sessionIdGenerator());
+			sessionDao = jdbcSessionDao;
 		} else {
 			throw new SessionException("Unknown Session DAO implementation type <<" + sessionDaoImplType
 					+ ">> in application properties!");

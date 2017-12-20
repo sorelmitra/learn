@@ -44,14 +44,14 @@ public class NomadMapSessionDAO extends AbstractSessionDAO {
 		Serializable id = generateSessionId(s);
 		s.setId(id);
 		sessions.put(id, s);
-		LOG.info("Created session " + id);
+		LOG.info("Created session " + id + ": " + s);
 		return id;
 	}
 
 	@Override
 	protected Session doReadSession(Serializable id) {
 		Session s = sessions.get(id);
-		LOG.info("Read session " + id);
+		LOG.info("Read session " + id + ": " + s);
 		return s;
 	}
 
@@ -59,14 +59,14 @@ public class NomadMapSessionDAO extends AbstractSessionDAO {
 	public void update(Session arg0) throws UnknownSessionException {
 		NomadSession s = (NomadSession) arg0;
 		sessions.put(s.getId(), s);
-		LOG.info("Updated session " + s.getId());
+		LOG.info("Updated session " + s.getId() + ": " + s);
 	}
 
 	@Override
 	public void delete(Session arg0) {
 		NomadSession s = (NomadSession) arg0;
 		sessions.remove(s.getId());
-		LOG.info("Deleted session " + s.getId());
+		LOG.info("Deleted session: " + s);
 	}
 
 }
