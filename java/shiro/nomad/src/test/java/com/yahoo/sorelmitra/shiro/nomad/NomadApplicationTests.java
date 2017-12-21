@@ -3,7 +3,6 @@ package com.yahoo.sorelmitra.shiro.nomad;
 import java.util.List;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.StoppedSessionException;
@@ -33,9 +32,6 @@ public class NomadApplicationTests {
 	private static Logger LOG = LoggerFactory.getLogger(NomadApplicationTests.class);
 
 	@Autowired
-	private SecurityManager securityManager;
-
-	@Autowired
 	private SessionManager sessionManager;
 
 	@Autowired
@@ -46,7 +42,6 @@ public class NomadApplicationTests {
 
 	@Before
 	public void setUp() {
-		SecurityUtils.setSecurityManager(securityManager);
 		currentUser = SecurityUtils.getSubject();
 		session = createSession();
 	}
