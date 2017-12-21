@@ -2,6 +2,7 @@ package com.yahoo.sorelmitra.shiro.nomad;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
@@ -47,6 +48,12 @@ public class NomadJdbcRepository implements NomadRepository {
 	@Override
 	public Collection<Session> getActiveSessions() {
 		// TODO Implement
+		return null;
+	}
+
+	@Override
+	public List<NomadSession> findByState(String state) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

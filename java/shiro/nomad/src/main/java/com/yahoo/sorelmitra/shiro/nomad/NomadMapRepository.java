@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.session.Session;
@@ -52,6 +53,20 @@ public class NomadMapRepository implements NomadRepository {
 	@Override
 	public Collection<Session> getActiveSessions() {
 		LinkedList<Session> activeSessions = new LinkedList<Session>();
+		walkValidSessions(new MapWalker() {
+			@Override
+			public void process(NomadSession s) {
+				activeSessions.add(s);
+			}
+		});
+		return activeSessions;
+	}
+
+	private interface MapWalker {
+		void process(NomadSession s);
+	}
+
+	private void walkValidSessions(MapWalker mapWalker) {
 		for (Serializable id : sessions.keySet()) {
 			NomadSession s = (NomadSession) sessions.get(id);
 			if (!s.isValid()) {
@@ -60,9 +75,22 @@ public class NomadMapRepository implements NomadRepository {
 			if (s.isExpired()) {
 				continue;
 			}
-			activeSessions.add(s);
+			mapWalker.process(s);
 		}
-		return activeSessions;
+	}
+
+	@Override
+	public List<NomadSession> findByState(String state) {
+		LinkedList<NomadSession> foundSessions = new LinkedList<NomadSession>();
+		walkValidSessions(new MapWalker() {
+			@Override
+			public void process(NomadSession s) {
+				if (state.equalsIgnoreCase(s.getState())) {
+					foundSessions.add(s);
+				}
+			}
+		});
+		return foundSessions;
 	}
 
 }

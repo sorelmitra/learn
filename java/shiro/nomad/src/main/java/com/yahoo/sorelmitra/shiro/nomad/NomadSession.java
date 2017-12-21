@@ -57,6 +57,8 @@ public class NomadSession implements ValidatingSession, Serializable {
 	private boolean expired;
 	private String host;
 
+	private String state;
+
 	public NomadSession() {
 		this.timeout = DefaultSessionManager.DEFAULT_GLOBAL_SESSION_TIMEOUT; // TODO - remove concrete reference to
 																				// DefaultSessionManager
@@ -67,83 +69,6 @@ public class NomadSession implements ValidatingSession, Serializable {
 	public NomadSession(String host) {
 		this();
 		this.host = host;
-	}
-
-	public Serializable getId() {
-		return this.id;
-	}
-
-	public void setId(Serializable id) {
-		this.id = id;
-	}
-
-	public Date getStartTimestamp() {
-		return startTimestamp;
-	}
-
-	public void setStartTimestamp(Date startTimestamp) {
-		this.startTimestamp = startTimestamp;
-	}
-
-	/**
-	 * Returns the time the session was stopped, or <tt>null</tt> if the session is
-	 * still active.
-	 * 
-	 * See {@link org.apache.shiro.session.SimpleSession} for more details.
-	 */
-	public Date getStopTimestamp() {
-		return stopTimestamp;
-	}
-
-	public void setStopTimestamp(Date stopTimestamp) {
-		this.stopTimestamp = stopTimestamp;
-	}
-
-	public Date getLastAccessTime() {
-		return lastAccessTime;
-	}
-
-	public void setLastAccessTime(Date lastAccessTime) {
-		this.lastAccessTime = lastAccessTime;
-	}
-
-	/**
-	 * Returns true if this session has expired, false otherwise. If the session has
-	 * expired, no further user interaction with the system may be done under this
-	 * session.
-	 */
-	public boolean isExpired() {
-		return expired;
-	}
-
-	public void setExpired(boolean expired) {
-		this.expired = expired;
-	}
-
-	public long getTimeout() {
-		return timeout;
-	}
-
-	public void setTimeout(long timeout) {
-		this.timeout = timeout;
-	}
-
-	public String getHost() {
-		return host;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public void touch() {
-		this.lastAccessTime = new Date();
-	}
-
-	public void stop() {
-		if (this.stopTimestamp == null) {
-			this.stopTimestamp = new Date();
-		}
 	}
 
 	protected boolean isStopped() {
@@ -228,6 +153,37 @@ public class NomadSession implements ValidatingSession, Serializable {
 			}
 			throw new ExpiredSessionException(msg);
 		}
+	}
+
+	/**
+	 * Attributes are not used with this class
+	 */
+	@Override
+	public Collection<Object> getAttributeKeys() throws InvalidSessionException {
+		return null;
+	}
+
+	/**
+	 * Attributes are not used with this class
+	 */
+	@Override
+	public Object getAttribute(Object key) throws InvalidSessionException {
+		return null;
+	}
+
+	/**
+	 * Attributes are not used with this class
+	 */
+	@Override
+	public void setAttribute(Object key, Object value) throws InvalidSessionException {
+	}
+
+	/**
+	 * Attributes are not used with this class
+	 */
+	@Override
+	public Object removeAttribute(Object key) throws InvalidSessionException {
+		return null;
 	}
 
 	/**
@@ -437,35 +393,84 @@ public class NomadSession implements ValidatingSession, Serializable {
 		return timestamp.toInstant().toEpochMilli();
 	}
 
-	/**
-	 * Attributes are not used with this class
-	 */
-	@Override
-	public Collection<Object> getAttributeKeys() throws InvalidSessionException {
-		return null;
+	public Serializable getId() {
+		return this.id;
+	}
+
+	public void setId(Serializable id) {
+		this.id = id;
+	}
+
+	public Date getStartTimestamp() {
+		return startTimestamp;
+	}
+
+	public void setStartTimestamp(Date startTimestamp) {
+		this.startTimestamp = startTimestamp;
 	}
 
 	/**
-	 * Attributes are not used with this class
+	 * Returns the time the session was stopped, or <tt>null</tt> if the session is
+	 * still active.
+	 * 
+	 * See {@link org.apache.shiro.session.SimpleSession} for more details.
 	 */
-	@Override
-	public Object getAttribute(Object key) throws InvalidSessionException {
-		return null;
+	public Date getStopTimestamp() {
+		return stopTimestamp;
 	}
 
-	/**
-	 * Attributes are not used with this class
-	 */
-	@Override
-	public void setAttribute(Object key, Object value) throws InvalidSessionException {
+	public void setStopTimestamp(Date stopTimestamp) {
+		this.stopTimestamp = stopTimestamp;
 	}
 
-	/**
-	 * Attributes are not used with this class
-	 */
-	@Override
-	public Object removeAttribute(Object key) throws InvalidSessionException {
-		return null;
+	public Date getLastAccessTime() {
+		return lastAccessTime;
+	}
+
+	public void setLastAccessTime(Date lastAccessTime) {
+		this.lastAccessTime = lastAccessTime;
+	}
+
+	public boolean isExpired() {
+		return expired;
+	}
+
+	public void setExpired(boolean expired) {
+		this.expired = expired;
+	}
+
+	public long getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public void touch() {
+		this.lastAccessTime = new Date();
+	}
+
+	public void stop() {
+		if (this.stopTimestamp == null) {
+			this.stopTimestamp = new Date();
+		}
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 }

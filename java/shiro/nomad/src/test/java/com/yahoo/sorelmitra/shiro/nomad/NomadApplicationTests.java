@@ -1,5 +1,7 @@
 package com.yahoo.sorelmitra.shiro.nomad;
 
+import java.util.List;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
@@ -31,6 +33,9 @@ public class NomadApplicationTests {
 
 	@Autowired
 	private SessionManager sessionManager;
+
+	@Autowired
+	private NomadRepository repository;
 
 	private Session session;
 	private Subject currentUser;
@@ -75,11 +80,36 @@ public class NomadApplicationTests {
 		}
 	}
 
+	@Test
+	public void testCustomField() {
+		String stateWander = "wandering";
+		String stateLook = "looking";
+		String id1 = setState(session, stateWander);
+		Session s2 = createSession();
+		String id2 = setState(s2, stateLook);
+		Session s3 = createSession();
+		String id3 = setState(s3, stateWander);
+		List<NomadSession> wandering = repository.findByState(stateWander);
+		List<NomadSession> looking = repository.findByState(stateLook);
+		Assert.assertEquals(2, wandering.size());
+		Assert.assertEquals(id1, wandering.get(0));
+		Assert.assertEquals(id3, wandering.get(1));
+		Assert.assertEquals(1, looking.size());
+		Assert.assertEquals(id2, wandering.get(0));
+	}
+
+	private String setState(Session arg0, String state) {
+		NomadSession s = (NomadSession) arg0;
+		s.setState(state);
+		String id1 = (String) s.getId();
+		return id1;
+	}
+
 	private Session createSession() {
 		Assert.assertNull(currentUser.getSession(false));
-		Session session = currentUser.getSession();
-		Assert.assertNotNull(session);
-		return session;
+		Session s = currentUser.getSession();
+		Assert.assertNotNull(s);
+		return s;
 	}
 
 }
