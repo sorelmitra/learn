@@ -11,19 +11,18 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class NomadMapSessionDAO extends AbstractSessionDAO {
+public class NomadSessionDAO extends AbstractSessionDAO {
 
-	private static Logger LOG = LoggerFactory.getLogger(NomadMapSessionDAO.class);
+	private static Logger LOG = LoggerFactory.getLogger(NomadSessionDAO.class);
 
-	private Map<Serializable, Session> sessions;
-
-	public NomadMapSessionDAO() {
-		sessions = new HashMap<Serializable, Session>();
-	}
+	@Autowired
+	private NomadRepository repository;
 
 	@Override
 	public Collection<Session> getActiveSessions() {
+		Map<Serializable, Session> sessions = new HashMap<Serializable, Session>(); // dummy
 		LinkedList<Session> activeSessions = new LinkedList<Session>();
 		for (Serializable id : sessions.keySet()) {
 			NomadSession s = (NomadSession) sessions.get(id);
@@ -43,14 +42,14 @@ public class NomadMapSessionDAO extends AbstractSessionDAO {
 		NomadSession s = (NomadSession) arg0;
 		Serializable id = generateSessionId(s);
 		s.setId(id);
-		sessions.put(id, s);
+		repository.create(s);
 		LOG.info("Created session " + id + ": " + s);
 		return id;
 	}
 
 	@Override
 	protected Session doReadSession(Serializable id) {
-		Session s = sessions.get(id);
+		Session s = repository.read(id);
 		LOG.info("Read session " + id + ": " + s);
 		return s;
 	}
@@ -58,15 +57,14 @@ public class NomadMapSessionDAO extends AbstractSessionDAO {
 	@Override
 	public void update(Session arg0) throws UnknownSessionException {
 		NomadSession s = (NomadSession) arg0;
-		sessions.put(s.getId(), s);
+		repository.update(s);
 		LOG.info("Updated session " + s.getId() + ": " + s);
 	}
 
 	@Override
 	public void delete(Session arg0) {
 		NomadSession s = (NomadSession) arg0;
-		sessions.remove(s.getId());
+		repository.delete(s);
 		LOG.info("Deleted session: " + s);
 	}
-
 }

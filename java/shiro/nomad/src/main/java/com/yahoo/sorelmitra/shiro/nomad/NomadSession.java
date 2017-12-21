@@ -309,18 +309,9 @@ public class NomadSession implements ValidatingSession, Serializable {
 		return hashCode;
 	}
 
-	/**
-	 * Returns the string representation of this NomadSession, equal to
-	 * <code>getClass().getName() + &quot;,id=&quot; + getId()</code>.
-	 *
-	 * @return the string representation of this NomadSession, equal to
-	 *         <code>getClass().getName() + &quot;,id=&quot; + getId()</code>.
-	 */
-	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(getClass().getName()).append(",id=").append(getId());
-		return sb.toString();
+		return "id: " + getId() + ", started: " + millis(getStartTimestamp()) + ", last access: "
+				+ millis(getLastAccessTime()) + ", stopped: " + millis(getStopTimestamp());
 	}
 
 	/**
@@ -437,6 +428,13 @@ public class NomadSession implements ValidatingSession, Serializable {
 	 */
 	private static boolean isFieldPresent(short bitMask, int fieldBitMask) {
 		return (bitMask & fieldBitMask) != 0;
+	}
+
+	private long millis(Date timestamp) {
+		if (timestamp == null) {
+			return 0;
+		}
+		return timestamp.toInstant().toEpochMilli();
 	}
 
 	/**

@@ -1,4 +1,0 @@
-shiro:
-  config:
-    session:
-      daoimpl: jdbc

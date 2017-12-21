@@ -3,6 +3,7 @@ package com.yahoo.sorelmitra.shiro.nomad;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.StoppedSessionException;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -44,7 +45,7 @@ public class NomadApplicationTests {
 	public void tearDown() {
 		try {
 			currentUser.logout();
-		} catch (UnknownSessionException e) {
+		} catch (UnknownSessionException | StoppedSessionException e) {
 		}
 	}
 

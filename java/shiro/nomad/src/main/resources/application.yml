@@ -6,5 +6,5 @@ spring:
 
 logging:
   level:
-    org.springframework.boot: info
+    org.springframework: info
     liquibase: trace
