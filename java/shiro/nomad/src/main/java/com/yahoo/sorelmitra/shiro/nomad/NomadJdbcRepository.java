@@ -1,6 +1,7 @@
 package com.yahoo.sorelmitra.shiro.nomad;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
@@ -41,6 +42,12 @@ public class NomadJdbcRepository implements NomadRepository {
 	public void delete(NomadSession s) {
 		repository.delete(s);
 		LOG.info("Deleted session " + s);
+	}
+
+	@Override
+	public Collection<Session> getActiveSessions() {
+		// TODO Implement
+		return null;
 	}
 
 }

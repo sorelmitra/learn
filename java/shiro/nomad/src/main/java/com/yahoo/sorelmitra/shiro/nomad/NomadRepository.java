@@ -1,6 +1,7 @@
 package com.yahoo.sorelmitra.shiro.nomad;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.apache.shiro.session.Session;
 
@@ -13,5 +14,7 @@ public interface NomadRepository {
 	void update(NomadSession s);
 
 	void delete(NomadSession s);
+
+	Collection<Session> getActiveSessions();
 
 }

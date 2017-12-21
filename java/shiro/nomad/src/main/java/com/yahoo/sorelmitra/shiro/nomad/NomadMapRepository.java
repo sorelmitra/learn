@@ -1,7 +1,9 @@
 package com.yahoo.sorelmitra.shiro.nomad;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.shiro.session.Session;
@@ -45,6 +47,22 @@ public class NomadMapRepository implements NomadRepository {
 	public void delete(NomadSession s) {
 		sessions.remove(s);
 		LOG.info("Deleted session " + s);
+	}
+
+	@Override
+	public Collection<Session> getActiveSessions() {
+		LinkedList<Session> activeSessions = new LinkedList<Session>();
+		for (Serializable id : sessions.keySet()) {
+			NomadSession s = (NomadSession) sessions.get(id);
+			if (!s.isValid()) {
+				continue;
+			}
+			if (s.isExpired()) {
+				continue;
+			}
+			activeSessions.add(s);
+		}
+		return activeSessions;
 	}
 
 }
