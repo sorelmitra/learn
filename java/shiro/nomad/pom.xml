@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>nomad</name>
-	<description>Sample Spring Boot app with Apache Shiro</description>
+	<description>Sample Spring Boot app with sessions based on Apache Shiro</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
