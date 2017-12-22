@@ -57,4 +57,10 @@ public class NomadJdbcRepository implements NomadRepository {
 		return null;
 	}
 
+	@Override
+	public NomadSession findOne(Serializable id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

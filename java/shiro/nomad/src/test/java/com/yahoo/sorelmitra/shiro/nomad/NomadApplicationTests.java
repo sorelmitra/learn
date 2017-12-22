@@ -2,14 +2,12 @@ package com.yahoo.sorelmitra.shiro.nomad;
 
 import java.util.List;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.StoppedSessionException;
-import org.apache.shiro.session.UnknownSessionException;
+import org.apache.shiro.session.mgt.DefaultSessionContext;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
+import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.subject.Subject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,20 +36,17 @@ public class NomadApplicationTests {
 	private NomadRepository repository;
 
 	private Session session;
-	private Subject currentUser;
+
+	private SessionContext context;
 
 	@Before
 	public void setUp() {
-		currentUser = SecurityUtils.getSubject();
+		context = new DefaultSessionContext();
 		session = createSession();
 	}
 
 	@After
 	public void tearDown() {
-		try {
-			currentUser.logout();
-		} catch (UnknownSessionException | StoppedSessionException e) {
-		}
 	}
 
 	@Test
@@ -92,22 +87,21 @@ public class NomadApplicationTests {
 		List<NomadSession> wandering = repository.findByState(stateWander);
 		List<NomadSession> looking = repository.findByState(stateLook);
 		Assert.assertEquals(2, wandering.size());
-		Assert.assertEquals(id1, wandering.get(0));
-		Assert.assertEquals(id3, wandering.get(1));
+		Assert.assertEquals(id1, wandering.get(0).getId());
+		Assert.assertEquals(id3, wandering.get(1).getId());
 		Assert.assertEquals(1, looking.size());
-		Assert.assertEquals(id2, wandering.get(0));
+		Assert.assertEquals(id2, looking.get(0).getId());
 	}
 
 	private String setState(Session arg0, String state) {
-		NomadSession s = (NomadSession) arg0;
+		NomadSession s = repository.findOne(arg0.getId());
 		s.setState(state);
 		String id1 = (String) s.getId();
 		return id1;
 	}
 
 	private Session createSession() {
-		Assert.assertNull(currentUser.getSession(false));
-		Session s = currentUser.getSession();
+		Session s = sessionManager.start(context);
 		Assert.assertNotNull(s);
 		return s;
 	}

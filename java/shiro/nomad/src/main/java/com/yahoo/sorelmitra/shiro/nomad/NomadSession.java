@@ -267,7 +267,7 @@ public class NomadSession implements ValidatingSession, Serializable {
 
 	public String toString() {
 		return "id: " + getId() + ", started: " + millis(getStartTimestamp()) + ", last access: "
-				+ millis(getLastAccessTime()) + ", stopped: " + millis(getStopTimestamp());
+				+ millis(getLastAccessTime()) + ", stopped: " + millis(getStopTimestamp()) + ", state: " + getState();
 	}
 
 	/**

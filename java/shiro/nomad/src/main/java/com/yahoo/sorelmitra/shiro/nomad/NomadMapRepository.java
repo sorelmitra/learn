@@ -93,4 +93,9 @@ public class NomadMapRepository implements NomadRepository {
 		return foundSessions;
 	}
 
+	@Override
+	public NomadSession findOne(Serializable id) {
+		return sessions.get(id);
+	}
+
 }

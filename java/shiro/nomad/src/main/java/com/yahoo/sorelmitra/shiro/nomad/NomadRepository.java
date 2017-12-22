@@ -20,4 +20,6 @@ public interface NomadRepository {
 
 	List<NomadSession> findByState(String state);
 
+	NomadSession findOne(Serializable id);
+
 }
