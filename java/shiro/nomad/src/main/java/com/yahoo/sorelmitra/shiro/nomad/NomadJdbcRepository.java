@@ -47,20 +47,19 @@ public class NomadJdbcRepository implements NomadRepository {
 
 	@Override
 	public Collection<Session> getActiveSessions() {
-		// TODO Implement
+		// It would be inefficient to implement as I'd have to convert
+		// from List<NomadSession>
 		return null;
 	}
 
 	@Override
 	public List<NomadSession> findByState(String state) {
-		// TODO Auto-generated method stub
-		return null;
+		return repository.findByState(state);
 	}
 
 	@Override
 	public NomadSession findOne(Serializable id) {
-		// TODO Auto-generated method stub
-		return null;
+		return repository.findOne(id);
 	}
 
 }

@@ -96,6 +96,7 @@ public class NomadApplicationTests {
 	private String setState(Session arg0, String state) {
 		NomadSession s = repository.findOne(arg0.getId());
 		s.setState(state);
+		repository.update(s);
 		String id1 = (String) s.getId();
 		return id1;
 	}
