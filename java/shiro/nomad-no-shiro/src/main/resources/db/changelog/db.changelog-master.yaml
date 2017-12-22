@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Avaya
+      changes:
+        - sql: CREATE SCHEMA nomad;
+  - changeSet:
+      id: 2
+      author: Avaya
+      changes:
+        - createTable:
+            schemaName: nomad
+            tableName: state
+            columns:
+              - column:
+                  name: id
+                  type: CHAR(36)
+                  constraints:
+                    nullable: false
