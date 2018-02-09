@@ -1,19 +1,15 @@
 version: '3'
 
 networks:
-  consul_dev:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.1.1.0/24
+  wan:
+    external: true
 
 services:
   c1:
     image: consul:latest
     command: consul agent -dev -client=0.0.0.0 -bind=0.0.0.0
     networks:
-      consul_dev:
+      wan:
         ipv4_address: 10.1.1.11
     ports:
       - "8401:8400"
@@ -23,7 +19,7 @@ services:
     image: consul:latest
     command: consul agent -dev -client=0.0.0.0 -bind=0.0.0.0 -join=cmain
     networks:
-      consul_dev:
+      wan:
         ipv4_address: 10.1.1.12
     ports:
       - "8402:8400"
@@ -35,7 +31,7 @@ services:
     image: consul:latest
     command: consul agent -dev -client=0.0.0.0 -bind=0.0.0.0 -join=cmain
     networks:
-      consul_dev:
+      wan:
         ipv4_address: 10.1.1.13
     ports:
       - "8403:8400"
@@ -46,14 +42,14 @@ services:
   bd:
     image: boatdirectory:0.1
     networks:
-      consul_dev:
+      wan:
         ipv4_address: 10.1.1.21
     ports:
       - "8770:8770"
   bdc:
     image: boatdirectory-client:0.1
     networks:
-      consul_dev:
+      wan:
         ipv4_address: 10.1.1.22
     ports:
       - "8080:8080"
