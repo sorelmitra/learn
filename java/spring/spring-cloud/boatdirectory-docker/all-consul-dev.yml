@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  wan:
+  bridge:
     external: true
 
 services:
@@ -9,7 +9,7 @@ services:
     image: consul:latest
     command: consul agent -dev -client=0.0.0.0 -bind=0.0.0.0
     networks:
-      wan:
+      bridge:
         ipv4_address: 10.1.1.11
     ports:
       - "8401:8400"
@@ -19,7 +19,7 @@ services:
     image: consul:latest
     command: consul agent -dev -client=0.0.0.0 -bind=0.0.0.0 -join=cmain
     networks:
-      wan:
+      bridge:
         ipv4_address: 10.1.1.12
     ports:
       - "8402:8400"
@@ -31,7 +31,7 @@ services:
     image: consul:latest
     command: consul agent -dev -client=0.0.0.0 -bind=0.0.0.0 -join=cmain
     networks:
-      wan:
+      bridge:
         ipv4_address: 10.1.1.13
     ports:
       - "8403:8400"
@@ -42,14 +42,14 @@ services:
   bd:
     image: boatdirectory:0.1
     networks:
-      wan:
+      bridge:
         ipv4_address: 10.1.1.21
     ports:
       - "8770:8770"
   bdc:
     image: boatdirectory-client:0.1
     networks:
-      wan:
+      bridge:
         ipv4_address: 10.1.1.22
     ports:
       - "8080:8080"

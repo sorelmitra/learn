@@ -1,0 +1,17 @@
+version: '3'
+
+networks:
+  wan:
+    external: true
+
+services:
+  c1:
+    image: consul:latest
+    command: consul agent -dev -client=10.1.1.11 -bind=10.1.1.11
+    networks:
+      wan:
+        ipv4_address: 10.1.1.11
+    ports:
+      - "8401:8400"
+      - "8501:8500"
+      - "8601:8600/udp"
