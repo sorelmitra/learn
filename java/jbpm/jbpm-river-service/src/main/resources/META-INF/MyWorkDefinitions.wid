@@ -1,0 +1,11 @@
+import org.drools.core.process.core.datatype.impl.type.StringDataType;
+[
+  [
+    "name" : "Java Class Work Item",
+    "parameters" : [
+      "class" : new StringDataType(),
+    ],
+    "displayName" : "Java Class",
+    "icon" : "icons/code.png"
+  ]
+]

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<deployment-descriptor
+    xsi:schemaLocation="http://www.jboss.org/jbpm deployment-descriptor.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <work-item-handlers>
+        <work-item-handler>
+            <resolver>mvel</resolver>
+            <identifier>new
+                com.yahoo.sorelmitra.KieJavaWorkHandler()</identifier>
+            <parameters />
+            <name>Java Class</name>
+        </work-item-handler>
+    </work-item-handlers>
+</deployment-descriptor>
