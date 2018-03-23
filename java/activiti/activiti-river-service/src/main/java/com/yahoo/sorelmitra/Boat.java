@@ -6,17 +6,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Boat implements Serializable {
 
+    private String name;
     private int seats;
     private int emptySeats;
 
-    public Boat(int seats) {
+    public Boat(String name, int seats) {
+        this.name = name;
         this.seats = seats;
         this.emptySeats = seats;
     }
 
     @Override
     public String toString() {
-        return "Seats total: " + seats + ", empty: " + emptySeats;
+        return "Boat " + getName() + ": " + seats + " seats, " + emptySeats + " empty";
     }
 
     @Override
@@ -28,12 +30,13 @@ public class Boat implements Serializable {
             return false;
         }
         Boat other = (Boat) obj;
-        return (seats == other.seats) && (emptySeats == other.emptySeats);
+        return (getName() == other.getName()) && (seats == other.seats) && (emptySeats == other.emptySeats);
     }
 
     @Override
     public int hashCode() {
         HashCodeBuilder hb = new HashCodeBuilder(13, 25);
+        hb.append(getName());
         hb.append(seats);
         hb.append(emptySeats);
         return hb.hashCode();
@@ -53,6 +56,14 @@ public class Boat implements Serializable {
 
     public void setEmptySeats(int emptySeats) {
         this.emptySeats = emptySeats;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

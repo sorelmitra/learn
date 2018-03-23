@@ -27,12 +27,14 @@ public class ActivitiRiverServiceTests {
 
     @Before
     public void setUp() {
-        cutter = new Boat(10);
+        cutter = new Boat("Cutty One", 10);
     }
 
     @Test
     public void testEmbark() {
         LOG.info("River service: " + riverService);
+        riverService.addBoat(cutter);
+        riverService.addTourists(6);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
         LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
                 + "] key [" + processInstance.getProcessDefinitionKey() + "]");
