@@ -1,56 +1,41 @@
 package com.yahoo.sorelmitra;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
 public class ActivitiRiverServiceTests {
     private static Logger LOG = LoggerFactory.getLogger(ActivitiRiverServiceTests.class);
 
+    private Boat cutter;
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private RiverService riverService;
+
     @Before
     public void setUp() {
-        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
-                .setJdbcUrl("jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000").setJdbcUsername("sa").setJdbcPassword("")
-                .setJdbcDriver("org.h2.Driver")
-                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-        ProcessEngine processEngine = cfg.buildProcessEngine();
-        String pName = processEngine.getName();
-        String ver = ProcessEngine.VERSION;
-        LOG.info("ProcessEngine [" + pName + "] Version: [" + ver + "]");
-
-        RepositoryService repositoryService = processEngine.getRepositoryService();
-        Deployment deployment = repositoryService.createDeployment()
-                .addClasspathResource("processes/EmbarkTourist.bpmn").deploy();
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .deploymentId(deployment.getId()).singleResult();
-        LOG.info("Found process definition [" + processDefinition.getName() + "] with id [" + processDefinition.getId()
-                + "]");
-
-        RuntimeService runtimeService = processEngine.getRuntimeService();
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
-        LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
-                + "] key [" + processInstance.getProcessDefinitionKey() + "]");
-
-        TaskService taskService = processEngine.getTaskService();
-        FormService formService = processEngine.getFormService();
+        cutter = new Boat(10);
     }
 
     @Test
     public void testEmbark() {
-
+        LOG.info("River service: " + riverService);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
+        LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
+                + "] key [" + processInstance.getProcessDefinitionKey() + "]");
+        Assert.assertEquals(4, cutter.getEmptySeats());
     }
 }
