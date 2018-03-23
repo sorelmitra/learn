@@ -10,6 +10,10 @@ import org.springframework.stereotype.Component;
 public class RiverService implements JavaDelegate {
     private static Logger LOG = LoggerFactory.getLogger(RiverService.class);
 
+    public RiverService() {
+        LOG.info("Constructed");
+    }
+
     @Override
     public void execute(DelegateExecution arg0) {
         getBoatStatus();
