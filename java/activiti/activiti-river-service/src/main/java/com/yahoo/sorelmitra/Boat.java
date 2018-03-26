@@ -66,4 +66,16 @@ public class Boat implements Serializable {
         this.name = name;
     }
 
+    public void embarkTourists(int tourists) throws RiverServiceException {
+        if (tourists > seats) {
+            throw new RiverServiceException(
+                    "Not enough seats (" + seats + ") in the boat to accomodate all tourists (" + tourists + ")");
+        }
+        if (tourists > emptySeats) {
+            throw new RiverServiceException("Not enough empty seats (" + emptySeats
+                    + ") in the boat to accomodate all tourists (" + tourists + ")");
+        }
+        emptySeats -= tourists;
+    }
+
 }

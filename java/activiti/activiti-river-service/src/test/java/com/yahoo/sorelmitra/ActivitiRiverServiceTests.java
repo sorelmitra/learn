@@ -34,10 +34,33 @@ public class ActivitiRiverServiceTests {
     public void testEmbark() {
         LOG.info("River service: " + riverService);
         riverService.addBoat(cutter);
+
         riverService.addTourists(6);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
         LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
                 + "] key [" + processInstance.getProcessDefinitionKey() + "]");
         Assert.assertEquals(4, cutter.getEmptySeats());
+
+        riverService.addTourists(4);
+        processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
+        LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
+                + "] key [" + processInstance.getProcessDefinitionKey() + "]");
+        Assert.assertEquals(0, cutter.getEmptySeats());
+
+        riverService.addTourists(2);
+        processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
+        LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
+                + "] key [" + processInstance.getProcessDefinitionKey() + "]");
+        Assert.assertTrue(riverService.getNoBoatWithEnoughEmptySeats());
+        Assert.assertEquals(0, cutter.getEmptySeats());
+    }
+
+    @Test
+    public void testNoBoat() {
+        riverService.addTourists(2);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embarkTourist");
+        LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
+                + "] key [" + processInstance.getProcessDefinitionKey() + "]");
+        Assert.assertTrue(riverService.getNoBoatWithEnoughEmptySeats());
     }
 }

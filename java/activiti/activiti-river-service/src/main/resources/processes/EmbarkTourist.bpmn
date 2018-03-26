@@ -3,24 +3,36 @@
   <process id="embarkTourist" name="Embark Tourist" isExecutable="true">
     <startEvent id="start-embark-tourist" name="Start"></startEvent>
     <serviceTask id="service-get-boat-status" name="Get boat status" activiti:expression="${riverService.getBoatStatus()}" activiti:resultVariableName="boatAvailable"></serviceTask>
-    <sequenceFlow id="flow1" sourceRef="start-embark-tourist" targetRef="service-get-boat-status"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="start-embark-tourist" targetRef="service-init"></sequenceFlow>
     <endEvent id="end-embark-tourist" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="service-no-boat-available" targetRef="end-embark-tourist"></sequenceFlow>
     <serviceTask id="service-get-tourists-count" name="Get tourists count" activiti:expression="${riverService.getTouristsCount()}" activiti:resultVariableName="touristsCount"></serviceTask>
     <sequenceFlow id="flow3" sourceRef="service-get-boat-status" targetRef="service-get-tourists-count"></sequenceFlow>
     <exclusiveGateway id="gateway-is-boat-available" name="Gateway Is Boat Available"></exclusiveGateway>
     <sequenceFlow id="flow4" sourceRef="service-get-tourists-count" targetRef="gateway-is-boat-available"></sequenceFlow>
-    <exclusiveGateway id="gateway-enough-places" name="Gateway Enough Places"></exclusiveGateway>
+    <exclusiveGateway id="gateway-enough-places-in-boat" name="Gateway Enough Places in Boat"></exclusiveGateway>
     <serviceTask id="service-no-boat-available" name="Inform no boat available" activiti:expression="${riverService.informNoBoatAvailable()}"></serviceTask>
-    <sequenceFlow id="flow5" name="boats available" sourceRef="gateway-is-boat-available" targetRef="gateway-enough-places">
+    <sequenceFlow id="flow-boats-available" name="boats available" sourceRef="gateway-is-boat-available" targetRef="service-get-next-boat">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${boatAvailable == true}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow6" name="no boats" sourceRef="gateway-is-boat-available" targetRef="service-no-boat-available"></sequenceFlow>
+    <sequenceFlow id="flow-no-boats" name="no boats" sourceRef="gateway-is-boat-available" targetRef="service-no-boat-available">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${boatAvailable == false}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="service-get-next-boat" name="Get next boat" activiti:expression="${riverService.getNextBoat()}" activiti:resultVariableName="boatEmptyPlaces"></serviceTask>
+    <sequenceFlow id="flow7" sourceRef="service-get-next-boat" targetRef="gateway-enough-places-in-boat"></sequenceFlow>
+    <serviceTask id="service-embark-tourists" name="Embark tourists in current boat" activiti:expression="${riverService.embarkTouristsInCurrentBoat()}"></serviceTask>
+    <sequenceFlow id="flow8" sourceRef="service-embark-tourists" targetRef="end-embark-tourist"></sequenceFlow>
+    <sequenceFlow id="flow-enough-places" name="enough places in boat" sourceRef="gateway-enough-places-in-boat" targetRef="service-embark-tourists">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${boatEmptyPlaces >= touristsCount}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow-not-enough-places" name="not enough places" sourceRef="gateway-enough-places-in-boat" targetRef="service-get-boat-status"></sequenceFlow>
+    <serviceTask id="service-init" name="Init" activiti:expression="${riverService.init()}"></serviceTask>
+    <sequenceFlow id="flow9" sourceRef="service-init" targetRef="service-get-boat-status"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_embarkTourist">
     <bpmndi:BPMNPlane bpmnElement="embarkTourist" id="BPMNPlane_embarkTourist">
       <bpmndi:BPMNShape bpmnElement="start-embark-tourist" id="BPMNShape_start-embark-tourist">
-        <omgdc:Bounds height="35.0" width="35.0" x="110.0" y="110.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="41.0" y="110.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="service-get-boat-status" id="BPMNShape_service-get-boat-status">
         <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="100.0"></omgdc:Bounds>
@@ -34,15 +46,24 @@
       <bpmndi:BPMNShape bpmnElement="gateway-is-boat-available" id="BPMNShape_gateway-is-boat-available">
         <omgdc:Bounds height="40.0" width="40.0" x="462.0" y="227.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="gateway-enough-places" id="BPMNShape_gateway-enough-places">
-        <omgdc:Bounds height="40.0" width="40.0" x="314.0" y="227.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="gateway-enough-places-in-boat" id="BPMNShape_gateway-enough-places-in-boat">
+        <omgdc:Bounds height="40.0" width="40.0" x="107.0" y="227.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="service-no-boat-available" id="BPMNShape_service-no-boat-available">
         <omgdc:Bounds height="81.0" width="105.0" x="430.0" y="330.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="service-get-next-boat" id="BPMNShape_service-get-next-boat">
+        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="service-embark-tourists" id="BPMNShape_service-embark-tourists">
+        <omgdc:Bounds height="71.0" width="105.0" x="75.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="service-init" id="BPMNShape_service-init">
+        <omgdc:Bounds height="55.0" width="105.0" x="110.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="145.0" y="127.0"></omgdi:waypoint>
-        <omgdi:waypoint x="250.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="76.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="127.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="482.0" y="411.0"></omgdi:waypoint>
@@ -56,19 +77,49 @@
         <omgdi:waypoint x="482.0" y="155.0"></omgdi:waypoint>
         <omgdi:waypoint x="482.0" y="227.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+      <bpmndi:BPMNEdge bpmnElement="flow-boats-available" id="BPMNEdge_flow-boats-available">
         <omgdi:waypoint x="462.0" y="247.0"></omgdi:waypoint>
-        <omgdi:waypoint x="354.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="247.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="13.0" width="100.0" x="364.0" y="227.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+      <bpmndi:BPMNEdge bpmnElement="flow-no-boats" id="BPMNEdge_flow-no-boats">
         <omgdi:waypoint x="482.0" y="267.0"></omgdi:waypoint>
         <omgdi:waypoint x="482.0" y="330.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="13.0" width="100.0" x="482.0" y="289.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="250.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="147.0" y="247.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="127.0" y="401.0"></omgdi:waypoint>
+        <omgdi:waypoint x="127.0" y="477.0"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="477.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow-enough-places" id="BPMNEdge_flow-enough-places">
+        <omgdi:waypoint x="127.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="127.0" y="330.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39.0" width="100.0" x="127.0" y="267.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow-not-enough-places" id="BPMNEdge_flow-not-enough-places">
+        <omgdi:waypoint x="107.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="22.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="22.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="302.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="302.0" y="100.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="29.0" y="208.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="215.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="127.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
