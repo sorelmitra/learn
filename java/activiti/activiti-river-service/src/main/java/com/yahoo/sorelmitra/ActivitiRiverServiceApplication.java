@@ -1,6 +1,8 @@
 package com.yahoo.sorelmitra;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.RepositoryService;
@@ -18,6 +20,9 @@ import org.springframework.context.annotation.Bean;
 public class ActivitiRiverServiceApplication {
     private static Logger LOG = LoggerFactory.getLogger(ActivitiRiverServiceApplication.class);
 
+    private List<Boat> boats;
+    private Boat cutter;
+
     public static void main(String[] args) {
         SpringApplication.run(ActivitiRiverServiceApplication.class, args);
     }
@@ -30,6 +35,11 @@ public class ActivitiRiverServiceApplication {
             @Override
             public void run(String... strings) throws Exception {
                 Map<String, Object> variables = new HashMap<String, Object>();
+                boats = new LinkedList<Boat>();
+                cutter = new Boat("Cutty One", 10);
+                boats.add(cutter);
+                variables.put("boats", boats);
+                variables.put("touristsCount", new Integer(6));
                 ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("embarkTourist", variables);
                 LOG.info("Embarking process started with process instance id [" + processInstance.getProcessInstanceId()
                         + "] key [" + processInstance.getProcessDefinitionKey() + "]");
