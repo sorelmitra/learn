@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -33,9 +35,26 @@ public class ActivitiRiverServiceTests {
 
     private TestRiverServiceDelegate riverServiceDelegate;
 
+    private Map<Object, Object> activitiBeans;
+
+    private RiverService riverService;
+
     @Before
     public void setUp() {
-        ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
+        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
+                .setJdbcUrl("jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000;DB_CLOSE_ON_EXIT=FALSE").setJdbcUsername("sa")
+                .setJdbcPassword("").setJdbcDriver("org.h2.Driver")
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+
+        // Ugly, but solves the unit-testing problem of injecting beans into Activiti effectively w/o resorting to
+        // activiti.cfg.xml
+        ProcessEngineConfigurationImpl cfgImpl = (ProcessEngineConfigurationImpl) cfg;
+        activitiBeans = new HashMap<Object, Object>();
+        riverService = new RiverService();
+        activitiBeans.put("riverService", riverService);
+        cfgImpl.setBeans(activitiBeans);
+
+        ProcessEngine processEngine = cfg.buildProcessEngine();
         String pName = processEngine.getName();
         String ver = ProcessEngine.VERSION;
         LOG.info("ProcessEngine [" + pName + "] Version: [" + ver + "]");
