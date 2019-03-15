@@ -3,3 +3,7 @@
 **/npm*.log
 target
 .bpmn
+.project
+.settings
+.vscode
+
