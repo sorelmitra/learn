@@ -1,6 +1,20 @@
 /*****************************************************************
+ * Contents:
  * 
- * Closures
+ * 1) Closures
+ * 2) "this"
+ * 3) Objects
+ * 4) Prototypes
+ * 5) Behavior Delegation vs "Class Polymorphism"
+ * 6) Types & Grammar
+ * 7) Event Loop and Job Queue
+ * 8) Promises
+ * 9) ECMAScript 6: Generators
+ */
+
+/*****************************************************************
+ * 
+ * 1) Closures
  * 
  *****************************************************************/
 
@@ -11,16 +25,18 @@ function makeAdder(increment) {
     makeAdder function has finished.
     From "Thinking in Java": A closure is a callable thing that retains
     information from the scope in which it was created.
-    Multiple calls to makeAdder create multiple instances of the "add" function.
+    Multiple calls to makeAdder create multiple instances of the "add" function,
+    each one with it's own closure to "increment".
     */
     function add(to) {
         var sum = to + increment;
-        console.log("%d + %d = %d", to, increment, sum);
+        console.log("Closure Adder: %d + %d = %d", to, increment, sum);
         to = sum;
     }
-    /* The changeIncrement function also has access to the same 
+    /* The changeIncrement function also has a closure to the same 
     "increment" variable after makeAdder has finished */
     function changeIncrement(newIncrement) {
+        console.log("Closure Adder: Changing increment from %d to %d", increment, newIncrement);
         increment = newIncrement;
     }
     /* When the caller of makeAdder saves the "add" and "changeIncrement"
@@ -30,11 +46,16 @@ function makeAdder(increment) {
     return [add, changeIncrement];
 }
 
-/* We get an array of functions: an "add" function instance, that has a reference to an "increment" variable, whose value is 1, and a changer function, that allows for changing the increment variable */
+/* We get an array of functions: an "add" function instance, that has a
+reference to an "increment" variable, whose value is 1,
+and a changer function, that allows for changing the increment variable */
 var adder = makeAdder(1);
 var plusOne = adder[0];
 var changePlusOne = adder[1];
-/* We get another array of functions: an "add" function instance, that has a reference to another "increment" variable, whose value this time is 10, and a changer function, that allows for changing the second increment variable */
+/* We get another array of functions: an "add" function instance, that has a 
+reference to another "increment" variable, whose value this time is 10, 
+and a changer function, that allows for changing 
+the second increment variable */
 adder = makeAdder(10)
 var plusTen = adder[0];
 
@@ -50,75 +71,123 @@ adder[1](9); /* call plusTen's increment changer directly from the array returne
 plusTen(7); /* Now we've ruined plusTen, too: it adds 9 to 7 */
 
 
-/*// Demonstration that a function has a "closure" on the variables in its scope, even when those variables are gone once their scope is finished */
+/* Demonstration that a function has a "closure" on the variables in its scope, 
+even when those variables are gone once their scope is finished */
 
 function foo() {
     var a = 2;
+    console.log("Closure Variable Gone: a is %d");
 
     function bar() {
-        console.log("I have a closure on this variable whose value is %d", a);
+        console.log("Closure Variable Gone: I have a closure on this variable whose value is %d", a);
     }
 
+    console.log("Closure Variable Gone: a is now gone");
     return bar;
 }
 
 var baz = foo();
 
 baz(); /* 2 -- Whoa, closure was just observed, man. */
-/* Calling bar via baz as above produces 2 because bar is a callable thing (a function) that retains information (e.g. variables) from the scope in which it was created (the scope of foo()) */
+/* Calling bar via baz as above produces 2 because bar is a callable thing 
+(a function) that retains information (e.g. variables) from the scope 
+in which it was created (the scope of foo()) */
 
-/* console.log("I'm trying to access that variable that baz (which is a reference to bar) said to have a closure on, a = ", a); // ReferenceError, a is not declared in this scope; although baz still has access to it thanks to its closure (=reference) on it */
+/*
+console.log("a = ", a);
+*/
+/* When trying to access that variable that baz (which is a reference to bar) 
+said to have a closure on, we get a ReferenceError that a is not declared 
+in this scope; although baz still has access to it 
+thanks to its closure (=reference) on it */
 
 
-/*// Another closure example from the YDKJS book - trying to print incremented numbers at 1-second intervals using setTimeout */
+/* Another closure example from the YDKJS book - trying to print 
+incremented numbers at 1-second intervals using setTimeout */
 
 var timeout;
 
 timeout = 100;
 setTimeout(function log1() {
-    console.log("Try 1 I'm not counting numbers correctly")
+    console.log("Closure Count Try 1 I'm not counting numbers correctly")
 }, timeout);
 for (var i=1; i<=5; i++) {
     setTimeout( function timer(){
-        console.log("Try 1 No %d", i);
+        console.log("Closure Count Try 1 No %d", i);
     }, timeout + i );
 }
-/* The above code does not count correctly, because each call to setTimeout gives it a new function called "timer", and each "timer" functions have a closure on the same "i" variable. Whenever a "timer" function is called, it uses whatever value is in "i" at that time. By the time the for loop finishes, no timer function would have been called (not even if the interval would be 0). So when all timer functions are called, i is already 6 */
+/* The above code does not count correctly, because each call to setTimeout 
+gives it a new function called "timer", and each "timer" functions 
+have a closure on the same "i" variable. 
+Whenever a "timer" function is called, it uses whatever value 
+is in "i" at that time. By the time the for loop finishes, no timer function 
+would have been called (not even if the interval would be 0). 
+So when all timer functions are called, i is already 6 */
 
-/* Let's fix it. The idea is to create a new scope for each "timer" function, scope that would make sure each "timer" function retains a reference to a variable with the proper value. To achieve this we use an Immediately Invoked Function Expression (IIFE), that creates a new scope. In this new scope we declare a new variable that has its value set to i's value. Because the IIFE is executed right-away, it will save in j the value of i at the moment of creating the timer. And since in the "timer" function we now use j, it will have the correct value. Since each time the loop is entered a new IIFE is created and executed, we effectively have 5 IIFEs, which create 5 scopes, each one with a "j" variable and a "timer" function passed to setTimeout */
-/* In ECMAScript 6 and above, we would have achieved the same efect *without* and IIFE but replacing "var j" with "let j". "let" turns a scopeless block into a scope (normally, only function blocks have a scope) */
+/* Let's fix it. The idea is to create a new scope for each "timer" function, 
+scope that would make sure each "timer" function retains a reference 
+to a variable with the proper value.
+To achieve this we use an Immediately Invoked Function Expression (IIFE), 
+that creates a new scope. 
+In this new scope we declare a new variable that has its value set to 
+i's value. Because the IIFE is executed right-away, it will save in j 
+the value of i at the moment of creating the timer. 
+And since in the "timer" function we now use j, it will have the correct value. 
+Since each time the loop is entered a new IIFE is created and executed, 
+we effectively have 5 IIFEs, which create 5 scopes, each one with a 
+"j" variable and a "timer" function passed to setTimeout */
+/* In ECMAScript 6 and above, we would have achieved the same efect *without* 
+an IIFE but replacing "var j" with "let j". "let" turns a scopeless block 
+into a scope (normally, only function blocks have a scope) */
 timeout = 200;
 setTimeout(function log2() {
-    console.log("Try 2 Now I'm counting numbers correctly")
+    console.log("Closure Count Try 2 Now I'm counting numbers correctly")
 }, timeout);
 for (var i=1; i<=5; i++) {
     (function createAVariableInANewScope() {
-        var j = i; /* use "let" instead of "var" here and the code works without the createAVariableInANewScope function declaration */
+        var j = i; /* use "let" instead of "var" here and the code works 
+                      without the createAVariableInANewScope function 
+                      declaration */
         setTimeout( function timer(){
-            console.log("Try 2 No %d", j); /* Must use j here, as j is set to the current value of i, and it will keep its value for the "timer" function */
-        }, timeout + i ) /* I don't need to use j here as this expression is executed right away. I need to use j only in the function that will be executed later, function that will make use of the closured variable */
+            console.log("Closure Count Try 2 No %d", j); /* Must use j here, as j is set 
+                                              to the current value of i, and 
+                                              it will keep its value for the 
+                                              "timer" function */
+        }, timeout + i ) /* I don't need to use j here as this expression 
+                            is executed right away. I need to use j only in 
+                            the function that will be executed later, 
+                            function that will make use of the closured 
+                            variable */
     })();
 }
 
-/* As stated above, in ECMAScript 6 we can use "let" to declare j and solve the problem without the need for an IIFE. Even better, if we use "let" in the for loop, the variable "i" will be declared not just once for the loop, but once for each iteration, setting it with the right value. This way the original code works in ECMAScript 6 if we just replace "var" with "let": */
+/* As stated above, in ECMAScript 6 we can use "let" to declare j and 
+solve the problem without the need for an IIFE. 
+Even better, if we use "let" in the for loop, the variable "i" will be 
+declared not just once for the loop, but once for each iteration, 
+setting it with the right value. 
+This way the original code works in ECMAScript 6 if we just replace 
+"var" with "let", which is shown below. */
 timeout = 300;
 setTimeout(function log3() {
-    console.log("Try 3 I'm counting numbers correctly using 'let' in ECMAScript 6")
+    console.log("Closure Count Try 3 I'm counting numbers correctly using 'let' in ECMAScript 6")
 }, timeout);
 for (let i=1; i<=5; i++) {
     setTimeout( function timer(){
-        console.log("Try 3 No %d", i);
+        console.log("Closure Count Try 3 No %d", i);
     }, timeout + i );
 }
 
 
-/*// Closures used to create modules */
+/* Closures used to create modules */
 
 function Robot() {
     var name;
     var ability;
     
-    /* closure function: it has references to the name and ability variables that were created when Robot() was called; multiple calls to Robot() create multiple instances of the name and ability variables */
+    /* closure function: it has references to the name and ability variables 
+    that were created when Robot() was called; multiple calls to Robot() 
+    create multiple instances of the name and ability variables */
     function doInit(_name, _ability) {
         name = _name;
         ability = _ability;
@@ -126,16 +195,20 @@ function Robot() {
     
     /* similar closure function */
     function doPerform() {
-        console.log("%s is executing %s", name, ability);
+        console.log("Closure Module: %s is executing %s", name, ability);
     }
     
-    /* public interface: we define two function variables, and assign them to our implementations; this way we can change the implementation function by simply modifying the values of the function variables to point to some other functions */
+    /* public interface: we define two function variables, and assign them 
+    to our implementations; this way we can change the implementation function 
+    by simply modifying the values of the function variables to point to 
+    some other functions */
     var robot = {
         init: doInit,
         perform: doPerform
     }
     
-    /* return the public interface, so that the caller of this function gets an object that can do stuff */
+    /* return the public interface, so that the caller of this function 
+    gets an object that can do stuff */
     return robot;
 }
 
@@ -146,20 +219,22 @@ robot.perform();
 /* robot.doInit("illegal", "illegal"); // Fires a TypeError exception: doInit is not accessible */
 
 
+
+
 /*****************************************************************
  * 
- * "this"
+ * 2) "this"
  * 
  *****************************************************************/
 
 
 /*// What "this" is NOT */
 
-var id = "not awesome";
+var id = "This: not awesome";
 
 (function wrongTimeout1() {
     var obj = {
-        id: "awesome 1",
+        id: "This: awesome 1",
         cool: function coolFn() {
             console.log( this.id );
         }
@@ -167,12 +242,15 @@ var id = "not awesome";
 
     obj.cool(); /* awesome */
 
-    setTimeout( obj.cool, 400 ); /* not awesome. "this" is NOT a reference to the "class" the function is "member of", because JavaScript is NOT Object-Oriented (at least at the time of this writing) */
+    setTimeout( obj.cool, 400 );
+    /* not awesome. "this" is NOT a reference to the "class" that the function 
+    is "member of", because JavaScript is NOT Object-Oriented (at least 
+        at the time of this writing) */
 })();
 
 (function wrongTimeout2() {
     var obj = {
-        id: "awesome 2",
+        id: "This: awesome 2",
         cool: function coolFn() {
             console.log( this.id );
         },
@@ -181,12 +259,14 @@ var id = "not awesome";
         }
     };
 
-    obj.coolTimeout(); /* not awesome. Trying to call setTimeout from "inside" the "class" yields the same result, for the same reason: JS is NOT OO */
+    obj.coolTimeout(); 
+    /* not awesome. Trying to call setTimeout from "inside" the "class" 
+    yields the same result, for the same reason: JS is NOT OO */
 })();
 
 (function rightTimeout() {
     var obj = {
-        id: "awesome 3",
+        id: "This: awesome 3",
         cool: function coolFn() {
             console.log( this.id );
         },
@@ -195,44 +275,87 @@ var id = "not awesome";
         }
     };
 
-    obj.coolTimeout(); /* awesome 3. As is explained below, it works correctly because of "this" binding by using Function.prototype.bind() */
+    obj.coolTimeout(); 
+    /* awesome 3. As is explained below, it works correctly because of "this" 
+    binding by using Function.prototype.bind() */
 })();
 
 
-/* "this" is a binding made in the activation record (execution context) of a function. The activation record is created at the call-site of the function, and makes "this" to point to the object from where the function is called. In JavaScript, everything is an object (except simple primitives - string, number, boolean, null, and undefined), including the global script (variables declared in the global scope are actually part of the global object) and functions. */
+/*// What "this" IS */
+
+/* "this" is a binding made in the activation record (execution context) 
+of a function.
+The activation record is created at the call-site of the function, 
+and makes "this" to point to the object from where the function is called. 
+In JavaScript, everything is an object (except simple primitives - 
+    string, number, boolean, null, and undefined), 
+including the global script (variables declared in the global scope are 
+    actually part of the global object) and functions. */
 
 
 /*// 1. default binding */
+
 function defaultBinding() {
-    console.log(this.defBind); /* "this" points to the global object */
+    console.log("%s; this: <<%s>>", this.defBind, this); /* "this" points to the global object */
 }
-var defBind = "(1) defBind is in fact <global object>.defBind (in browsers <global object> is window)";
-defaultBinding(); /* "(1) ..." */
+defaultBinding(); /* undefined */
+var defBind = "default binding 1";
+/* defBind is in fact <global object>.defBind (in browsers <global object>
+     is window)" */;
+defaultBinding(); /* default binding 1 */
 
 /* default binding in strict mode */
 function defaultBindingInStrictMode() {
     "use strict";
-    console.log( this.defBind ); /* "this" is undefined, because in strict mode the global object is not eligible for default binding */
+    console.log("This: %s", this.defBind); 
+    /* If we try to set "this" to the global object via implicit binding when
+    we call this function, it will be undefined instead */ 
 }
-/* defaultBindingInStrictMode(); // TypeError: this is undefined, because of strict mode */
+/*
+defaultBindingInStrictMode();
+*/
+/* TypeError: this is undefined, because in strict mode the global object is 
+not eligible for default binding */
+
+/* Strict mode applies to where "this" IS USED, not where the function that
+uses "this" is called. The function below demonstrates it. */
 (function immediatelyCalled() {
     "use strict";
-    /*var*/ defBind = "(2) although we use strict mode here, the defaultBinding() function does not use strict mode, so 'this' is allowed to bind to the global object";
-    /* Note: if we uncomment the "var" above, we will get at runtime the value of defBind "(1) ..." instead of "(2) ..." (!!!). Why? Because the IIFE creates its own scope, and putting "var" above will create a new variable in the scope of this IIFE. See below when using a normal function for an explanation. */
+    /*var*/ defBind = "default binding 2";
+    /* although we use strict mode here, the defaultBinding() function 
+    does not use strict mode, so 'this' is allowed 
+    to bind to the global object.
+    /* Note: if we uncomment the "var" above, we will get at runtime 
+    the value of defBind "default binding 1" instead of "default binding 2" (!). 
+    Why? Because the IIFE creates its own scope, and putting "var" above 
+    will create a new variable in the scope of this IIFE. 
+    See below when using a normal function for an explanation. */
     defaultBinding();
 })();
 
 /* default binding from another function */
 function usingDefaultBinding() {
-    var defBind = "(3) I'm a function so I'm an object that can be passed as 'this'";
+    var defBind = "default binding 3";
+    /* A function is an object that can be passed as 'this' */
     defaultBinding();
 }
-usingDefaultBinding(); /* Will we get "(3) ..." ? NO!!! because not LEXICAL SCOPE is what determines "this" binding, but the OBJECT used when calling the function. In our case, although we call the function from usingDefaultBinding, we don't pass the usingDefaultBinding Function object when calling defaultBinding. So DEFAULT binding is performed. */
+usingDefaultBinding();
+/* Will we get "default binding 3" ? NO! We get "default binding 2" instead!
+Why? Because what determines "this" binding is NOT LEXICAL SCOPE,
+BUT the OBJECT used when calling the function. 
+In our case, although we call the function from usingDefaultBinding(), 
+we don't pass the usingDefaultBinding Function object 
+when calling defaultBinding. So DEFAULT binding is performed. */
 
-/* default binding from another function */
+/* explicit binding from another function */
 function usingFunctionObjectBindingExplicitly() {
-    arguments.callee.defBind = "(4) Now we really pass the Function object as 'this'";
-    /* Note: We want to pass the function object as "this", so we need defBind to be a part of that function object. If we say "var defBind = ..." above instead of "arguments.callee.defBind = ...", then defBind will be a variable partaining to the functions local LEXICAL SCOPE. So we need to make defBind part of the function object itself, so we use the above syntax  */
+    arguments.callee.defBind = "explicit binding function";
+    /* Note: We want to pass the function object as "this", so we need 
+    defBind to be a part of that function object. If we say "var defBind = ..." 
+    above instead of "arguments.callee.defBind = ...", then defBind will be 
+    a variable partaining to the functions local LEXICAL SCOPE. 
+    So we need to make defBind part of the function object itself, 
+    thus the use the above syntax. */
     defaultBinding.call(arguments.callee);
 }
 usingFunctionObjectBindingExplicitly();
@@ -240,8 +363,8 @@ usingFunctionObjectBindingExplicitly();
 
 /*// 2. implicit binding, when calling from a context object */
 
-function showA() {
-    console.log("a is ", this.a);
+function showA(text) {
+    console.log("This: %s: a is ", text, this.a);
 }
 
 var obj = {
@@ -254,55 +377,97 @@ var obj2 = {
     obj: obj
 };
 
-obj2.obj.showA(); /* 2, only the last object matters */
+obj2.obj.showA("implicit binding"); /* 2, only the last object matters */
 
 var defaultBindingByMistake = obj.showA; /* function reference/alias! */
 
 var a = "oops, global"; /* `a` also property on global object */
 
-defaultBindingByMistake(); /* "oops, global", because we call it without a context object */
+defaultBindingByMistake("default binding by mistake");
+/* "oops, global", because we call it without a context object */
 
-setTimeout(obj.showA, 700); /* "oops, global", because setTimeout() has a function reference which it calls without a context object */
+setTimeout(obj.showA, 700);
+/* "oops, global", because setTimeout() has a function reference 
+which it calls without a context object */
 
 /* another default binding by mistake */
-(obj2.showA = obj.showA)(); /* "oops, global", as "this" points to the global object. Why did it get to the global object? Because the result value of the assignment expression p.foo = o.foo is a reference to just the underlying function object. As such, the effective call-site is just foo(), not p.foo() or o.foo() as you might expect */
+(obj2.showA = obj.showA)("function assignment");
+/* "oops, global", as "this" points to the global object. 
+Why did it get to the global object? 
+Because the result value of the assignment expression obj2.showA = obj.showA is 
+a reference to just the underlying function object. As such, the effective 
+call-site is just showA(), not obj2.showA() or obj.showA()
+as you might expect */
 
 
 /*// 3. explicit binding */
 
-showA.call(obj); /* 2 */
-showA.call(obj2); /* 42 */
+showA.call(obj, "explicit binding obj"); /* 2 */
+showA.call(obj2, "explicit binding obj2"); /* 42 */
 
 /* Hard binding pattern */
 function showAOfObj() {
     return showA.apply(obj, arguments);
 }
 
-showAOfObj(); /* 2 */
-setTimeout(showAOfObj, 710); /* 2, because of hard binding: showAOfObj() always passes obj as "this" */
+showAOfObj("hard binding pattern"); /* 2 */
+setTimeout(showAOfObj, 710);
+/* 2, because of hard binding: showAOfObj() always passes obj as "this" */
 
 /* Hard binding helper */
 function bind(func, obj) {
-    return function() { /* we return a function, as our purpose is to have a function that always has "this" set to obj */
-        return func.apply(obj, arguments); /* the function we return simply calls the function we receive as the first argument with all arguments */
+    return function() {
+        /* we return a function, as our purpose is to have a function 
+        that always has "this" set to obj */
+        return func.apply(obj, arguments);
+        /* The function we return simply calls the function we receive in
+        the outer function as the first argument.
+        It calls it with all arguments of the inner function. */
     }
 }
 
-setTimeout(bind(showA, obj2), 720); /* 42, because the hard binding helper bind() will always call showA() with a "this" set to obj2 */
+setTimeout(bind(showA, obj2), 720);
+/* 42, because the hard binding helper bind() will always call showA() 
+with a "this" set to obj2 */
 
-setTimeout(showA.bind(obj2), 730); /* 42, this time using Function.prototype.bind(), introduced in ECMAScript 5 */
+setTimeout(showA.bind(obj2, "timeout with EC5 hard binding"), 730);
+/* 42, this time using Function.prototype.bind(), introduced in ECMAScript 5 */
 
-/* Function.prototype.bind() can also be used for default arguments or "partial function application" */
+/* Function.prototype.bind() can also be used for default arguments 
+or "partial function application" */
 function sum(a, b, c) {
-    console.log("the sum is", a + b + c);
+    console.log("This: the sum of %d, %d, %d is %d", a, b, c, a + b + c);
 }
 /* s4() is a partial function application of sum(): s4(b, c) = sum(4, b, c) */
-/* Note that partial function application is different than (and not a subset of, as YDKJS says) currying: if bind() would produce currying, then s4 would return another function (say s43) that would have the parameter for b fixed (say to 3). Calling s43(c) would return the sum 4+3+c. */
-var s4 = sum.bind(null, 4); /* "this" is set to null, 'cause we don't care for it, we just use the default arguments */
+
+/* Partial Function Application vs Currying
+Note that Partial Function Application is different than (and probably not a 
+    subset of, as YDKJS says) Currying.
+Difference
+- Currying always produces nested unary (1-ary) functions. 
+  The transformed function is still largely the same as the original.
+- Partial application produces functions of arbitrary number of arguments. 
+  The transformed function is different from the original — it needs 
+  less arguments.
+- Currying is not partial application. It can be implemented using 
+  partial application. You can’t curry a function that takes any number of 
+  arguments, (unless you fix the number of arguments).
+Source: https://codeburst.io/javascript-currying-vs-partial-application-4db5b2442be8
+*/
+
+var s4 = sum.bind(null, 4);
+/* "this" is set to null, 'cause we don't care for it, we just use 
+the default arguments */
 s4(3, 2); /* 9 */
 
-/* Setting "this" to null can be dangerous. If you ever use that against a function call (for instance, a third-party library function that you don't control), and that function does make a "this" reference, the default binding rule means it might inadvertently reference (or worse, mutate!) the global object (window in the browser). */
-/* A safer way to do this is to create an empty object, specifically for this purpose. It might be a good idea to name it ø (option+o on a Mac keyboard) */
+/* Setting "this" to null can be dangerous. If you ever use that 
+against a function call (for instance, a third-party library function 
+    that you don't control), and that function does make a "this" reference, 
+the default binding rule means it might inadvertently reference 
+(or worse, mutate!) the global object (window in the browser). */
+/* A safer way to do this is to create an empty object, specifically 
+for this purpose. It might be a good idea to name it ø 
+(option+o on a Mac keyboard). */
 var ø = Object.create(null);
 var saferS4 = sum.bind(ø, 4);
 saferS4(3, 2); /* 9 */
@@ -314,52 +479,90 @@ function dummy() {
     this.a = 57;
 }
 
-var d = new dummy(); /* "new" does the following: 1) creates a new object; 2) sets it's prototype (not used here); 3) sets "this" to point to the newly created object for the dummy() function; 4) makes dummy() return the newly created object (unless dummy() returns something else) */
-console.log("my dummy is", d.a);
+var d = new dummy();
+/* "new" does the following:
+1) creates a new object;
+2) sets it's prototype (not used here)
+3) sets "this" to point to the newly created object for the dummy() function
+4) makes dummy() return the newly created object
+  (unless dummy() returns something else) */
+console.log("This: my dummy is", d.a);
 
 
 /*// Precedence of bindings */
 
 /* explicit has precedence over implicit */
-obj.showA.call(obj2); /* 42; explicit binding has precedence over implicit binding; although we called showA via obj, it uses obj2 as "this" */
+obj.showA.call(obj2, "explicit over implicit");
+/* 42; explicit binding has precedence over implicit binding; 
+although we called showA via obj, it uses obj2 as "this" */
 
 var dummyObj = {
     a: 5,
     dummy: dummy
 };
 
-d = new dummyObj.dummy(); /* 57 */
-console.log("'new' has precedence over implicit binding: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a);
+d = new dummyObj.dummy();
+console.log("This: new over implicit: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a);
+/* 5, 57: "new" has precedence over implicit binding */
 
-/* d = new dummyObj.dummy.call(obj2); // TypeError: new and call/apply cannot be used together */
+/*
+d = new dummyObj.dummy.call(obj2);
+*/
+/* TypeError: new and call/apply cannot be used together */
 
 var f = dummy.bind(dummyObj);
 d = new f();
-console.log("'new' has precedence over hard (explicit) binding: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a); /* 57 */
+console.log("This: new over explicit: dummyObj's a is %d, d's a is %d", dummyObj.a, d.a);
+/* 5, 57: "new" has precedence over hard (explicit) binding */
 
 /*// Precedence of bindings: new, explicit, implicit, default */
 
 
+
+
 /*****************************************************************
  * 
- * Objects
+ * 3) Objects
  * 
  *****************************************************************/
 
-/* There are six primitive types: number, boolean, string, null, undefined, object. */
-/* ECMAScript 6 adds a new primitive type: Symbol */
-/* Leaving null and undefined aside, this means that everything that's not a number, boolean or string, is an object. So a function is an object, a callable one. */
+/* There are six primitive types:
+number, boolean, string, null, undefined, object.
+ECMAScript 6 adds a new primitive type: Symbol.
 
-/* YDKJS does not define what is a JavaScript object. Since some well-known languages that have objects are OO languages (e.g. C++, Java, Python), the common assumption might be that JS is OO too. It's NOT OO, as the above discussion on "this" has pointed out. So, what's an object in JS? */
+Leaving null and undefined aside, this means that everything that's 
+not a number, boolean or string, is an object.
+So a function is an object, that is a callable one. */
 
-/* Try my own definition: a JS object is a structure that can have data and functions, and which is passed around by reference. - this is not very accurate, as an object is closer to a hash (dictionary) than to a data structure */
-/* YDKJS mentions that the contents of an object consist of values (any type) stored at specifically named locations, which we call properties. It also mentions that: The engine stores values in implementation-dependent ways, and may very well not store them in some object container. What is stored in the container are these property names, which act as pointers (technically, references) to where the values are stored. */
+/* YDKJS does not define what is a JavaScript object. 
+Since some well-known languages that have objects are OO languages 
+(e.g. C++, Java, Python), the common assumption might be that JS is OO too. 
+It's NOT OO, as the above discussion on "this" has pointed out. 
 
-/* So a DEFINITION: An object is a collection of named references to values of any type. These references are called properties. The values and the object itself with its references content are stored by the Engine in an implementation-dependent way. The object is passed around by reference. */
+So, what IS an object in JS? 
 
-/* Built-in objects: Number, Boolean, String, Object, Function; Array, Date, RegExp, Error */
-/* Although they might have the appearance of types or "classes", they are NOT. */
-/* Instead, they are FUNCTIONS. */
+Try my own definition: a JS object is a data structure (dictionary-like)
+that can have data and functions, and which is passed around by reference.
+
+YDKJS mentions that the contents of an object consist of values (any type) 
+stored at specifically named locations, which we call properties. 
+It also mentions that:
+The engine stores values in implementation-dependent ways, and may very well 
+not store them in some object container. What is stored in the container 
+are these property names, which act as pointers (technically, references) 
+to where the values are stored.
+
+So a DEFINITION:
+An object is a collection of named references to values of any type.
+These references are called properties.
+The values and the object itself with its references content are stored 
+by the Engine in an implementation-dependent way. 
+The object is passed around by reference. */
+
+/* Built-in objects:
+Number, Boolean, String, Object, Function; Array, Date, RegExp, Error.
+Although they might have the appearance of types or "classes", they are NOT.
+Instead, they are FUNCTIONS. */
 
 
 /*// Primitive Types and their Corresponding Objects */
@@ -371,32 +574,52 @@ function showTypeofAndValue(x, msg) {
     } else {
         s = msg;
     }
-    console.log(s, "is a", typeof x, "and has the value", x);
+    console.log("Objects: ", s, "is a", typeof x, "and has the value", x);
 }
 var n;
 
 /* primitive number type */
 n = 2;
-showTypeofAndValue(n, "n"); /* number 2 */
+showTypeofAndValue(n, "primitive"); /* number 2 */
 /* Number is actually a function that returns the primitive number type */
 n = Number(3);
-showTypeofAndValue(n, "now n"); /* number 3 */
+showTypeofAndValue(n, "still primitive"); /* number 3 */
 
-/* Because of the "new" operator seen above, the Number() function can also be called as a constructor (but not a "class" constructor) */
+/* Because of the "new" operator seen above, the Number() function can 
+also be called as a constructor (but not a "class" constructor) */
 n = new Number(4);
-showTypeofAndValue(n, "again, n"); /* Number {4} */
-/* This can be explained if we remember that "new" constructs a new object, sets its prototype (that's where Number is coming from), sets "this" to the newly created object, and calls the given function (in this case Number) making it return the new object (instead of its primitive type number) */
+showTypeofAndValue(n, "object"); /* Number {} */
+/* This can be explained if we remember that "new" constructs a new object, 
+sets its prototype (that's where Number is coming from), 
+sets "this" to the newly created object, 
+and calls the given function (in this case Number) making it return 
+the new object (instead of its primitive type number) */
 
 /* primitive types are not objects, but we can call methods of their corresponding object type on them. How come? */
 var pi = 3.1415926;
 showTypeofAndValue(pi, "pi"); /* it is a primitive number type */
-console.log("pi is a %s with the value ~ %s", typeof pi, pi.toFixed(2)); /* when we call a function of the corresponding object type, the Engine coerces the primitive type to the corresponding type; it automatically creates an object of that type (in our case Number), for that call ONLY; we don't have access to that object in our code, and it is garbage collected after our function call; our variable still remains a primitive number */
+console.log("Objects: pi is a %s with the value ~ %s", typeof pi, pi.toFixed(2));
+/* toFixed() is a function on Number object, which corresponds 
+to the "number" primitive.
+When we call a function of the corresponding object type, 
+the Engine coerces the primitive type to the corresponding type; 
+it automatically creates an object of that type (in our case Number), 
+for that call ONLY; we don't have access to that object in our code, 
+and it is garbage collected after our function call; 
+our variable still remains a primitive number */
 
-/* console.log("pi is a %s with the string value %s", typeof pi, pi.big()); // TypeError: pi.big is not a function; so we can't call functions of an object type that does not correspond to this primitive type */
+/*
+console.log("pi is a %s with the string value %s", typeof pi, pi.big());
+*/
+/* TypeError: pi.big() is not a function; 
+We can't call functions of an object type that does not correspond 
+to this primitive type. */
 
+/* We can, however, "hijack" the object created by the Engine when calling 
+functions of an object type that correspond to a primitive. */
 (function invokedRightAway() {
-    /* We can, however, "hijack" the object created by the Engine when calling functions of an object type that correspond to a primitive */
-    /* "use strict"; // but not in strict mode */
+    /* "use strict"; */
+    // We can't hijack in strict mode */
     String.prototype.returnMe = function() {
         return this;
     }
@@ -441,14 +664,17 @@ var myObject = {
     d: anotherFunction
 };
 anotherArray.push( anotherObject, myObject ); /* circular reference! */
-console.log(myObject, myObject.c[0], myObject.c[1]);
+console.log("Objects: Circular reference: ", myObject, myObject.c[0], myObject.c[1]);
 
 /* ECMAScript 6: Shallow object copy */
 var newObj = Object.assign( {}, myObject );
-console.log("newObj has exactly references to the same objects as myObject: %s %s %s",
+console.log("Objects: newObj: %s %s %s",
     newObj.b === anotherObject,
     newObj.c === anotherArray,
-    newObj.d === anotherFunction); /* we can also see here how to display data types for which there's no string substitution %: use %s and type coercion will do the rest */
+    newObj.d === anotherFunction);
+/* "newObj" has references to exactly the same objects as myObject.
+We can also see here how to display data types for which there's 
+no string substitution (%): use %s and type coercion will do the rest. */
 
 
 /*// Property descriptors */
@@ -458,7 +684,7 @@ var myObject = {
 };
 
 myObject.a = 3;
-console.log(" I changed a property that's by default writable: %d", myObject.a);
+console.log("Objects: I changed a property that's by default writable: %d", myObject.a);
 
 Object.defineProperty( myObject, "a", {
     value: myObject.a, /* I can use it's previous value */
@@ -468,13 +694,23 @@ Object.defineProperty( myObject, "a", {
 } ); /* This property also happens to be an object CONSTANT (non-writable, non-configurable) */
 
 myObject.a = 5; /* useless, no change will be perfomed */
-console.log(" I changed a property that's NOT writable anymore: %d", myObject.a);
-/* Object.defineProperty( myObject, "a", {value: 6, writable: true, configurable: true, enumerable: true} ); // TypeError, can't configure a non-configurable property */
+console.log("Objects: I changed a property that's NOT writable anymore: %d", myObject.a);
+/*
+Object.defineProperty( myObject, "a", {
+    value: 6, 
+    writable: true, 
+    configurable: true, 
+    enumerable: true
+} );
+*/
+/* TypeError, can't configure a non-configurable property */
 
 
-/*// "delete" operator: it attempts to delete a property on an object. IF that was the last reference to that object, the object might actually be garbage collected. BUT there's NO resembling of C++'s delete operator */
+/*// "delete" operator: it attempts to delete a property on an object. 
+IF that was the last reference to that object, the object might actually be 
+garbage collected. BUT there's NO resembling of C++'s delete operator */
 delete myObject.a; /* a non configurable property cannot be deleted */
-console.log(" I deleted a property that's not configurable: %d", myObject.a);
+console.log("Objects: I deleted a property that's not configurable: %d", myObject.a);
 
 
 /*// Immutability */
@@ -484,55 +720,100 @@ myObject = {
     b: 9
 };
 
-Object.preventExtensions(myObject); /* Immutability Level 1: Prevent adding new properties */
-/* Note that I cannot say myObject.preventExtensions() because this method is part of Object, not of Object.prototype. If it were the latter case, then I could call it via myObject, because delegation would look it up and find it in myObject's prototype, which is Object.prototype */
+/* Immutability Level 1: Prevent adding new properties */
+Object.preventExtensions(myObject);
+/* Note that I cannot say myObject.preventExtensions() because this method 
+is part of Object, not of Object.prototype. 
+If it were the latter case, then I could call it via myObject, because 
+delegation would look it up and find it in myObject's prototype, 
+which is Object.prototype */
 myObject.a = 10;
 myObject.c = 6;
-console.log("I added a property on an object that prevents extensions: %s, I also modified an existing property: %d", myObject.c, myObject.a);
+console.log("Objects: myObject prevents extensions: %d, %d", myObject.a, myObject.c);
+/* 10, undefined: Adding a property on an object that prevents extensions fails. 
+Modified an existing property on the same object works. */
 
-Object.seal(myObject); /* Immutability Level 2: Level 1 + Prevent configuring its properties */
+/* Immutability Level 2: Level 1 + Prevent configuring its properties */
+Object.seal(myObject);
 myObject.a = 11;
-console.log("I modified a property on a sealed object: %d", myObject.a);
+console.log("Objects: myObject is sealed: %d", myObject.a);
+/* 11: myObject is not configurable, but its values can be modified */
 
-/* Object.defineProperty( myObject, "b", {value: 6, writable: true, configurable: true, enumerable: true} ); // TypeError: now b is not configurable because of the seal() call */
-
-Object.freeze(myObject); /* Immutability Level 3: Level 2 + Prevent modifying its properties */
-myObject.b = 12;
-console.log("I modified a property on a frozen object: %d", myObject.b);
-
-
-/*// [[Get]] and [[Set]] */
 /*
+Object.defineProperty( myObject, "b", {
+    value: 6, 
+    writable: true, 
+    configurable: true, 
+    enumerable: true
+} );
+// TypeError: now myObject is not configurable because of the seal() call */
+
+/* Immutability Level 3: Level 2 + Prevent modifying its properties */
+Object.freeze(myObject);
+myObject.b = 12;
+console.log("Objects: myObject is frozen: %d", myObject.b);
+/* 9: myObject is not writable anymore */
+
+/*
+[Get]] and [[Set]]
+
 These are two built-in operations that are used whenever accessing object properties.
-[[Get]] returns the property that was requested to be accesed on the object with this algorithm:
-- If a property with this name is found on the current object, it is returned
-- Else, if a property with this name is found in the prototype chain, it is returned
-- Else, it returns undefined
-[[Set]] attempts to save the requested property on the given object, with the following algorithm:
-- If a setter with the same name is found on this object, call it
-- Else, if a non-writable property with the same name is found on this object, then adding it on this object is disallowed (silently in normal mode, with error in strict mode)
-- Else, if a writable property with the same name is found in the prototype chain, it is added on this object, shadowing the existing one
-- Else, if a non-writable property with the same name is found in the prototype chain, then adding it on this object is disallowed (silently in normal mode, with error in strict mode)
-- Else, if a setter is found in the prototype chain, it is called
-- Else (no property with the same name is found, anywhere) it is added to the current object
-The first three rules refer to this object, the last three ones refer to its prototype chain.
+
+[[Get]] returns the property that was requested to be accesed on the object 
+by using this algorithm:
+- If a property with this name is found on the current object,
+  it is returned
+- Else, if a property with this name is found in the prototype chain,
+  it is returned
+- Else, undefined is returned
+
+[[Set]] attempts to save the requested property on the given object, 
+with the following algorithm:
+- If a SETTER with the same name is found on
+  THIS OBJECT, call it
+- Else, if a NON-WRITABLE PROPERTY with the same name is found on
+  THIS OBJECT, then adding it on this object is disallowed 
+  (silently in normal mode, with error in strict mode)
+- Else, if a WRITABLE PROPERTY with the same name is found in the 
+  PROTOTYPE CHAIN, it is added on this object, shadowing the existing one
+- Else, if a NON-WRITABLE PROPERTY with the same name is found in the 
+  PROTOTYPE CHAIN, then adding it on this object is disallowed 
+  (silently in normal mode, with error in strict mode)
+- Else, if a SETTER is found in the
+  PROTOTYPE CHAIN, it is called
+- Else (no property with the same name is found, anywhere) 
+  it is added to the current object
+
+  The first 2 rules refer to this object, 
+  the last 4 ones refer to its prototype chain.
 */
 
 var someObj = {
-    a: undefined /* undefined doesn't necessarily mean that the property does not exist */
+    a: undefined
+    /* undefined doesn't necessarily mean that the property does not exist */
 };
-console.log("Distinguishing between undefined property or property explicitly set to undefined requires a method call: a is %s, b is %s, a is%s own property, b is%s own property",
+/* Distinguishing between undefined property or property explicitly set to 
+undefined requires a method call. */
+console.log("Objects: a=%s, b=%s, does a exist? %s, does b exist? %s",
     someObj.a, /* undefined by authoring */
     someObj.b, /* undefined as returned from the [[Get]] operation */
-    someObj.hasOwnProperty("a") ? "" : " not", /* Object.prototype.hasOwnProperty() */
-    Object.prototype.hasOwnProperty.call(someObj, "b") ? "" : " not"); /* another way of calling hasOwnProperty (useful for objects that don't have a prototype, or whose prototype does not go back to Object) */
+    someObj.hasOwnProperty("a") ? "YES" : "NO",
+    /* Object.prototype.hasOwnProperty() */
+    Object.prototype.hasOwnProperty.call(someObj, "b") ? "YES" : "NO");
+    /* Another way of calling hasOwnProperty (useful for objects that 
+        don't have a prototype, or whose prototype 
+        does not go back to Object) */
 
 
 /*// Getters and Setters */
 
 var x = {
-    get a() { /* getter defined in the literal notation */
-        return this._a; /* use "this" to make sure its bound to this object rather than a global variable */
+    /* getter defined in the literal notation */
+    get a() {
+        /* Use "this" to make sure its bound to this object rather 
+        than a global variable (of course if you call it the right way
+            and don't mess with it). */
+        return this._a;
     },
     set a(v) {
         this._a = v;
@@ -540,26 +821,35 @@ var x = {
 }
 
 Object.defineProperty(x, "b", {
-    get: function() { /* getter defined via defineProperty() */
+    /* getter defined via defineProperty() */
+    get: function() {
         return 7;
     },
-    enumerable: true /* otherwise it won't appear in the Enumeration for ... in below */
+    enumerable: true
+    /* otherwise it won't appear in the Enumeration for ... in below */
 });
 
 x.a = 8; /* calls a's setter */
-console.log(x.a, x.b); /* calls the getters for a and b */
-
+console.log("Objects: getters: %s, %s", x.a, x.b);
+/* calls the getters for a and b */
 
 /*// Enumeration */
 for (var k in x) { /* using keys */
-    console.log("x[%s]=%s", k, x[k]);
+    console.log("Objects: x[%s]=%s", k, x[k]);
 }
 
 /*// ECMAScript 6: iteration */
 var arr = [1, 2, 3, 4];
-var it = arr[Symbol.iterator](); /* iterator is a function defined on Arrays, accessible via Symbol.iterator */
-console.log("array iterator returns", it.next(), it.next(), it.next(), it.next(), it.next());
+var it = arr[Symbol.iterator]();
+/* iterator is a function defined on Arrays, accessible via 
+the Symbol.iterator name */
+showTypeofAndValue(it.next(), "iterator 1");
+showTypeofAndValue(it.next(), "iterator 2");
+showTypeofAndValue(it.next(), "iterator 3");
+showTypeofAndValue(it.next(), "iterator 4");
+showTypeofAndValue(it.next(), "iterator 5");
 
+/* Define our own iterator */
 Object.defineProperty( x, Symbol.iterator, {
     enumerable: false,
     writable: false,
@@ -579,14 +869,17 @@ Object.defineProperty( x, Symbol.iterator, {
     }
 } );
 
-for (var v of x) { /* ECMAScript 6: call the iterator automatically via for ... of (equivalent to var it = x[Symbol.iterator]; it.next() ...) */
+/* ECMAScript 6: call the iterator automatically via for ... of 
+(equivalent to var it = x[Symbol.iterator]; it.next() ...) */
+for (var v of x) {
     console.log("x property value", v);
 }
 
 
+
 /*****************************************************************
  * 
- * Prototypes
+ * 4) Prototypes
  * 
  *****************************************************************/
 
@@ -629,9 +922,16 @@ console.log("prototype's constructor %s, constructed object's constructor %s, Ob
 /* What happened? a.constructor resolves in a's prototype chain. It resolves to a.prototype.constructor, which in the first case is Foo.prototype.constructor, but in the second case we overrriden Foo.prototype to an empty object, meaning that now Foo.prototype no longer has a "constructor" property, so a.constructor [[Get]] operation goes further in the chain, ending at Object.prototype, which DOES have a "constructor" property. */
 
 
+
+
 /*****************************************************************
  * 
- * Behavior Delegation vs "class" with "pseudo-polymorfism" vs ECMAScript 6 class
+ * 5) Behavior Delegation vs "Class Polymorphism"
+ * 
+ * This compares three approaches:
+ * a) Behavior Delegation
+ * b) "class" with "pseudo-polymorfism"
+ * c) ECMAScript 6 class
  * 
  *****************************************************************/
 
@@ -812,14 +1112,16 @@ var some = {
 /*console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1)); // ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" syntax doStuff(a) {} actually resolves to doStuff: function() {}, so its an anonymous function, you cannot call it. In this case it is fixed by saying some.doStuff(a + 1); in the function recursive call, but in some other cases it might not be that simple. */
 
 
+
+
 /*****************************************************************
  * 
- * Types & Grammar
+ * 6) Types & Grammar
  * 
  *****************************************************************/
 
 function showTypeof(x) {
-    console.log("typeof", x, "is", typeof x);
+    console.log("Types: typeof", x, "is", typeof x);
 }
 
 showTypeof(42);
@@ -831,7 +1133,7 @@ showTypeof(null); /* surprise: "object", due to an old JS bug that wasn't fixed 
 showTypeof(Symbol()); /* "symbol", new ECMAScript 6 type */
 showTypeof(function() {}); /* "function", although a function is an object */
 
-console.log(function(a, b) {}.length); /* 2; a function has a length property specifying the number of parameters it accepts */
+console.log("Types: ", function(a, b) {}.length); /* 2; a function has a length property specifying the number of parameters it accepts */
 
 /* In JavaScript, types are associated with VALUES, not VARIABLES */
 var showMyType;  showTypeof(showMyType); /* it has no value - but this actually means it has the "undefined" value */
@@ -841,15 +1143,16 @@ showMyType = "ab";  showTypeof(showMyType); /* string */
 /* console.log(someUndeclaredVariable); // ReferenceError. Although the message might be confusing, actually this means the variable is "undeclared", as opposed to being declared and "undefined" */
 
 /* We can however use typeof to verify if a variable or function is declared or not. This behavior exists in order to allow checking for existence of variables in the code. */
-console.log(typeof someUndeclaredVariable); /* suprise: "undefined" */
+console.log("Types: ", typeof someUndeclaredVariable); /* suprise: "undefined" */
 
 /* undefined cannot be compared with boolean (coercion allowed), but testing it for trueness (or falseness) is allowed and works fine */
-console.log("'undefined' coerces to 'boolean': %s %s; but applying ! (not) on it gives us %s", undefined == true, undefined == false, !undefined);
+console.log("Types: 'undefined' coerces to 'boolean': %s %s; but applying ! (not) on it gives us %s", undefined == true, undefined == false, !undefined);
 
-console.log("window.DEBUG", window.DEBUG); /* undefined */
-/* an undefined value can be tested for trueness or falseness */
+console.log("Types: window.DEBUG", window.DEBUG); /* undefined */
+/* an undefined value is not equal to either true or false, but it
+can be tested for trueness or falseness */
 if (!window.DEBUG) {
-    console.log("window.DEBUG is undefined, which we saw earlier that is not equal to either true or false, but still the code got here");
+    console.log("Types: 'undefined' behaves as 'false' in tests");
 }
 
 /* Numbers */
@@ -1117,9 +1420,11 @@ if (window) {
 }
 
 
+
+
 /*****************************************************************
  * 
- * Event Loop and Job Queue
+ * 7) Event Loop and Job Queue
  * 
  *****************************************************************/
 
@@ -1153,11 +1458,7 @@ ECMAScript 6 also has a Job Queue. This is a mechanism to put messages in the Ev
 */
 
 
-/*****************************************************************
- * 
- * Fake Promise-like code - values
- * 
- *****************************************************************/
+/* // Fake Promise-like code - values */
 
 /* Suppose we want to add x and y when one or both could get their values somewhere later (maybe async). Rather than doing ugly checks in a loop, waiting for both of them to get their values, we write a mechanism that allows us to be informed async when both values are available:
 */
@@ -1203,11 +1504,7 @@ add(fetchX, fetchY, function showSum(sum) {
 });
 
 
-/*****************************************************************
- * 
- * Fake Promise-like code - completion events
- * 
- *****************************************************************/
+/* // Fake Promise-like code - completion events */
 
 /* We have an async function that, when it completes, it can return information on the way it completed: with success or error, in both cases providing some data - useful data for success, error info for error. We want to listen for this information without the "callback hell" - having control over when our callback would be called */
 
@@ -1248,9 +1545,11 @@ With real promises, we control when our code is called.
 */
 
 
+
+
 /*****************************************************************
  * 
- * Promises
+ * 8) Promises
  * 
  *****************************************************************/
 
@@ -1553,24 +1852,24 @@ p.then( function(v){
 } );
 
 
+
+
 /*****************************************************************
  * 
- * ECMAScript 6: Generators
+ * 9) ECMAScript 6: Generators
  * 
  *****************************************************************/
 
-/* Calling yield() in a function turns it into a generator - it returns an iterator, and each call to iterator.next() executes a chunk of code */
-
-/* Uncomment this if you have an ECMAScript 6 JS Engine
+/* Calling "yield" in a function turns it into a generator - 
+it returns an iterator, and each call to iterator.next() 
+executes a chunk of code */
 
 function *generateSome(){
-    console.log("Generator - Step 1");
-    yield();
-    console.log("Generator - Step 2");
+    console.log("Generator: Step 1");
+    yield
+    console.log("Generator: Step 2");
 }
 
 var it = generateSome();
 it.next();
 it.next();
-
-*/
