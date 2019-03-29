@@ -595,7 +595,8 @@ sets "this" to the newly created object,
 and calls the given function (in this case Number) making it return 
 the new object (instead of its primitive type number) */
 
-/* primitive types are not objects, but we can call methods of their corresponding object type on them. How come? */
+/* primitive types are not objects, but we can call methods of their 
+corresponding object type on them. How come? */
 var pi = 3.1415926;
 showTypeofAndValue(pi, "pi"); /* it is a primitive number type */
 console.log("Objects: pi is a %s with the value ~ %s", typeof pi, pi.toFixed(2));
@@ -689,9 +690,13 @@ console.log("Objects: I changed a property that's by default writable: %d", myOb
 Object.defineProperty( myObject, "a", {
     value: myObject.a, /* I can use it's previous value */
     writable: false, /* not writable */
-    configurable: false, /* not configurable. This is a one-way road, you cannot revert it! */
-    enumerable: true /* whether it appears in for ... in loops and other enumerations */
-} ); /* This property also happens to be an object CONSTANT (non-writable, non-configurable) */
+    configurable: false, /* not configurable. This is a one-way road, 
+                            you cannot revert it! */
+    enumerable: true /* whether it appears in for ... in loops 
+                        and other enumerations */
+} ); 
+/* This property also happens to be an object CONSTANT
+(non-writable, non-configurable) */
 
 myObject.a = 5; /* useless, no change will be perfomed */
 console.log("Objects: I changed a property that's NOT writable anymore: %d", myObject.a);
@@ -757,7 +762,8 @@ console.log("Objects: myObject is frozen: %d", myObject.b);
 /*
 [Get]] and [[Set]]
 
-These are two built-in operations that are used whenever accessing object properties.
+These are two built-in operations that are used whenever accessing 
+object properties.
 
 [[Get]] returns the property that was requested to be accesed on the object 
 by using this algorithm:
@@ -884,7 +890,18 @@ for (var v of x) {
  *****************************************************************/
 
 /*
-From the ECMAScript 6 specification: "All ordinary objects have an internal slot called [[Prototype]]. The value of this internal slot is either null or an object and is used for implementing inheritance. Data properties of the [[Prototype]] object are inherited (are visible as properties of the child object) for the purposes of get access, but not for set access. Accessor properties are inherited for both get access and set access." Actually inheritance may be a wrong word here, as there's no class to inherit from. It's just that [[Prototype]] is a reference to another object, whose properties are accessible via the current object by means of the internal [[Get]] and [[Set]] operations.
+From the ECMAScript 6 specification: "All ordinary objects have 
+an internal slot called [[Prototype]]. The value of this internal slot 
+is either null or an object and is used for implementing inheritance. 
+Data properties of the [[Prototype]] object are inherited (are visible as 
+    properties of the child object) for the purposes of get access, 
+but not for set access. 
+Accessor properties are inherited for both get access and set access." 
+
+Actually "inheritance" may be a wrong word here, as there's no class 
+to inherit from. It's just that [[Prototype]] is a reference to another object, 
+whose properties are accessible via the current object by means of the 
+internal [[Get]] and [[Set]] operations.
 */
 
 var anotherObject = {
@@ -895,31 +912,70 @@ var anotherObject = {
     }
 };
 
-var myObject = Object.create( anotherObject ); /* anotherObject is the prototype of myObject. myObject's [[Prototype]] now points to anotherObject */
-console.log("Property from the prototype chain", anotherObject.a, myObject.a, anotherObject.hasOwnProperty( "a"), myObject.hasOwnProperty("a"));
-myObject.f(); /* call function from the prototype. Note that "this" is bound to myObject, and that the properties a, b, f are actually part of anotherObject. The internal [[Get]] operation resolves them by inspecting the prototype chain */
+var myObject = Object.create( anotherObject );
+/* anotherObject is the prototype of myObject. myObject's [[Prototype]] now 
+points to anotherObject */
 
-myObject.a++; /* oops, implicit shadowing! This translates to myObject.a = myObject.a + 1, which, by the rules described at the [[Put]] operation, shadows anotherObject.a, setting it's value to anotherObject.a + 1 */
+console.log("Prototypes: Property from the prototype chain", 
+    anotherObject.a, myObject.a, anotherObject.hasOwnProperty( "a"), 
+    myObject.hasOwnProperty("a"));
 
-console.log("implicit shadowing: %d %d %s", anotherObject.a, myObject.a, myObject.hasOwnProperty("a"));
+myObject.f(); 
+/* call function from the prototype. Note that "this" is bound to myObject, 
+and that the properties a, b, f are actually part of anotherObject. 
+The internal [[Get]] operation resolves them by inspecting 
+the prototype chain */
 
-console.log("accesing an object's prototype:", Object.getPrototypeOf(myObject));
+myObject.a++;
+/* oops, implicit shadowing! This translates to myObject.a = myObject.a + 1, 
+which, by the rules described at the [[Set]] operation, shadows 
+anotherObject.a, setting it's value to anotherObject.a + 1 */
+
+console.log("Prototypes: implicit shadowing: %d %d %s", 
+    anotherObject.a, myObject.a, myObject.hasOwnProperty("a"));
+
+console.log("Prototypes: accesing an object's prototype:", 
+    Object.getPrototypeOf(myObject));
 
 
 /*// Constructor */
-/* All functions, being objects, have their [[Prototype]]. Function's prototype are accessible via the "prototype" property. */
-/* From ECMAScript 6 Spec: "Unless otherwise specified every built-in function object has the %FunctionPrototype% object (19.2.3) as the initial value of its [[Prototype]] internal slot. The value of Function.prototype is %FunctionPrototype%, the intrinsic Function prototype object (19.2.3)." */
+/* All functions, being objects, have their [[Prototype]]. 
+Function's prototype is accessible via the "prototype" property.
+From ECMAScript 6 Spec: "Unless otherwise specified every built-in 
+function object has the %FunctionPrototype% object (19.2.3) as the 
+initial value of its [[Prototype]] internal slot. 
+The value of Function.prototype is %FunctionPrototype%, the intrinsic 
+Function prototype object (19.2.3)." */
 function Foo() {
     /* ... */
 }
 var a = new Foo();
-console.log("prototype's constructor %s, constructed object's constructor %s prototype %s, instance of %s", Foo.prototype.constructor === Foo, a.constructor === Foo, Object.isProto, a instanceof Foo);
-/* instanceof answers the following question: in the entire [[Prototype]] chain of a, does the object arbitrarily pointed to by Foo.prototype ever appear? */
+console.log("Prototypes: prototype's constructor %s", 
+    Foo.prototype.constructor === Foo);
+console.log("Prototypes: constructed object's constructor %s", 
+    a.constructor === Foo);
+console.log("Prototypes: instance of %s", a instanceof Foo);
+/* instanceof answers the following question: in the entire 
+[[Prototype]] chain of a, does the object arbitrarily pointed to by 
+Foo.prototype ever appear? */
 
 Foo.prototype = {};
-a = new Foo(); /* oops, now a's "constructor" is no longer Foo's prototype's constructor, but Object's prototype's constructor */
-console.log("prototype's constructor %s, constructed object's constructor %s, Object's prototype constructor %s", Foo.prototype.constructor === Foo, a.constructor === Foo, a.constructor === Object.prototype.constructor);
-/* What happened? a.constructor resolves in a's prototype chain. It resolves to a.prototype.constructor, which in the first case is Foo.prototype.constructor, but in the second case we overrriden Foo.prototype to an empty object, meaning that now Foo.prototype no longer has a "constructor" property, so a.constructor [[Get]] operation goes further in the chain, ending at Object.prototype, which DOES have a "constructor" property. */
+a = new Foo();
+/* oops, now a's "constructor" is no longer Foo's prototype's constructor, 
+but Object's prototype's constructor */
+console.log("Prototypes: prototype's constructor %s", 
+    Foo.prototype.constructor === Foo);
+console.log("Prototypes: constructed object's constructor %s", 
+    a.constructor === Foo);
+console.log("Prototypes: Object's prototype constructor %s", 
+    a.constructor === Object.prototype.constructor);
+/* What happened? a.constructor resolves in a's prototype chain. 
+It resolves to a.prototype.constructor, which in the first case is 
+Foo.prototype.constructor, but in the second case we overrriden Foo.prototype 
+to an empty object, meaning that now Foo.prototype no longer has 
+a "constructor" property, so a.constructor [[Get]] operation goes further 
+in the chain, ending at Object.prototype, which DOES have a 
+"constructor" property. */
 
 
 
@@ -935,14 +991,16 @@ console.log("prototype's constructor %s, constructed object's constructor %s, Ob
  * 
  *****************************************************************/
 
-/* Demo: Implement a general Widget and a specific Button with all three mechanisms */
+/* Demo: Implement a general Widget and a specific 
+Button with all three mechanisms */
 /* Use jQuery for DOM and CSS manipulation */
 
 /*// Get jQuery into our DOM and wait for it to be loaded */
 function jQueryLoader(handler) {
     var jqScriptElem = document.createElement("script");
     jqScriptElem.setAttribute("lang", "javascript");
-    jqScriptElem.setAttribute("src", "node_modules/jquery/dist/jquery.js");
+    jqScriptElem.setAttribute("src", 
+        "https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js");
     document.getElementsByTagName("head")[0].appendChild(jqScriptElem);
 
     var count = 0;
@@ -951,7 +1009,22 @@ function jQueryLoader(handler) {
             console.log("jQuery did not load in %d seconds", count);
             return;
         }
-        if (typeof jQuery == "undefined") { /* What we are doing here? If we would check for undefined without quotes, it will only catch the situation when jQuery is NOT DECLARED. But if jQuery is declared (I don't know how would that happen) and undefined, typeof would return "undefined". When the variable is declared, typeof always returns a string. Now, the test we have catches all situations because of type coercion: if jQuery is declared but is undefined, typeof returns "undefined". If jQuery is not declared, typeof returns undefined, which will be coerced to string "undefined"... */
+        /* What we are doing here?
+        
+        If we would check for undefined without quotes, it will only catch 
+        the situation when jQuery is NOT DECLARED.
+        
+        But if jQuery is declared (I don't know how would 
+        that happen) and undefined, typeof would return "undefined".
+
+        When the variable is declared, typeof always returns a string. 
+        Now, the test we have catches all situations because of 
+        type coercion:
+        - If jQuery is declared but is undefined,
+            typeof returns "undefined". 
+        - If jQuery is not declared, typeof returns undefined, which 
+            will be coerced to string "undefined"... */
+        if (typeof jQuery == "undefined") {
             setTimeout(waitForJQLoading, 1000);
             return;
         }
@@ -960,12 +1033,14 @@ function jQueryLoader(handler) {
     setTimeout(waitForJQLoading, 1000);
 }
 
+/* Because we need to wait for jQuery to load, all our code 
+is called async, so wrap it up in a function called 
+below via jQueryLoader */    
 function whenJQueryIsReady() {
     
-    /* Because we need to wait for jQuery to load, all our code is called async, so wrap it up in a function called below via jQueryLoader */
-    
     /* jQuery loaded, say a green bold hi */
-    $("body").append($("<p>").text("Hi there from jQuery").css("font-weight", "bold").css("color", "darkgreen"));
+    $("body").append($("<p>").text("Hi there from jQuery")
+        .css("font-weight", "bold").css("color", "darkgreen"));
 
 
     /*// 1. Widget and Button with classic JS "class" */
@@ -974,11 +1049,15 @@ function whenJQueryIsReady() {
         function Widget(width, height) {
             this.width = width || 50;
             this.height = height || 50;
-            this.$elem = null; /* our jQuery HTML element that will represent the widget */
+            this.$elem = null;
+            /* our jQuery HTML element that will represent the widget */
         }
         
-        /* base class render function: put our element where specified and apply its properties */
-        Widget.prototype.render = function($where) { /* prefixed "where" with $ so that I know this function expects a jQuery element */
+        /* base class render function: put our element where specified 
+        and apply its properties */
+        Widget.prototype.render = function($where) {
+            /* Prefixed "where" with $ so that I know this function expects 
+            a jQuery element. It's just a convention */
             this.$elem.css({
                 width: this.width + "px",
                 height: this.height + "px"
@@ -989,7 +1068,12 @@ function whenJQueryIsReady() {
             Widget.call(this, width, height);
             this.label = label;
             this.$elem = $("<button>").text(label);
-            this.$elem.bind("click", Button.prototype.onClick.bind(this)); /* YKDJS has this line in Button.prototype.render(), but I'm not sure this is "rendering". In the OOLO version (Objects Linked-to Other Objects, as oppsed to Object Oriented) I moved this to the equivalent of "render", as it seems to fit better there */
+            this.$elem.bind("click", Button.prototype.onClick.bind(this));
+            /* YKDJS has this line in Button.prototype.render(), but 
+            I'm not sure this is "rendering". In the OOLO version 
+            (Objects Linked-to Other Objects, as oppsed to Object Oriented) 
+            I moved this to the equivalent of "render", as it seems 
+            to fit better there */
         }
         
         /* inherit from the Widget class */
@@ -1004,7 +1088,8 @@ function whenJQueryIsReady() {
         }
         
         Button.prototype.onClick = function() {
-            alert("I'm a button created using a classic JS 'class' approach: " + this.label);
+            alert("I'm a button created using a classic JS 'class' approach: "
+                + this.label);
         }
 
         var b1 = new Button(150, 30, "Classic JS Class");
@@ -1016,10 +1101,12 @@ function whenJQueryIsReady() {
     
     (function ECMAScript6Class() {
         class Widget {
-            constructor(width, height) { /* equivalent of function Widget from above */
+            /* equivalent of function Widget from above */
+            constructor(width, height) {
                 this.width = width || 50;
                 this.height = height || 50;
-                this.$elem = null; /* our jQuery HTML element that will represent the widget             */
+                this.$elem = null;
+                /* our jQuery HTML element that will represent the widget */
             }
             
             render($where) {
@@ -1035,7 +1122,12 @@ function whenJQueryIsReady() {
                 super(width, height);
                 this.label = label;
                 this.$elem = $("<button>").text(label);
-                this.$elem.bind("click", this.onClick.bind(this)); /* YKDJS has this line in Button.prototype.render(), but I'm not sure this is "rendering". In the OOLO version (Objects Linked-to Other Objects, as oppsed to Object Oriented) I moved this to the equivalent of "render", as it seems to fit better there */
+                this.$elem.bind("click", this.onClick.bind(this));
+                /* YKDJS has this line in Button.prototype.render(), but 
+                I'm not sure this is "rendering". In the OOLO version
+                (Objects Linked-to Other Objects, as oppsed to Object Oriented) 
+                I moved this to the equivalent of "render", as it seems 
+                to fit better there */
             }
         
             render($where) {
@@ -1058,11 +1150,15 @@ function whenJQueryIsReady() {
     /*// 3. Widget and Button with Behavior Delegation */
     
     (function behaviorDelegation() {
-        var Widget = { /* Widget is just an object with a couple of functions and data. We could have created it with Object.create() for consistency with the way we create Button below */
+        /* Widget is just an object with a couple of functions and data. 
+        We could have created it with Object.create() for consistency with 
+        the way we create Button below */
+        var Widget = { 
             init: function (width, height) {
                 this.width = width || 50;
                 this.height = height || 50;
-                this.$elem = null; /* our jQuery HTML element that will represent the widget             */
+                this.$elem = null; 
+                /* our jQuery HTML element that will represent the widget */
             },
             placeAndStyle: function($where) {
                  this.$elem.css({
@@ -1072,7 +1168,9 @@ function whenJQueryIsReady() {
            }
         };
         
-        var Button = Object.create(Widget); /* Button has Widget as its [[Prototype]], so now it can call to Widget functions directly */
+        var Button = Object.create(Widget);
+        /* Button has Widget as its [[Prototype]], so now it can call to 
+        Widget functions directly */
         Button.setup = function(width, height, label) {
             this.init(width, height);
             this.label = label;
@@ -1089,7 +1187,9 @@ function whenJQueryIsReady() {
             alert("I'm a button created using ECMAScript 6 classes: " + this.label);
         }
         
-        var b1 = Object.create(Button); /* b1 has Button as its [[Prototype]], so now it can call Widget and Button functions directly */
+        var b1 = Object.create(Button);
+        /* b1 has Button as its [[Prototype]], so now it can call 
+        Widget and Button functions directly */
         b1.setup(180, 30, "Behavior Delegation");
         b1.build($("body"));
     })();
@@ -1106,10 +1206,19 @@ var some = {
         if (a > 4) {
             return a;
         }
-        doStuff(a + 1); /* oops, the Engine doesn't know who's doStuff(). See commented console.log() below */
+        doStuff(a + 1);
+        /* oops, the Engine doesn't know who's doStuff(). 
+        See commented console.log() below */
     }
 };
-/*console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1)); // ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" syntax doStuff(a) {} actually resolves to doStuff: function() {}, so its an anonymous function, you cannot call it. In this case it is fixed by saying some.doStuff(a + 1); in the function recursive call, but in some other cases it might not be that simple. */
+/*
+console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1));
+*/
+/* ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" 
+syntax doStuff(a) {} actually resolves to doStuff: function() {}, 
+so its an anonymous function, you cannot call it. 
+In this case it is fixed by saying "some.doStuff(a + 1);" in the function 
+recursive call, but in some other cases it might not be that simple. */
 
 
 
@@ -1352,24 +1461,32 @@ console.log("Types: Explicit Coercion",
 console.log("Types: Implicit Coercion",
     "42" + "0",
     "42" + 0, 
-    0 + "42", /* "042": if one of the operands is a string, the other one is converted to string */
+    0 + "42", /* "042": if one of the operands is a string, the other one 
+                is converted to string */
     [1,2] + [3,4], /* "1,23,4": both are first converted to strings */
     "" + 507, /* to string */
     507 + "", /* idem */
     "3.14" - 0, /* to number: "-" is only defined for numbers */
-    [5] - [3], /* 2: each array is converted to string, then each string is converted to number */
+    [5] - [3], /* 2: each array is converted to string, then each string is 
+                     converted to number */
     true + 3, /* 4: "true" is converted to number (1) first */
     [] + 0,
-    /*"" + Symbol("cool"), // TypeError: implicit coercion to Symbol is not allowed */
+    /*"" + Symbol("cool"), */ /* TypeError: implicit coercion to Symbol 
+                                 is not allowed */
     "42.7" == 42.7, /* in case of comparison, string is converted to number */
-    "42" == true, /* oops: false: true is first converted to number, so is "42", so: 41 == 1 is false! */
-    "42" == false, /* false again, for the same reason: it coerces to 42 == 0 which is false */
+    "42" == true, /* oops: false: true is first converted to number, 
+                     so is "42", so: 41 == 1 is false! */
+    "42" == false, /* false again, for the same reason: it coerces to 42 == 0 
+                      which is false */
     "0" == false, /* true: 0 == 0 */
-    /* so never use such comparisons; instead use if (a) - implicit conversion to Boolean - or if(!!a) - implicit conversion to Boolean - */
+    /* so never use such comparisons; instead use if (a) - implicit 
+    conversion to Boolean - or if(!!a) - implicit conversion to Boolean - */
     null == undefined,
     undefined == null,
     [42].valueOf(),
-    "42" == [42], /* true, because when objects are involved they are converted to primitive first, so this coerces to "42" == 42, i.e. 42 == 42 which is true */
+    "42" == [42], /* true, because when objects are involved they are 
+                     converted to primitive first, so this coerces to 
+                     "42" == 42, i.e. 42 == 42 which is true */
     [4, 2].valueOf(),
     "42" == [4, 2], 
     "less or greater than",
@@ -1624,15 +1741,23 @@ add(fetchX, fetchY, function showSum(sum) {
 
 /* // Fake Promise-like code - completion events */
 
-/* We have an async function that, when it completes, it can return information on the way it completed: with success or error, in both cases providing some data - useful data for success, error info for error. We want to listen for this information without the "callback hell" - having control over when our callback would be called */
+/* We have an async function that, when it completes, it can return 
+information on the way it completed: with success or error, in both cases 
+providing some data - useful data for success, error info for error. 
+We want to listen for this information without the "callback hell" - 
+having control over when our callback would be called */
 
 
-/* We have to make our "promise" global - as opposed to real ECMAScript 6 Promises */
+/* We have to make our "promise" global - as opposed to real 
+ECMAScript 6 Promises */
 var o = {
     value: undefined
 };
 
-/* This function returns a "promise" that has two "events" associated: success and error. To make it async, it uses setTimeout(). To provide success/error cases it tests for a random number. On the success case, the error "event" is empty, and viceversa. */
+/* This function returns a "promise" that has two "events" associated: 
+success and error. To make it async, it uses setTimeout(). To provide 
+success/error cases it tests for a random number. On the success case, 
+the error "event" is empty, and viceversa. */
 function doWork() {
     
     if ((o.value = Math.random()) < 0.5) {
