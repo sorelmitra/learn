@@ -52,9 +52,9 @@ This project will demonstrate software development with the following tools and 
 - **Architecture**: Microservices with Docker and Kubernetes, Cloud/On Premise
 - **Cloud Hosting**: AWS
 - **Chat Bot Administration App**: 
-	- **Backend**: Python with https://www.djangoproject.com/
+	- **Backend**: Node.js with https://expressjs.com/
 	- **Frontend**: React JS https://reactjs.org/
 - **Chat Bot App**: Node.js with https://expressjs.com/, REST, and https://botlang.org
 - **Web Chat App**:
 	- **Frontend**: React Native https://facebook.github.io/react-native/ for mobile
-	- **Backend**: Node.js with https://expressjs.com/
+	- **Backend**: Python with https://www.djangoproject.com/
