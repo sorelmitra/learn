@@ -1,0 +1,25 @@
+{
+  "name": "botagg",
+  "version": "1.0.0",
+  "description": "# Introduction",
+  "main": "index.js",
+  "dependencies": {
+    "selenium-webdriver": "^4.0.0-alpha.1",
+    "cucumber": "^5.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sorelmitra/botagg.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sorelmitra/botagg/issues"
+  },
+  "homepage": "https://github.com/sorelmitra/botagg#readme"
+}
