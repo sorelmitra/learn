@@ -1,10 +1,11 @@
 const { Given, When, Then } = require('cucumber');
 const assert = require('assert');
-const { driver } = require('selenium-webdriver');
+const {Builder, By, Key, until} = require('selenium-webdriver');
+let driver = new Builder().forBrowser("chrome").build();
 
-Given('Browse to URL {string}', function(string) {
-    // Write code here that turns the phrase above into concrete actions
-    return 'pending';
+Given('Browse to URL {string}', async function(string) {
+	console.log("string %s driver %s", string, driver);
+	await driver.get(string);
 });
 
 Given('Input {string} to {string}', function(string, string2) {

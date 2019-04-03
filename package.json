@@ -4,12 +4,13 @@
   "description": "# Introduction",
   "main": "index.js",
   "dependencies": {
-    "selenium-webdriver": "^4.0.0-alpha.1",
-    "cucumber": "^5.1.0"
+    "chromedriver": "^2.46.0",
+    "cucumber": "^5.1.0",
+    "selenium-webdriver": "^4.0.0-alpha.1"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/cucumber-js"
   },
   "repository": {
     "type": "git",
