@@ -1,0 +1,29 @@
+version: '3'
+
+networks:
+  botagg:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.2.1.0/24
+
+volumes:
+  postgres10-data:
+    external: true
+
+services:
+  postgresql:
+    image: postgres-cert:latest
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf' -c 'hba_file=/etc/postgresql/pg_hba.conf'
+    networks:
+      botagg:
+        ipv4_address: 10.2.1.11
+    ports:
+      - "5203:5432"
+    volumes:
+      - postgres10-data:/var/lib/postgresql/data
+      - ${PWD}/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ${PWD}/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    environment:
+      - POSTGRES_PASSWORD=postgres
