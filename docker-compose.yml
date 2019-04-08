@@ -23,7 +23,7 @@ services:
       - "5203:5432"
     volumes:
       - postgres10-data:/var/lib/postgresql/data
-      - ${PWD}/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ${PWD}/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./src/conf/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./src/conf/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
     environment:
       - POSTGRES_PASSWORD=postgres
