@@ -14,9 +14,16 @@ Given('Browse to URL {string}', async function(string) {
 	await driver.get(string);
 });
 
-Given('Input {string} to {string}', function(string, string2) {
-    // Write code here that turns the phrase above into concrete actions
-    return 'pending';
+Given('Input {string} to {string}', function(string, string2, callback) {
+    driver.findElement(By.id(string2))
+    .then(
+        function(element) {
+            element.sendKeys(string);
+        },
+        function(err) {
+            callback(err);
+        }
+    );
 });
 
 When('Click {string}', function(string) {
