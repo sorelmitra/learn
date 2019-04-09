@@ -10,7 +10,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/cucumber-js"
+    "test": "./node_modules/.bin/cucumber-js",
+    "webchat": "./src/webchat/manage.py runserver"
   },
   "repository": {
     "type": "git",

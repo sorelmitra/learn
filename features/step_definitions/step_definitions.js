@@ -1,7 +1,12 @@
 const { Given, When, Then } = require('cucumber');
 const assert = require('assert');
 const {Builder, By, Key, until} = require('selenium-webdriver');
-let driver = new Builder().forBrowser("chrome").build();
+var chrome = require('selenium-webdriver/chrome');
+var chromeOptions = new chrome.Options();
+chromeOptions.addArguments("--auto-open-devtools-for-tabs");
+let driver = new Builder().forBrowser("chrome")
+    .setChromeOptions(chromeOptions)
+    .build();
 
 Given('Browse to URL {string}', async function(string) {
 	console.log("string %s driver %s", string, driver);
