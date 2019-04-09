@@ -1,4 +1,4 @@
-const { Given, When, Then } = require('cucumber');
+const { Given, When, Then, setDefaultTimeout } = require('cucumber');
 const assert = require('assert');
 const {Builder, By, Key, until} = require('selenium-webdriver');
 var chrome = require('selenium-webdriver/chrome');
@@ -8,8 +8,9 @@ let driver = new Builder().forBrowser("chrome")
     .setChromeOptions(chromeOptions)
     .build();
 
+setDefaultTimeout(15 * 1000);
+
 Given('Browse to URL {string}', async function(string) {
-	console.log("string %s driver %s", string, driver);
 	await driver.get(string);
 });
 
