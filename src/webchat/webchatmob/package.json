@@ -1,0 +1,37 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "eject": "expo eject",
+    "test": "node_modules/.bin/jest test/**/*.spec.js"
+  },
+  "dependencies": {
+    "expo": "^32.0.0",
+    "react": "16.5.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
+  },
+  "devDependencies": {
+    "babel-preset-expo": "^5.0.0",
+    "detox": "^12.1.4",
+    "detox-expo-helpers": "^0.6.0",
+    "expo-detox-hook": "^1.0.10",
+    "jest": "^24.7.1",
+    "jest-expo": "^32.0.0",
+    "mocha": "^6.1.2",
+    "react-native-testing-library": "^1.7.0",
+    "react-test-renderer": "^16.8.6"
+  },
+  "detox": {
+    "test-runner": "mocha",
+    "configurations": {
+      "ios.sim": {
+        "binaryPath": "bin/Exponent.app",
+        "type": "ios.simulator",
+        "name": "iPhone 5"
+      }
+    }
+  },
+  "private": true
+}

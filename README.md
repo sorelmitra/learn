@@ -46,7 +46,7 @@ This project will demonstrate software development with the following tools and 
 - **Source Control**: GIT with GitHub
 - **Issue & Sprint Tracking**: GitHub Issues
 - **Stories Definition & Acceptance Criteria**: Gherkin Language
-- **Automatic Acceptance Tests**: Python+Behave, Cucumber-JS
+- **Automatic Acceptance Tests**: Cucumber-JS with Selenium WebDriver for Web, Detox for Mobile
 - **Web Domain**: <span style="color:red">None for now. Free Domains are not an option as they are associated with scams and bad practices</span>
 - **Web Hosting**: <span style="color:red">AWS Free Tier</span>
 - **Architecture**: Microservices with Docker and Kubernetes, Cloud/On Premise
