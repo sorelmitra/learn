@@ -5,7 +5,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "test": "node_modules/.bin/jest test/**/*.spec.js"
+    "test": "detox test -c ios.sim e2e"
   },
   "dependencies": {
     "expo": "^32.0.0",
@@ -14,24 +14,24 @@
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0",
-    "detox": "^12.1.4",
+    "detox": "^12.3.0",
     "detox-expo-helpers": "^0.6.0",
     "expo-detox-hook": "^1.0.10",
     "jest": "^24.7.1",
     "jest-expo": "^32.0.0",
-    "mocha": "^6.1.2",
     "react-native-testing-library": "^1.7.0",
     "react-test-renderer": "^16.8.6"
   },
   "detox": {
-    "test-runner": "mocha",
+    "test-runner": "jest",
     "configurations": {
       "ios.sim": {
         "binaryPath": "bin/Exponent.app",
         "type": "ios.simulator",
-        "name": "iPhone 5"
+        "name": "iPhone 5s"
       }
-    }
+    },
+    "specs": ""
   },
   "private": true
 }

@@ -64,6 +64,7 @@ export default class App extends React.Component {
     this.setState({
       listStyle: {height: shortHeight}
     });
+    this._conversationView.scrollToEnd();
   }
 
   keyboardDidHide() {
@@ -89,7 +90,6 @@ export default class App extends React.Component {
 
   textStyle(index) {
     style = styles[this.state.messageTypes[index]];
-    console.log("style: ", style);
     return style;
   }
 
@@ -136,6 +136,7 @@ export default class App extends React.Component {
           renderItem={({item, index}) => <View style={styles.message}><Text style={this.textStyle(index)}>{item.text}</Text></View>}
         />
         <TextInput
+          testID="messageText"
           ref={(c) => this._textInput = c}
           value={this.state.input}
           style={styles.input}
