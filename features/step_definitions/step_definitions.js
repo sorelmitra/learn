@@ -8,31 +8,18 @@ let driver = new Builder().forBrowser("chrome")
     .setChromeOptions(chromeOptions)
     .build();
 
-setDefaultTimeout(15 * 1000);
+setDefaultTimeout(30 * 1000);
 
 Given('Browse to URL {string}', async function(string) {
 	await driver.get(string);
 });
 
-Given('Input {string} to {string}', function(string, string2, callback) {
-    driver.findElement(By.id(string2))
-    .then(
-        function(element) {
-            element.sendKeys(string);
-        },
-        function(err) {
-            callback(err);
-        }
-    );
+Given('Check {string} element contains {string}', async function(string, string2) {
+    var element = await driver.findElement(By.xpath(string));
+    var value = await element.getText();
+    var pattern = ".*" + string2 + ".*";
+    var re = new RegExp(pattern, 'i');
+    var m = value.match(re);
+    console.log("Regexp <%s> found <%s> on <%s>", re, m, value);
+    assert(m != null);
 });
-
-When('Click {string}', function(string) {
-    // Write code here that turns the phrase above into concrete actions
-    return 'pending';
-});
-
-Then('Check field {string} receives {string} in {string}', function(string, string2, string3) {
-    // Write code here that turns the phrase above into concrete actions
-    return 'pending';
-});
-

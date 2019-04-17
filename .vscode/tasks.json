@@ -18,6 +18,11 @@
 			"problemMatcher": [
 				"$eslint-compact"
 			]
+		},
+		{
+			"type": "npm",
+			"script": "test-webchatapp",
+			"problemMatcher": []
 		}
 	]
 }

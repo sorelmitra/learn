@@ -8,10 +8,15 @@
     "cucumber": "^5.1.0",
     "selenium-webdriver": "^4.0.0-alpha.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "concurrently": "^4.1.0"
+  },
   "scripts": {
-    "test": "./node_modules/.bin/cucumber-js",
-    "webchatapp": "./src/webchat/manage.py runserver"
+    "webchatapp": "./src/webchat/manage.py runserver",
+    "webchatmob": "cd ./src/webchat/webchatmob && npm start",
+    "test-webchatapp": "./node_modules/.bin/cucumber-js",
+    "test-webchatmob": "cd ./src/webchat/webchatmob && npm test",
+    "test": "npm run test-webchatapp && npm run test-webchatmob"
   },
   "repository": {
     "type": "git",
