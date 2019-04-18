@@ -8,7 +8,7 @@ let driver = new Builder().forBrowser("chrome")
     .setChromeOptions(chromeOptions)
     .build();
 
-setDefaultTimeout(30 * 1000);
+setDefaultTimeout(60 * 1000);
 
 Given('Browse to URL {string}', async function(string) {
 	await driver.get(string);
