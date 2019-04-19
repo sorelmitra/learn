@@ -1,84 +1,99 @@
 import React from 'react';
-import { Text, View, 
+import {
+	Text, View,
 	Image, FlatList, TextInput, Keyboard,
-	Dimensions } from 'react-native';
+	Dimensions
+} from 'react-native';
 
-import {heights, styles} from './styles';
+import { heights, styles } from './styles';
 
 export default class ChatScreen extends React.Component {
 
 	constructor(props) {
 		super(props);
-	
+
 		this.state = {
-		  input: "",
-		  data: [],
-		  index: 1,
-		  messageTypes: [],
-		  listStyle: {height: this.regularListHeight()}
+			input: "",
+			data: [],
+			index: 1,
+			messageTypes: [],
+			listStyle: { height: this.regularListHeight() }
 		}
 	}
-	
+
 	componentDidMount() {
-		var f = this.keyboardDidShow.bind(this);
+		var hardBound = this.keyboardDidShow.bind(this);
 		this.keyboardDidShowListener = Keyboard.addListener(
-		  'keyboardDidShow',
-		  f,
+			'keyboardDidShow',
+			hardBound,
 		);
-		f = this.keyboardDidHide.bind(this);
+		hardBound = this.keyboardDidHide.bind(this);
 		this.keyboardDidHideListener = Keyboard.addListener(
-		  'keyboardDidHide',
-		  f,
+			'keyboardDidHide',
+			hardBound,
 		);
-		//this._textInput.focus();
-	  }
-	
-	  componentDidUpdate() {
 	}
-	
+
+	componentDidUpdate() {
+	}
+
 	heightsSum() {
 		var sum = 0;
 		for (var n in heights) {
-		  sum += heights[n];
+			sum += heights[n];
 		}
 		return sum;
 	}
-	
+
 	regularListHeight() {
 		windowHeight = Dimensions.get('window').height;
 		regularHeight = windowHeight - this.heightsSum();
 		return regularHeight;
 	}
-	
+
 	keyboardDidShow(e) {
 		keyboardHeight = e.endCoordinates.height;
 		windowHeight = Dimensions.get('window').height;
 		shortHeight = windowHeight - keyboardHeight - this.heightsSum();
 		console.log("short height: ", shortHeight);
 		this.setState({
-		  listStyle: {height: shortHeight}
+			listStyle: { height: shortHeight }
 		});
 		this._conversationView.scrollToEnd();
 	}
-	
+
 	keyboardDidHide() {
 		this.setState({
-		  listStyle: {height: this.regularListHeight()}
+			listStyle: { height: this.regularListHeight() }
 		});
 	}
-	
-	onTextInput(event) {
-		var message = {
-		text: event.nativeEvent.text,
-		key: this.state.index.toString()
+
+	addMessage(message, messageType) {
+		var o = {
+			text: message,
+			key: this.state.index.toString()
 		};
+		console.log("index A <", message, ">", this.state.index);
 		this.setState({
-		input: "",
-		data: [...this.state.data, message],
-		index: this.state.index + 1,
-		messageTypes: [...this.state.messageTypes, "outgoingMessage"],
+			input: "",
+			data: [...this.state.data, o],
+			index: this.state.index + 1,
+			messageTypes: [...this.state.messageTypes, messageType],
 		});
-		this.fetchSomething();
+		console.log("index B <", message, ">", this.state.index);
+	}
+
+	onTextInput(event) {
+		this.addMessage(event.nativeEvent.text, "outgoingMessage");
+		let self = this;
+		this.fetchSomething().then(
+			function(message) {
+				self.addMessage(message, "incomingMessage");
+			},
+			function(err) {
+				console.log(err);
+			}
+		)
 		this._conversationView.scrollToEnd();
 	}
 
@@ -86,30 +101,26 @@ export default class ChatScreen extends React.Component {
 		style = styles[this.state.messageTypes[index]];
 		return style;
 	}
-	
+
 	fetchSomething() {
-		let self = this;
-		fetch("https://randomuser.me/api")
-		  .then(
-			function(response) {
-			  console.log("Response: %s", response);
-			  respJson = response._bodyInit;
-			  console.log("RespJSON: %s", respJson);
-			  body = JSON.parse(respJson);
-			  results = body.results;
-			  oneResult = results[0];
-			  value = oneResult.name.first + " " + oneResult.name.last;
-			  self.setState({
-				input: "",
-				data: [...self.state.data, {text: value, key: self.state.index.toString()}],
-				index: self.state.index + 1,
-				messageTypes: [...self.state.messageTypes, "incomingMessage"],
-			  });
-			})
-		  .catch(
-			function (reason) {
-			  console.log(reason);
-			});
+		return new Promise(function(resolve, reject) {
+			fetch("https://randomuser.me/api")
+				.then(
+					function (response) {
+						console.log("Response: %s", response);
+						respJson = response._bodyInit;
+						console.log("RespJSON: %s", respJson);
+						body = JSON.parse(respJson);
+						results = body.results;
+						oneResult = results[0];
+						value = oneResult.name.first + " " + oneResult.name.last;
+						resolve(value);
+					})
+				.catch(
+					function (reason) {
+						reject(reason);
+					});
+		});
 	}
 
 	render() {
@@ -117,30 +128,30 @@ export default class ChatScreen extends React.Component {
 			uri: 'https://cdn.pixabay.com/photo/2019/01/16/20/52/chatbot-3936760_960_720.jpg'
 		}
 		return (
-			<View 
-			style={this.state.mainViewStyle}
-			ref={(c) => this._mainView = c}
+			<View
+				style={this.state.mainViewStyle}
+				ref={(c) => this._mainView = c}
 			>
-			<Image source={pic} style={{width: '100%', height: heights.logo}}/>
-			<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
-			<Text style={styles.subtext}>Type your message below</Text>
-			<View style={styles.title}><Text>Conversation</Text></View>
-			<FlatList
-				ref={(c) => this._conversationView = c}
-				data={this.state.data}
-				style={this.state.listStyle}
-				renderItem={({item, index}) => <View style={styles.message}><Text style={this.textStyle(index)}>{item.text}</Text></View>}
-			/>
-			<TextInput
-				testID="messageText"
-				ref={(c) => this._textInput = c}
-				value={this.state.input}
-				style={styles.input}
-				placeholder="Your message goes here"
-				onChangeText={(text) => this.setState({input: text})}
-				onSubmitEditing={(event) => this.onTextInput(event)}
-			></TextInput>
+				<Image source={pic} style={{ width: '100%', height: heights.logo }} />
+				<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
+				<Text style={styles.subtext}>Type your message below</Text>
+				<View style={styles.title}><Text>Conversation</Text></View>
+				<FlatList
+					ref={(c) => this._conversationView = c}
+					data={this.state.data}
+					style={this.state.listStyle}
+					renderItem={({ item, index }) => <View style={styles.message}><Text style={this.textStyle(index)}>{item.text}</Text></View>}
+				/>
+				<TextInput
+					testID="messageText"
+					ref={(c) => this._textInput = c}
+					value={this.state.input}
+					style={styles.input}
+					placeholder="Your message goes here"
+					onChangeText={(text) => this.setState({ input: text })}
+					onSubmitEditing={(event) => this.onTextInput(event)}
+				></TextInput>
 			</View>
 		);
 	}
-  };
+};
