@@ -5,7 +5,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "test": "detox test -c ios.sim e2e"
+    "test": "detox test -c ios.sim -r e2e"
   },
   "dependencies": {
     "expo": "^32.0.0",
