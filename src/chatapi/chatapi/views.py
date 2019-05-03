@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def index(request):
-	return HttpResponse("Hi World from BotAgg WebChat!")
+	return HttpResponse("Hi World from BotAgg Chat API!")
 
 def default(request):
 	return HttpResponse("Oops, you tried a wrong path!")

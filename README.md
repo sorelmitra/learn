@@ -15,7 +15,7 @@ This platform will have 5 components:
 * **SampleBot Admin**. This is a web app where chat bot owners can create accounts and configure SampleBot, including: connection to one of the supported communication channels, intent recognition and responses
 * **ChatBot API**. This is a chat bot RESTful API that serves as an interface for talking to various bots (for now only SampleBot). It allows sending a message to a bot and getting the bot response
 * **Chat API**. This is a chat RESTful API that allows posting messages and getting notifications when messages are posted
-* **Chat App**. This is a mobile app where the visitors can write messages and read messages posted by other chat members
+* **Chat Mobile**. This is a mobile app where the visitors can write messages and read messages posted by other chat members
 
 Additionally, this platform will conform to the following constraints (initially it is enough if we at least *design* for it):
 
@@ -58,4 +58,4 @@ This project demonstrates software development with the following tools and tech
 	* **SampleBot Admin**: React JS https://reactjs.org/
 	* **ChatBot API**: Node.js, REST
 	* **Chat API**: Python with https://www.djangoproject.com/
-	* **Chat App**. React Native https://facebook.github.io/react-native/
+	* **Chat Mobile**. React Native https://facebook.github.io/react-native/

@@ -6,7 +6,7 @@
 		{
 			"type": "npm",
 			"script": "start",
-			"path": "src/webchat/webchatmob/",
+			"path": "src/chatmob/",
 			"problemMatcher": [
 				"$eslint-compact"
 			]
@@ -14,14 +14,14 @@
 		{
 			"type": "npm",
 			"script": "ios",
-			"path": "src/webchat/webchatmob/",
+			"path": "src/chatmob/",
 			"problemMatcher": [
 				"$eslint-compact"
 			]
 		},
 		{
 			"type": "npm",
-			"script": "test-webchatapp",
+			"script": "test-chatapi",
 			"problemMatcher": []
 		}
 	]

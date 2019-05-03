@@ -12,11 +12,9 @@
     "concurrently": "^4.1.0"
   },
   "scripts": {
-    "webchatapp": "./src/webchat/manage.py runserver",
-    "webchatmob": "cd ./src/webchat/webchatmob && npm start",
-    "test-webchatapp": "./node_modules/.bin/cucumber-js",
-    "test-webchatmob": "cd ./src/webchat/webchatmob && npm test",
-    "test": "npm run test-webchatapp && npm run test-webchatmob"
+    "test-chatapi": "./node_modules/.bin/cucumber-js",
+    "test-chatmob": "cd ./src/chatmob && npm test",
+    "test": "npm run test-chatapi && npm run test-chatmob"
   },
   "repository": {
     "type": "git",
