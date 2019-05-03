@@ -5,7 +5,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "test": "detox test -c ios.sim -r e2e"
+    "test": "IOS=true ./node_modules/.bin/wdio ./features/steps/testconf/local.conf.js"
   },
   "dependencies": {
     "expo": "^32.0.0",
@@ -13,15 +13,26 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
   },
   "devDependencies": {
+    "appium": "1.8.1",
     "babel-preset-expo": "^5.0.0",
+    "chai": "4.1.2",
+    "chai-as-promised": "^6.0.0",
+    "cucumber": "4.2.1",
     "detox": "^12.3.0",
     "detox-expo-helpers": "^0.6.0",
     "expo-detox-hook": "^1.0.10",
-    "jest": "^24.7.1",
+    "jest": "^23.6.0",
     "jest-expo": "^32.0.0",
+    "metro-react-native-babel-preset": "^0.54.0",
+    "protractor": "^5.4.1",
+    "protractor-cucumber-framework": "^3.1.2",
     "react-native-testing-library": "^1.7.0",
     "react-test-renderer": "^16.8.6",
-    "wd": "^1.11.2"
+    "wd": "1.10.1",
+    "wdio-appium-service": "0.2.3",
+    "wdio-cucumber-framework": "2.2.0",
+    "wdio-spec-reporter": "0.1.4",
+    "webdriverio": "^4.13.1"
   },
   "detox": {
     "test-runner": "jest",

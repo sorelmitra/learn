@@ -12,7 +12,7 @@
     "concurrently": "^4.1.0"
   },
   "scripts": {
-    "test-chatapi": "./node_modules/.bin/cucumber-js",
+    "test-chatapi": "./node_modules/.bin/cucumber-js src/chatapi/features --require 'src/chatapi/features/steps/*.js'",
     "test-chatmob": "cd ./src/chatmob && npm test",
     "test": "npm run test-chatapi && npm run test-chatmob"
   },
