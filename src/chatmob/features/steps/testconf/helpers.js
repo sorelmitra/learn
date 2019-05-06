@@ -5,7 +5,7 @@ function getAppPath(isAndroid) {
   } else if (isAndroid) {
     return `${process.cwd()}/android/app/build/outputs/apk/app-debug.apk`
   } else {
-    return `${process.cwd()}/bin/Exponent.app`
+    return `${process.cwd()}/ios/build/chatmob/Build/Products/Debug-iphonesimulator/chatmob.app`
   }
 
 }
