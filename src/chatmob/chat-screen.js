@@ -106,15 +106,17 @@ export default class ChatScreen extends React.Component {
 		return new Promise(function(resolve, reject) {
 			fetch("https://randomuser.me/api")
 				.then(
-					function (response) {
-						console.log("Response: %s", response);
-						respJson = response._bodyInit;
-						console.log("RespJSON: %s", respJson);
-						body = JSON.parse(respJson);
-						results = body.results;
-						oneResult = results[0];
-						value = oneResult.name.first + " " + oneResult.name.last;
-						resolve(value);
+					function (responseBlob) {
+						responseBlob.json()
+							.then(function(response) {
+								results = response.results;
+								oneResult = results[0];
+								value = oneResult.name.first + " " + oneResult.name.last;
+								resolve(value);
+							})
+							.catch(function(reason) {
+								reject(reason);
+							});
 					})
 				.catch(
 					function (reason) {

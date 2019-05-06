@@ -1,0 +1,3 @@
+rootProject.name = 'chatmob'
+
+include ':app'

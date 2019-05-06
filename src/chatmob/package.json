@@ -1,16 +1,13 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "eject": "expo eject",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios --simulator='iPhone 5s'",
     "test": "IOS=true ./node_modules/.bin/wdio ./features/steps/testconf/local.conf.js"
   },
   "dependencies": {
-    "expo": "^32.0.0",
-    "react": "16.5.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
+    "react": "16.8.6",
+    "react-native": "0.59.5"
   },
   "devDependencies": {
     "appium": "1.8.1",
@@ -18,11 +15,10 @@
     "chai": "4.1.2",
     "chai-as-promised": "^6.0.0",
     "cucumber": "4.2.1",
-    "detox": "^12.3.0",
+    "detox": "^12.6.3",
     "detox-expo-helpers": "^0.6.0",
     "expo-detox-hook": "^1.0.10",
     "jest": "^23.6.0",
-    "jest-expo": "^32.0.0",
     "metro-react-native-babel-preset": "^0.54.0",
     "protractor": "^5.4.1",
     "protractor-cucumber-framework": "^3.1.2",
