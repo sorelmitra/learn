@@ -1,5 +1,3 @@
-const {reloadApp} = require('detox-expo-helpers');
-
 async function addMessage(text) {
   await element(by.id('messageText')).tap();
   await element(by.id('messageText')).typeText(text);
@@ -10,7 +8,7 @@ async function addMessage(text) {
 
 describe('Conversation', () => {
   beforeEach(async () => {
-    await reloadApp();
+    await device.reloadReactNative();
   });
 
   it('should add message to the list', async () => {
