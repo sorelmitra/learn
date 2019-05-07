@@ -54,8 +54,8 @@ This project demonstrates software development with the following tools and tech
 - **Architecture**: Microservices with Docker and Kubernetes, Cloud/On Premise
 - **Cloud Hosting**: Google Cloud
 - **Components**:
-	* **SampleBot Service**: Node.js with https://expressjs.com/, REST, and https://botlang.org
-	* **SampleBot Admin**: React JS https://reactjs.org/
+	* **SampleBot Service**: Node.js with [Express JS](https://expressjs.com/), REST, and [Botlang](https://botlang.org)
+	* **SampleBot Admin**: [React JS](https://reactjs.org/)
 	* **ChatBot API**: Node.js, REST
-	* **Chat API**: Python with https://www.djangoproject.com/
-	* **Chat Mobile**. React Native https://facebook.github.io/react-native/
+	* **Chat API**: Python with [Django](https://www.djangoproject.com/) and [Thorn](https://pypi.org/project/thorn/)
+	* **Chat Mobile**. [React Native](https://facebook.github.io/react-native/)
