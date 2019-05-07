@@ -142,10 +142,21 @@ export default class ChatScreen extends React.Component {
 					ref={(c) => this._conversationView = c}
 					data={this.state.data}
 					style={this.state.listStyle}
-					renderItem={({ item, index }) => <View style={styles.message}><Text style={this.textStyle(index)}>{item.text}</Text></View>}
+					renderItem={({ item, index }) =>
+						<View
+							style={styles.message}
+							accessibilityLabel={item.text}
+						>
+							<Text
+								style={this.textStyle(index)}
+							>
+								{item.text}
+							</Text>
+						</View>}
 				/>
 				<TextInput
 					testID="messageText"
+					accessibilityLabel="message input field"
 					ref={(c) => this._textInput = c}
 					value={this.state.input}
 					style={styles.input}

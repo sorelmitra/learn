@@ -32,6 +32,7 @@ const capabilities = {
     isolateSimDevice: true,
     platformVersion: "12.2",
     deviceName: "iPhone 5s",
+    showXcodeLog: true,
     app: getAppPath()
   }
 }
@@ -65,5 +66,5 @@ exports.config = Object.assign(commonConfig.config, {
   },
   port: 4723,
   baseUrl: 'http://127.0.0.1',
-
+  logLevel: 'verbose'
 })
