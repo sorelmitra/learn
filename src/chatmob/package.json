@@ -3,7 +3,7 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios --simulator='iPhone 5s'",
-    "test": "IOS=true ./node_modules/.bin/wdio ./features/steps/testconf/local.conf.js"
+    "test": "detox test --configuration ios.sim"
   },
   "dependencies": {
     "@babel/runtime": "^7.4.4",
