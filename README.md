@@ -13,7 +13,7 @@ This platform will have 5 components:
 
 * **SampleBot Service**. This is a Web Service that implements a simple bot. Functions TBD.
 * **SampleBot Admin**. This is a web app where chat bot owners can create accounts and configure SampleBot, including: connection to one of the supported communication channels, intent recognition and responses
-* **ChatBot API**. This is a chat bot RESTful API that serves as an interface for talking to various bots (for now only SampleBot). It allows sending a message to a bot and getting the bot response
+* **ChatBot API**. This is a chat bot RESTful API that serves as an interface for talking to various bots (for now only SampleBot). It allows sending a message to a bot and getting the bot response. It registers as an observer for message posting to the **Chat API**
 * **Chat API**. This is a chat RESTful API that allows posting messages and getting notifications when messages are posted
 * **Chat Mobile**. This is a mobile app where the visitors can write messages and read messages posted by other chat members
 
