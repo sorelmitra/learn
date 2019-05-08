@@ -1,3 +1,5 @@
+Feature: NOT USED, go to e2e/ directory instead!
+
 Feature: CHAT_MOB_BASIC: Basic Mobile Chat Capabilities
 
 Scenario: CHAT_MOB_ADD_MESSAGE: Add message to conversation
