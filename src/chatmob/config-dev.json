@@ -1,0 +1,8 @@
+{
+	"chat": {
+		"host": "https://jsonplaceholder.typicode.com",
+		"path": {
+			"post": "/todos/1"
+		}
+	}
+}

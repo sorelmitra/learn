@@ -1,9 +1,12 @@
 import logService from './log-service';
+import config from './config';
 
 class ChatService {
 
+	chatPostUrl = "" + config.chat.host + config.chat.path.post;
+
 	post(message) {
-		logService.debug(this, "Posting TODO");
+		logService.debug(this, `Posting to <${this.chatPostUrl}>: <${message}>`);
 	}
 }
 
