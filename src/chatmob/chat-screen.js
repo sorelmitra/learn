@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 
 import { heights, styles } from './styles';
+import chatService from './chat-service';
 
 export default class ChatScreen extends React.Component {
 
@@ -86,43 +87,13 @@ export default class ChatScreen extends React.Component {
 	onTextInput(event) {
 		this.addMessage(event.nativeEvent.text, "outgoingMessage");
 		let self = this;
-		this.fetchSomething().then(
-			function(message) {
-				self.addMessage(message, "incomingMessage");
-			},
-			function(err) {
-				console.log(err);
-			}
-		)
+		chatService.post(event.nativeEvent.text);
 		this._conversationView.scrollToEnd();
 	}
 
 	textStyle(index) {
 		style = styles[this.state.messageTypes[index]];
 		return style;
-	}
-
-	fetchSomething() {
-		return new Promise(function(resolve, reject) {
-			fetch("https://randomuser.me/api")
-				.then(
-					function (responseBlob) {
-						responseBlob.json()
-							.then(function(response) {
-								results = response.results;
-								oneResult = results[0];
-								value = oneResult.name.first + " " + oneResult.name.last;
-								resolve(value);
-							})
-							.catch(function(reason) {
-								reject(reason);
-							});
-					})
-				.catch(
-					function (reason) {
-						reject(reason);
-					});
-		});
 	}
 
 	render() {
