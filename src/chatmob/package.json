@@ -8,7 +8,8 @@
   "dependencies": {
     "@babel/runtime": "^7.4.4",
     "react": "16.8.6",
-    "react-native": "0.59.5"
+    "react-native": "0.59.5",
+    "react-native-config": "^0.11.7"
   },
   "devDependencies": {
     "appium": "1.8.1",

@@ -1,7 +1,9 @@
+import logService from './log-service';
+
 class ChatService {
 
 	post(message) {
-		console.log("chat POST: TO BE IMPLEMENTED!");
+		logService.debug(this, "Posting TODO");
 	}
 }
 
