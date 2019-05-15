@@ -1,3 +1,5 @@
+import { reject } from "q";
+
 async function addMessage(text) {
   await element(by.id('messageText')).tap();
   await element(by.id('messageText')).typeText(text);
@@ -24,11 +26,11 @@ describe('Conversation', () => {
     }
   });
 
-  it('should show post in progress', async () => {
+  it('should show post sent', async () => {
     let text = 'Post Me';
     await addMessage(text);
     await expect(element(by.id('messageStatus'))).toBeVisible();
-    await expect(element(by.id('messageStatus'))).toHaveText('Sending...');
-  })
+    await expect(element(by.id('messageStatus'))).toHaveText('(sent)');
+  });
 
 });

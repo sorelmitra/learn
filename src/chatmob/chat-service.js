@@ -12,7 +12,7 @@ class ChatService {
 			body: message,
 			userId: 1
 		};
-		fetch(this.chatPostUrl, {
+		return fetch(this.chatPostUrl, {
 			method: 'POST',
 			mode: 'cors',
 			cache: 'no-cache',
@@ -24,10 +24,7 @@ class ChatService {
 			referrer: 'no-referrer',
 			body: JSON.stringify(data), // body data type must match "Content-Type" header
 		})
-		.then(response => response.json())
-		.then(resp => {
-			logService.debug(this, `Posted, got response <${JSON.stringify(resp)}>`);
-		});
+		.then(response => response.json());
 	}
 }
 

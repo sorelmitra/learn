@@ -19,6 +19,7 @@ export default class ChatScreen extends React.Component {
 			index: 1,
 			messageTypes: [],
 			listStyle: { height: this.regularListHeight() },
+			messagePostingStatus: "Sending...",
 			messageStatusStyle: styles.messageStatusVisible
 		}
 	}
@@ -88,7 +89,19 @@ export default class ChatScreen extends React.Component {
 	onTextInput(event) {
 		this.addMessage(event.nativeEvent.text, "outgoingMessage");
 		let self = this;
-		chatService.post(event.nativeEvent.text);
+		chatService.post(event.nativeEvent.text)
+		.then(function(resp) {
+			console.log(resp);
+			self.setState({
+				messagePostingStatus: "(sent)",
+			});
+		})
+		.catch(function(error) {
+			console.log(error);
+			self.setState({
+				messagePostingStatus: "(error!)",
+			});
+		});
 		this._conversationView.scrollToEnd();
 	}
 
@@ -131,7 +144,7 @@ export default class ChatScreen extends React.Component {
 								<Text 
 									style={styles.messageStatusText}
 									testID="messageStatus"
-									>Sending...</Text>
+									>{this.state.messagePostingStatus}</Text>
 							</View>
 						</View>
 					}
