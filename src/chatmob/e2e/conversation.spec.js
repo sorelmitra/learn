@@ -24,4 +24,11 @@ describe('Conversation', () => {
     }
   });
 
+  it('should show post in progress', async () => {
+    let text = 'Post Me';
+    await addMessage(text);
+    await expect(element(by.id('messageStatus'))).toBeVisible();
+    await expect(element(by.id('messageStatus'))).toHaveText('Sending...');
+  })
+
 });

@@ -2,10 +2,10 @@ import { StyleSheet } from 'react-native';
 
 export const heights = {
 	logo: 150,
-	head: 15,
+	head: 30,
 	subtext: 10,
 	input: 15,
-	conv: 30,
+	conv: 20,
 	padding: 10
 };
 
@@ -22,14 +22,24 @@ export const styles = StyleSheet.create({
 	  fontSize: 14,
 	  justifyContent: 'flex-end'
 	},
+	messageRow: {
+		flexDirection: 'row'
+	},
 	message: {
 	  height: 30,
 	  justifyContent: 'center'
 	},
+	messageStatusText: {
+		fontSize: 10,
+		color: 'gray',
+		padding: 5
+	},
+	messageStatusVisible: {
+	},
 	heading: {
 	  height: heights.head,
 	  color: 'black',
-	  fontSize: 12
+	  fontSize: 18
 	},
 	subtext: {
 	  height: heights.subtext,

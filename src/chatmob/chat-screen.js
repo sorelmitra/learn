@@ -18,7 +18,8 @@ export default class ChatScreen extends React.Component {
 			data: [],
 			index: 1,
 			messageTypes: [],
-			listStyle: { height: this.regularListHeight() }
+			listStyle: { height: this.regularListHeight() },
+			messageStatusStyle: styles.messageStatusVisible
 		}
 	}
 
@@ -107,23 +108,33 @@ export default class ChatScreen extends React.Component {
 			>
 				<Image source={pic} style={{ width: '100%', height: heights.logo }} />
 				<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
-				<Text style={styles.subtext}>Type your message below</Text>
 				<View style={styles.title}><Text>Conversation</Text></View>
 				<FlatList
 					ref={(c) => this._conversationView = c}
 					data={this.state.data}
 					style={this.state.listStyle}
 					renderItem={({ item, index }) =>
-						<View
-							style={styles.message}
-							accessibilityLabel={item.text}
-						>
-							<Text
-								style={this.textStyle(index)}
+						<View style={styles.messageRow}>
+							<View
+								style={styles.message}
+								accessibilityLabel={item.text}
 							>
-								{item.text}
-							</Text>
-						</View>}
+								<Text
+									style={this.textStyle(index)}
+								>
+									{item.text}
+								</Text>
+							</View>
+							<View 
+								style={this.state.messageStatusStyle}
+							>
+								<Text 
+									style={styles.messageStatusText}
+									testID="messageStatus"
+									>Sending...</Text>
+							</View>
+						</View>
+					}
 				/>
 				<TextInput
 					testID="messageText"
