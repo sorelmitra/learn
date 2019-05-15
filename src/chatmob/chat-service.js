@@ -5,15 +5,27 @@ class ChatService {
 
 	chatPostUrl = "" + config.chat.host + config.chat.path.post;
 
-	post(message) {
+	async post(message) {
 		logService.debug(this, `Posting to <${this.chatPostUrl}>: <${message}>`);
 		var data = {
-			title: 'foo',
-			body: message,
-			userId: 1
+			body: message
 		};
-		return fetch(this.chatPostUrl, {
-			method: 'POST',
+		const resp = await this.restJsonCall('POST', data);
+		return new Promise(function() {
+			if (resp.success) {
+				resolve();
+			} else {
+				if (resp.reason === undefined) {
+					throw "Unknown response from server!";
+				}
+				throw resp.reason;
+			}
+		});
+	}
+
+	async restJsonCall(restMethod, data) {
+		const response = await fetch(this.chatPostUrl, {
+			method: restMethod,
 			mode: 'cors',
 			cache: 'no-cache',
 			credentials: 'same-origin',
@@ -22,9 +34,9 @@ class ChatService {
 			},
 			redirect: 'follow',
 			referrer: 'no-referrer',
-			body: JSON.stringify(data), // body data type must match "Content-Type" header
-		})
-		.then(response => response.json());
+			body: JSON.stringify(data),
+		});
+		return await response.json();
 	}
 }
 

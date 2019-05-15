@@ -1,8 +1,8 @@
 {
 	"chat": {
-		"host": "https://jsonplaceholder.typicode.com",
+		"host": "https://botagg-239511.appspot.com/chat",
 		"path": {
-			"post": "/posts"
+			"post": "/posts/add"
 		}
 	}
 }
