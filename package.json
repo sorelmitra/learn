@@ -1,28 +1,17 @@
 {
   "name": "botagg",
   "version": "1.0.0",
-  "description": "# Introduction",
-  "main": "index.js",
-  "dependencies": {
-    "chromedriver": "^2.46.0",
-    "cucumber": "^5.1.0",
-    "selenium-webdriver": "^4.0.0-alpha.1"
-  },
-  "devDependencies": {
-    "concurrently": "^4.1.0"
-  },
+  "description": "Chat Bot Aggregator Demo",
+  "main": "README.md",
   "scripts": {
-    "test-chatapi": "./node_modules/.bin/cucumber-js src/chatapi/features --require 'src/chatapi/features/steps/*.js'",
-    "test-chatmob": "cd ./src/chatmob && npm test",
-    "test": "npm run test-chatapi && npm run test-chatmob"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sorelmitra/botagg.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Sorel Mitra",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/sorelmitra/botagg/issues"
   },

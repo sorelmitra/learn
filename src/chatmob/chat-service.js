@@ -13,7 +13,11 @@ class ChatService {
 		const resp = await this.restJsonCall('POST', data);
 		return new Promise(function() {
 			if (resp.success) {
-				resolve();
+				if (resp.body == data.body) {
+					resolve();
+				} else {
+					throw `Response from server is 'success' but for another message: <${resp.body}>`;
+				}
 			} else {
 				if (resp.reason === undefined) {
 					throw "Unknown response from server!";

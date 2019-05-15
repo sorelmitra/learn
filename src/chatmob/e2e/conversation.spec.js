@@ -26,7 +26,7 @@ describe('Conversation', () => {
     }
   });
 
-  it.skip('should show post sent', async () => {
+  it.only('should show post sent', async () => {
     let text = 'Post Me';
     await addMessage(text);
     await expect(element(by.id('messageStatus'))).toBeVisible();
