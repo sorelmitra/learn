@@ -47,11 +47,11 @@ This project demonstrates software development with the following tools and tech
 
 - **Source Control**: GIT with GitHub
 - **Issue & Sprint Tracking**: GitHub Issues
-- **Stories Definition & Acceptance Criteria**: Gherkin Language
+- **Stories Definition & Acceptance Criteria**: Cucumber and Detox
 - **Automatic Acceptance Tests**: Cucumber-JS with Selenium WebDriver for Web, Detox/Appium for Mobile
 - **Web Domain**: <span style="color:red">None for now. Free Domains are not an option as they are associated with scams and bad practices</span>
 - **Web Hosting**: <span style="color:red">Google Cloud</span>
-- **Architecture**: Microservices with Docker and Kubernetes for On Premise, Google Free-Tier technologies for Cloud
+- **Architecture**: Microservices with Docker and Kubernetes for On Premise, Google Free-Tier technologies for Cloud (Docker is [not supported](https://cloud.google.com/cloud-build/docs/quickstart-docker) in Google Free Tier)
 - **Cloud Hosting**: Google Cloud
 - **Components**:
 	* **SampleBot Service**: Node.js with [Express JS](https://expressjs.com/), REST, and [Botlang](https://botlang.org)
