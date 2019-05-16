@@ -1,0 +1,8 @@
+{
+	"chat": {
+		"host": "http://localhost:8000/chat",
+		"path": {
+			"post": "/posts/add"
+		}
+	}
+}
