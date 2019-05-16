@@ -1,8 +1,10 @@
 {
   "scripts": {
-    "start": "react-native start",
+    "start": "react-native start --reset-cache",
+    "start-dev-local": "REACT_APP_BOTAGG_MOB_ENV=dev-local npm start",
+    "start-dev-cloud": "REACT_APP_BOTAGG_MOB_ENV=dev-cloud npm start",
     "android": "react-native run-android",
-    "ios": "react-native run-ios --simulator='iPhone 5s'",
+    "ios": "REACT_APP_BOTAGG_MOB_ENV=DEV react-native run-ios --simulator='iPhone 5s'",
     "test": "detox test --configuration ios.sim"
   },
   "dependencies": {
@@ -11,6 +13,7 @@
   },
   "devDependencies": {
     "appium": "1.8.1",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "chai": "4.1.2",
     "chai-as-promised": "^6.0.0",
     "cucumber": "4.2.1",

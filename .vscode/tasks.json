@@ -13,6 +13,22 @@
 		},
 		{
 			"type": "npm",
+			"script": "start-dev-local",
+			"path": "src/chatmob/",
+			"problemMatcher": [
+				"$eslint-compact"
+			]
+		},
+		{
+			"type": "npm",
+			"script": "start-dev-cloud",
+			"path": "src/chatmob/",
+			"problemMatcher": [
+				"$eslint-compact"
+			]
+		},
+		{
+			"type": "npm",
 			"script": "ios",
 			"path": "src/chatmob/",
 			"problemMatcher": [
