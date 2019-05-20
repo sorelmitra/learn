@@ -57,7 +57,7 @@ export default class ChatScreen extends React.Component {
 	}
 
 	keyboardDidShow(e) {
-		this._conversationView.scrollToEnd();
+		this._conversationView.scrollToEnd({animated: false});
 	}
 
 	keyboardWillHide(e) {
@@ -106,8 +106,12 @@ export default class ChatScreen extends React.Component {
 		});
 	}
 
+	onConversationLayout(event) {
+		this._conversationView.scrollToEnd({animated: false});
+	}
+
 	onConversationChanged(contentWidth, contentHeight) {
-		this._conversationView.scrollToEnd();
+		this._conversationView.scrollToEnd({animated: false});
 	}
 
 	textStyle(index) {
@@ -127,7 +131,7 @@ export default class ChatScreen extends React.Component {
 				<Animated.Image source={pic} style={{ flex: 0, width: '100%', height: this.picHeight }} />
 				<View><Text style={[styles.title, {flex: 0}]}>Conversation</Text></View>
 				<Animated.View style={{flex: 1, paddingBottom: this.keyboardHeight}}>
-					<View style = {[styles.container, {flex: 1}]}>
+					<View style = {[styles.container, {flex: 1}]} onLayout={(event) => this.onConversationLayout(event)}>
 						<FlatList
 							ref={(c) => this._conversationView = c}
 							data={this.state.data}
