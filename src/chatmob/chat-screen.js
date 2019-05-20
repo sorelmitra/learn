@@ -193,12 +193,13 @@ const styles = StyleSheet.create({
 		margin: 5
 	},
 	title: {
-		height: 20,
+		height: 16,
 		color: 'black',
 		fontSize: 14,
 		alignItems: 'center',
 		justifyContent: 'flex-end',
-		borderBottomWidth: 1
+		borderBottomWidth: 1,
+		margin: 5
 	},
 	messageRow: {
 		flexDirection: 'row'
