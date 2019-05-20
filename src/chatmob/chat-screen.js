@@ -40,6 +40,10 @@ export default class ChatScreen extends React.Component {
 			'keyboardDidShow',
 			this.keyboardDidShow.bind(this),
 		);
+		this.keyboardDidHideListener = Keyboard.addListener(
+			'keyboardDidHide',
+			this.keyboardDidHide.bind(this),
+		);
 	}
 
 	keyboardWillShow(e) {
@@ -57,7 +61,6 @@ export default class ChatScreen extends React.Component {
 	}
 
 	keyboardDidShow(e) {
-		this._conversationView.scrollToEnd({animated: false});
 	}
 
 	keyboardWillHide(e) {
@@ -73,19 +76,21 @@ export default class ChatScreen extends React.Component {
 		]).start();
 	}
 
+	keyboardDidHide(e) {
+		//this._conversationView.scrollToEnd({animated: false});
+	}
+
 	addMessage(message, messageType) {
 		var o = {
 			text: message,
 			key: this.state.index.toString()
 		};
-		console.log("index A <", message, ">", this.state.index);
 		this.setState({
 			input: "",
-			data: [...this.state.data, o],
+			data: [o, ...this.state.data],
 			index: this.state.index + 1,
 			messageTypes: [...this.state.messageTypes, messageType],
 		});
-		console.log("index B <", message, ">", this.state.index);
 	}
 
 	onTextInput(event) {
@@ -106,12 +111,18 @@ export default class ChatScreen extends React.Component {
 		});
 	}
 
-	onConversationLayout(event) {
-		this._conversationView.scrollToEnd({animated: false});
+	showLastMessage(options = {flash: true}) {
+		this._conversationView.scrollToOffset({x:0, y: 0, animated: false});
+		if (options == null) {
+			return;
+		}
+		if (options.flash == true) {
+			this._conversationView.flashScrollIndicators();
+		}
 	}
 
 	onConversationChanged(contentWidth, contentHeight) {
-		this._conversationView.scrollToEnd({animated: false});
+		this.showLastMessage();
 	}
 
 	textStyle(index) {
@@ -131,11 +142,15 @@ export default class ChatScreen extends React.Component {
 				<Animated.Image source={pic} style={{ flex: 0, width: '100%', height: this.picHeight }} />
 				<View><Text style={[styles.title, {flex: 0}]}>Conversation</Text></View>
 				<Animated.View style={{flex: 1, paddingBottom: this.keyboardHeight}}>
-					<View style = {[styles.container, {flex: 1}]} onLayout={(event) => this.onConversationLayout(event)}>
+					<View 
+						style={[styles.container, {flex: 1}]} 
+					>
 						<FlatList
+							testID="conversationList"
 							ref={(c) => this._conversationView = c}
 							data={this.state.data}
 							style={styles.list}
+							inverted={true}
 							onContentSizeChange={(contentWidth, contentHeight) => this.onConversationChanged(contentWidth, contentHeight)}
 							renderItem={({ item, index }) =>
 								<View style={styles.messageRow}>
@@ -161,7 +176,7 @@ export default class ChatScreen extends React.Component {
 							}
 						/>
 					</View>
-					<View style = {[styles.container, {flex: 0}]}>
+					<View style={[styles.container, {flex: 0}]}>
 						<TextInput
 							testID="messageText"
 							accessibilityLabel="message input field"
@@ -222,13 +237,13 @@ const styles = StyleSheet.create({
 	},
 	list: { 
 		margin: 5, 
-		flex: 1, 
 		alignSelf: 'stretch' 
 	},
 	input: {
 		height: 24,
 		borderWidth: StyleSheet.hairlineWidth,
-		borderRadius: 5
+		borderRadius: 5,
+		padding: 3
 	},
 	outgoingMessage: {
 		color: 'green',
