@@ -2,10 +2,9 @@ import React from 'react';
 import {
 	Text, View,
 	Image, FlatList, TextInput, Keyboard,
-	Dimensions
+	StyleSheet, Animated
 } from 'react-native';
 
-import { heights, styles } from './styles';
 import chatService from './chat-service';
 
 export default class ChatScreen extends React.Component {
@@ -18,56 +17,33 @@ export default class ChatScreen extends React.Component {
 			data: [],
 			index: 1,
 			messageTypes: [],
-			listStyle: { height: this.regularListHeight() },
 			messagePostingStatus: "Sending...",
-			messageStatusStyle: styles.messageStatusVisible
+			messageStatusStyle: styles.messageStatusVisible,
+			keyboardHeight: 0
 		}
+
 	}
 
 	componentDidMount() {
-		var hardBound = this.keyboardDidShow.bind(this);
-		this.keyboardDidShowListener = Keyboard.addListener(
-			'keyboardDidShow',
-			hardBound,
+		this.keyboardWillShowListener = Keyboard.addListener(
+			'keyboardWillShow',
+			this.keyboardWillShow.bind(this),
 		);
-		hardBound = this.keyboardDidHide.bind(this);
-		this.keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			hardBound,
+		this.keyboardWillHideListener = Keyboard.addListener(
+			'keyboardWillHide',
+			this.keyboardWillHide.bind(this),
 		);
 	}
 
-	componentDidUpdate() {
-	}
-
-	heightsSum() {
-		var sum = 0;
-		for (var n in heights) {
-			sum += heights[n];
-		}
-		return sum;
-	}
-
-	regularListHeight() {
-		windowHeight = Dimensions.get('window').height;
-		regularHeight = windowHeight - this.heightsSum();
-		return regularHeight;
-	}
-
-	keyboardDidShow(e) {
-		keyboardHeight = e.endCoordinates.height;
-		windowHeight = Dimensions.get('window').height;
-		shortHeight = windowHeight - keyboardHeight - this.heightsSum();
-		console.log("short height: ", shortHeight);
+	keyboardWillShow(e) {
 		this.setState({
-			listStyle: { height: shortHeight }
+			keyboardHeight: e.endCoordinates.height
 		});
-		this._conversationView.scrollToEnd();
 	}
 
-	keyboardDidHide() {
+	keyboardWillHide() {
 		this.setState({
-			listStyle: { height: this.regularListHeight() }
+			keyboardHeight: 0
 		});
 	}
 
@@ -116,50 +92,122 @@ export default class ChatScreen extends React.Component {
 		}
 		return (
 			<View
-				style={this.state.mainViewStyle}
+				style={styles.mainView}
 				ref={(c) => this._mainView = c}
 			>
-				<Image source={pic} style={{ width: '100%', height: heights.logo }} />
-				<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
-				<View style={styles.title}><Text>Conversation</Text></View>
-				<FlatList
-					ref={(c) => this._conversationView = c}
-					data={this.state.data}
-					style={this.state.listStyle}
-					renderItem={({ item, index }) =>
-						<View style={styles.messageRow}>
-							<View
-								style={styles.message}
-								accessibilityLabel={item.text}
-							>
-								<Text
-									style={this.textStyle(index)}
-								>
-									{item.text}
-								</Text>
-							</View>
-							<View 
-								style={this.state.messageStatusStyle}
-							>
-								<Text 
-									style={styles.messageStatusText}
-									testID="messageStatus"
-									>{this.state.messagePostingStatus}</Text>
-							</View>
-						</View>
-					}
-				/>
-				<TextInput
-					testID="messageText"
-					accessibilityLabel="message input field"
-					ref={(c) => this._textInput = c}
-					value={this.state.input}
-					style={styles.input}
-					placeholder="Your message goes here"
-					onChangeText={(text) => this.setState({ input: text })}
-					onSubmitEditing={(event) => this.onTextInput(event)}
-				></TextInput>
+				<Image source={pic} style={{ flex: 0, width: '100%', height: 150 }} />
+				<View style = {[styles.container, {flex: 0}]}>
+					<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
+					<View style={styles.title}><Text>Conversation</Text></View>
+				</View>
+				<View style={{flex: 1, paddingBottom: this.state.keyboardHeight}}>
+					<View style = {[styles.container, {flex: 1}]}>
+						<FlatList
+							ref={(c) => this._conversationView = c}
+							data={this.state.data}
+							style={styles.list}
+							renderItem={({ item, index }) =>
+								<View style={styles.messageRow}>
+									<View
+										style={styles.message}
+										accessibilityLabel={item.text}
+									>
+										<Text
+											style={this.textStyle(index)}
+										>
+											{item.text}
+										</Text>
+									</View>
+									<View 
+										style={this.state.messageStatusStyle}
+									>
+										<Text 
+											style={styles.messageStatusText}
+											testID="messageStatus"
+											>{this.state.messagePostingStatus}</Text>
+									</View>
+								</View>
+							}
+						/>
+					</View>
+					<View style = {[styles.container, {flex: 0}]}>
+						<TextInput
+							testID="messageText"
+							accessibilityLabel="message input field"
+							ref={(c) => this._textInput = c}
+							value={this.state.input}
+							style={styles.input}
+							placeholder="Type your message"
+							onChangeText={(text) => this.setState({ input: text })}
+							onSubmitEditing={(event) => this.onTextInput(event)}
+						></TextInput>
+					</View>
+				</View>
 			</View>
 		);
 	}
 };
+
+
+const styles = StyleSheet.create({
+	mainView: {
+		backgroundColor: '#eee',
+		flex: 1
+	},
+	container: {
+		alignItems: 'stretch',
+		justifyContent: 'flex-start',
+		backgroundColor: '#fff',
+		margin: 5
+	},
+	title: {
+		height: 20,
+		color: 'black',
+		fontSize: 14,
+		justifyContent: 'flex-end'
+	},
+	messageRow: {
+		flexDirection: 'row'
+	},
+	message: {
+		height: 30,
+		justifyContent: 'center'
+	},
+	messageStatusText: {
+		fontSize: 10,
+		color: 'gray',
+		margin: 5
+	},
+	messageStatusVisible: {
+	},
+	heading: {
+		height: 30,
+		color: 'black',
+		fontSize: 18
+	},
+	subtext: {
+		height: 10,
+		color: 'gray',
+		fontSize: 9
+	},
+	list: { 
+		margin: 5, 
+		flex: 1, 
+		alignSelf: 'stretch' 
+	},
+	input: {
+		height: 24,
+		borderWidth: StyleSheet.hairlineWidth,
+		borderRadius: 5
+	},
+	outgoingMessage: {
+		color: 'green',
+		fontSize: 14
+	},
+	incomingMessage: {
+		color: 'red',
+		fontSize: 14,
+		textAlign: 'right'
+	}
+});
+
