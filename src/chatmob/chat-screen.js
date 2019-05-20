@@ -19,9 +19,9 @@ export default class ChatScreen extends React.Component {
 			messageTypes: [],
 			messagePostingStatus: "Sending...",
 			messageStatusStyle: styles.messageStatusVisible,
-			keyboardHeight: 0
 		}
 
+		this.keyboardHeight = new Animated.Value(0);
 	}
 
 	componentDidMount() {
@@ -36,15 +36,21 @@ export default class ChatScreen extends React.Component {
 	}
 
 	keyboardWillShow(e) {
-		this.setState({
-			keyboardHeight: e.endCoordinates.height
-		});
+		Animated.parallel([
+			Animated.timing(this.keyboardHeight, {
+				duration: e.duration * 0.60,
+				toValue: e.endCoordinates.height
+			})
+		]).start();
 	}
 
-	keyboardWillHide() {
-		this.setState({
-			keyboardHeight: 0
-		});
+	keyboardWillHide(e) {
+		Animated.parallel([
+			Animated.timing(this.keyboardHeight, {
+				duration: e.duration,
+				toValue: 0
+			})
+		]).start();
 	}
 
 	addMessage(message, messageType) {
@@ -100,7 +106,7 @@ export default class ChatScreen extends React.Component {
 					<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
 					<View style={styles.title}><Text>Conversation</Text></View>
 				</View>
-				<View style={{flex: 1, paddingBottom: this.state.keyboardHeight}}>
+				<Animated.View style={{flex: 1, paddingBottom: this.keyboardHeight}}>
 					<View style = {[styles.container, {flex: 1}]}>
 						<FlatList
 							ref={(c) => this._conversationView = c}
@@ -142,7 +148,7 @@ export default class ChatScreen extends React.Component {
 							onSubmitEditing={(event) => this.onTextInput(event)}
 						></TextInput>
 					</View>
-				</View>
+				</Animated.View>
 			</View>
 		);
 	}
