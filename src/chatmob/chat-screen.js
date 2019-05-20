@@ -21,7 +21,10 @@ export default class ChatScreen extends React.Component {
 			messageStatusStyle: styles.messageStatusVisible,
 		}
 
+		this.expandedPicHeight = 150;
+		this.minimizedPicHeight = 80;
 		this.keyboardHeight = new Animated.Value(0);
+		this.picHeight = new Animated.Value(this.expandedPicHeight);
 	}
 
 	componentDidMount() {
@@ -33,15 +36,28 @@ export default class ChatScreen extends React.Component {
 			'keyboardWillHide',
 			this.keyboardWillHide.bind(this),
 		);
+		this.keyboardDidShowListener = Keyboard.addListener(
+			'keyboardDidShow',
+			this.keyboardDidShow.bind(this),
+		);
 	}
 
 	keyboardWillShow(e) {
+		let showDuration = e.duration * 0.60;
 		Animated.parallel([
 			Animated.timing(this.keyboardHeight, {
-				duration: e.duration * 0.60,
+				duration: showDuration,
 				toValue: e.endCoordinates.height
+			}),
+			Animated.timing(this.picHeight, {
+				duration: showDuration,
+				toValue: this.minimizedPicHeight
 			})
 		]).start();
+	}
+
+	keyboardDidShow(e) {
+		this._conversationView.scrollToEnd();
 	}
 
 	keyboardWillHide(e) {
@@ -49,6 +65,10 @@ export default class ChatScreen extends React.Component {
 			Animated.timing(this.keyboardHeight, {
 				duration: e.duration,
 				toValue: 0
+			}),
+			Animated.timing(this.picHeight, {
+				duration: e.duration,
+				toValue: this.expandedPicHeight
 			})
 		]).start();
 	}
@@ -84,6 +104,9 @@ export default class ChatScreen extends React.Component {
 				messagePostingStatus: "(error!)",
 			});
 		});
+	}
+
+	onConversationChanged(contentWidth, contentHeight) {
 		this._conversationView.scrollToEnd();
 	}
 
@@ -101,17 +124,15 @@ export default class ChatScreen extends React.Component {
 				style={styles.mainView}
 				ref={(c) => this._mainView = c}
 			>
-				<Image source={pic} style={{ flex: 0, width: '100%', height: 150 }} />
-				<View style = {[styles.container, {flex: 0}]}>
-					<Text style={styles.heading}>Welcome to BotAgg Chat!</Text>
-					<View style={styles.title}><Text>Conversation</Text></View>
-				</View>
+				<Animated.Image source={pic} style={{ flex: 0, width: '100%', height: this.picHeight }} />
+				<View><Text style={[styles.title, {flex: 0}]}>Conversation</Text></View>
 				<Animated.View style={{flex: 1, paddingBottom: this.keyboardHeight}}>
 					<View style = {[styles.container, {flex: 1}]}>
 						<FlatList
 							ref={(c) => this._conversationView = c}
 							data={this.state.data}
 							style={styles.list}
+							onContentSizeChange={(contentWidth, contentHeight) => this.onConversationChanged(contentWidth, contentHeight)}
 							renderItem={({ item, index }) =>
 								<View style={styles.messageRow}>
 									<View
@@ -143,6 +164,7 @@ export default class ChatScreen extends React.Component {
 							ref={(c) => this._textInput = c}
 							value={this.state.input}
 							style={styles.input}
+							blurOnSubmit={false}
 							placeholder="Type your message"
 							onChangeText={(text) => this.setState({ input: text })}
 							onSubmitEditing={(event) => this.onTextInput(event)}
@@ -170,7 +192,9 @@ const styles = StyleSheet.create({
 		height: 20,
 		color: 'black',
 		fontSize: 14,
-		justifyContent: 'flex-end'
+		alignItems: 'center',
+		justifyContent: 'flex-end',
+		borderBottomWidth: 1
 	},
 	messageRow: {
 		flexDirection: 'row'
@@ -185,11 +209,6 @@ const styles = StyleSheet.create({
 		margin: 5
 	},
 	messageStatusVisible: {
-	},
-	heading: {
-		height: 30,
-		color: 'black',
-		fontSize: 18
 	},
 	subtext: {
 		height: 10,
