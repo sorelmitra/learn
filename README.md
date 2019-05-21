@@ -46,7 +46,7 @@ This will be an Agile project.
 This project demonstrates software development with the following tools and technologies:
 
 - **Source Control**: GIT with GitHub
-- **Issue & Sprint Tracking**: GitHub Issues
+- **Issue & Sprint Tracking**: GitHub Issues and Project/Board
 - **Stories Definition & Acceptance Criteria**: Cucumber and Detox
 - **Automatic Acceptance Tests**: Cucumber-JS with Selenium WebDriver for Web, Detox/Appium for Mobile
 - **Web Domain**: <span style="color:red">None for now. Free Domains are not an option as they are associated with scams and bad practices</span>
@@ -54,8 +54,12 @@ This project demonstrates software development with the following tools and tech
 - **Architecture**: Microservices with Docker and Kubernetes for On Premise, Google Free-Tier technologies for Cloud (Docker is [not supported](https://cloud.google.com/cloud-build/docs/quickstart-docker) in Google Free Tier)
 - **Cloud Hosting**: Google Cloud
 - **Components**:
-	* **SampleBot Service**: Node.js with [Express JS](https://expressjs.com/), REST, and [Botlang](https://botlang.org)
+	* **SampleBot Service**: [Node.js](https://nodejs.org) with [Express JS](https://expressjs.com/), REST, and [Botlang](https://botlang.org)
 	* **SampleBot Admin**: [React JS](https://reactjs.org/)
 	* **ChatBot API**: Node.js, REST
 	* **Chat API**: Python with [Django](https://www.djangoproject.com/) and [Thorn](https://pypi.org/project/thorn/)
 	* **Chat Mobile**. [React Native](https://facebook.github.io/react-native/)
+
+## Development
+
+Please follow our [Development Guide](https://github.com/sorelmitra/botagg/blob/master/DevelopmentGuide.md)
