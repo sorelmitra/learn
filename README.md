@@ -62,4 +62,4 @@ This project demonstrates software development with the following tools and tech
 
 ## Development
 
-Please follow our [Development Guide](https://github.com/sorelmitra/botagg/blob/master/DevelopmentGuide.md)
+Please follow our [Development Guide](https://github.com/sorelmitra/botagg/blob/master/docs/DevelopmentGuide.md).
