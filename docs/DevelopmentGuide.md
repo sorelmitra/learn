@@ -10,7 +10,9 @@ The project folder is organized as follows:
 
 	This holds the sources of this project. It's a Node.JS project initialized with npm. Currently it doesn't define any action or source except for a docker-compose file for Postgres, but it will hold npm tasks for the on-premise solution.
 
-	* **docs** - contains documentation for this project, including the current document
+	* **docs**
+	
+		Contains documentation for this project, including the current document
 	
 	* **src**
 
@@ -34,7 +36,9 @@ The project folder is organized as follows:
 
 			The **e2e** folder holds the End-to-End tests, which are based on Detox+Jest.
 
-		* **postgres** - contains a Dockerfile for Postgres with Certificates Authentication
+		* **postgres**
+		
+			Contains a Dockerfile for Postgres with Certificates Authentication
 
 # Quick Start
 
