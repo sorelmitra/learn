@@ -60,6 +60,16 @@ This project demonstrates software development with the following tools and tech
 	* **Chat API**: Python with [Django](https://www.djangoproject.com/) and [Thorn](https://pypi.org/project/thorn/)
 	* **Chat Mobile**. [React Native](https://facebook.github.io/react-native/)
 
+# Documentation
+
+## User & API Guides
+
+- User Guide for [Chat Mobile](https://github.com/sorelmitra/botagg/blob/master/docs/ChatMobileUserGuide.md)
+
+- User Guide for [Chat API](https://github.com/sorelmitra/botagg/blob/master/docs/ChatAPIGuide.md)
+
 ## Development
 
-Please follow our [Development Guide](https://github.com/sorelmitra/botagg/blob/master/docs/DevelopmentGuide.md).
+- General [Development Guide](https://github.com/sorelmitra/botagg/blob/master/docs/DevelopmentGuide.md)
+
+- Setting up [Postgres in Docker with Certificates](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md)
