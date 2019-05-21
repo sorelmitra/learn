@@ -1,13 +1,14 @@
 # botagg
 
-# Introduction
+# Overview
 
-This is a demo chatbot app with mobile frontend and web admin app.
+This is a learning project. While I learn some new [technologies](#tools) I also build a demo chatbot app with mobile frontend and web admin app, as a proof that I understood something from these technologies :)
 
 
 # Goals
 
-Build a demo app that offers a mobile chat platform where visitors can discuss with a chat bot and a web app where chat bot owners can administer their bots.
+- Learn to develop and test using the [technologies](#tools) specified below
+- Build a demo app that offers a mobile chat platform where visitors can discuss with a chat bot and a web app where chat bot owners can administer their bots
 
 This platform will have 5 components:
 
