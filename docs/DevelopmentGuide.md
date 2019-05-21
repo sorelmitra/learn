@@ -32,7 +32,7 @@ The project folder is organized as follows:
 
 			It only runs on iOS so far.
 
-			The 'e2e' folder holds the End-to-End tests, which are based on Detox+Jest.
+			The **e2e** folder holds the End-to-End tests, which are based on Detox+Jest.
 
 		* **postgres** - contains a Dockerfile for Postgres with Certificates Authentication
 
@@ -143,3 +143,12 @@ Run the automated tests:
 
 	npm run test
 
+# Development
+
+This is a learning and demo project. Thus, it does not employ all techniques for ensuring quality of a production project. However, I do want to understand the tools that help to ensure quality on the technologies used, so I did employ automated tests.
+
+A few guidelines:
+
+- TDD/BDD is encouraged. For lack of time, I won't be employing all aspects of automated testing. Being forced to choose only one solution, I opted for End-to-End tests because at the end of the day they give you insurance that your entire solution works in the deployed form. I favor BDD with Cucumber, but for Mobile Appium doesn't *behave* like I want (pun intended), so I sticked with Detox/Jest and it's test descriptions with `it('should...')`
+- Good code quality is encouraged. It pays off, even if I limit this project for demo purposes only. For once, I learn what it means to maintain code quality with these languages. Secondly, it actually helps when you have little time: a good-quality code means I use very little time to "connect" to the project when I get the time
+- Code comments explaining the technologies are encouraged if time permits. This is my standard way of learning a new technology: I create a dummy programming file, in which I add comments documenting the various aspects of programming. For this project, since it actually does something meaningful, there is less need for such comments, but still they are welcome
