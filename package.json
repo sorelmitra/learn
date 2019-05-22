@@ -4,6 +4,7 @@
   "description": "Chat Bot Aggregator Demo",
   "main": "README.md",
   "scripts": {
+    "postgres": ""
   },
   "repository": {
     "type": "git",

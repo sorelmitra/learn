@@ -79,7 +79,7 @@ Create an isolated Python environment, and install dependencies:
 Run the Django migrations to set up your models:
 
 	python manage.py makemigrations
-	python manage.py makemigrations polls
+	python manage.py makemigrations chatapi
 	python manage.py migrate
 
 ### Start Chat API On a Local PC

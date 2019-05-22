@@ -46,6 +46,18 @@
 			"script": "env",
 			"path": "src/chatapi/",
 			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "makemigrations",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "migrate",
+			"path": "src/chatapi/",
+			"problemMatcher": []
 		}
 	]
 }
