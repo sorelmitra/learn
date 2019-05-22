@@ -84,9 +84,23 @@ Run the Django migrations to set up your models:
 
 ### Start Chat API On a Local PC
 
+Start the local Postgres with Certificates:
+
+	cd ../.. # CD to root of botagg project
+	docker-compose up -d
+
+Check that Postgres is up and running:
+
+	psql "sslmode=verify-ca host=192.168.99.100 port=5203" -U postgres
+
+Create the database in the local Postgres:
+
+	create database chatapi;
+
 Start a local web server:
 
-	npm start
+	cd src/chatapi
+	npm start-dev-local
 
 When you no longer need the server, hit `Ctr+C` to stop it.
 
@@ -104,7 +118,11 @@ In your web browser, enter this address: http://localhost:8000. You should see t
 
 4. Make sure "env" is added to .gcloudignore
 
-5. Deploy the app to the cloud:
+5. Prepare the Cloud Postgres:
+
+	TBD
+
+6. Deploy the app to the cloud:
 
 		python manage.py collectstatic
 		gcloud app deploy
