@@ -37,12 +37,6 @@
 		},
 		{
 			"type": "npm",
-			"script": "start",
-			"path": "src/chatapi/",
-			"problemMatcher": []
-		},
-		{
-			"type": "npm",
 			"script": "env",
 			"path": "src/chatapi/",
 			"problemMatcher": []
@@ -56,6 +50,12 @@
 		{
 			"type": "npm",
 			"script": "migrate",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "start-dev-local",
 			"path": "src/chatapi/",
 			"problemMatcher": []
 		}

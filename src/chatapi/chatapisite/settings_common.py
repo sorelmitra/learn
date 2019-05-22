@@ -19,17 +19,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'p9(*o9x_q7pm^89y9sq(y!_wvms(3e)%a$)y6)ys494!dsx)mx'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    'localhost',
-    'botagg-239511.appspot.com'
-]
-
 
 # Application definition
 
@@ -72,20 +61,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chatapisite.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'chatapi',
-        'USER': 'postgres',
-        'HOST': '192.168.99.100',
-        'PORT': '5203'
-    },
-}
 
 
 # Password validation
