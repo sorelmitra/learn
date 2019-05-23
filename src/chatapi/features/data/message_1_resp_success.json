@@ -1,0 +1,8 @@
+{
+    "success": true,
+    "post": {
+        "id": 1,
+        "body": "Message 1"
+    },
+    "reason": "message posted successfully"
+}
