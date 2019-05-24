@@ -84,25 +84,13 @@ CD to the Chat API source directory:
 
 	cd src/chatapi
 
-Start Postgres in Docker
-
-	docker-compose up -d
-
 Create an isolated Python environment, and install dependencies:
 
 	virtualenv env
 	npm run env-install
 
-Run the Django migrations to set up your models:
-
-	npm run makemigrations
-	npm run migrate
-
-### Start Chat API On a Local PC
-
 Start the local Postgres with Certificates:
 
-	cd ../.. # CD to root of botagg project
 	docker-compose up -d
 
 Check that Postgres is up and running:
@@ -112,6 +100,17 @@ Check that Postgres is up and running:
 Create the database in the local Postgres:
 
 	create database chatapi;
+
+Create a super user for your Django app
+
+	npm run createsuperuser
+
+### Start Chat API On a Local PC
+
+Run the Django migrations to set up your models:
+
+	npm run makemigrations
+	npm run migrate
 
 Start a local web server:
 
