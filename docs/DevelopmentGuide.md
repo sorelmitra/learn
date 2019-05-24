@@ -50,7 +50,7 @@ The project folder is organized as follows:
 
 2. Install [Docker Machine](https://docs.docker.com/machine/install-machine/) and create and start a machine
 
-3. Build the [Postgres with Certificates image](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#7-create-and-build-a-docker-postgres Image)
+3. Build the [Postgres with Certificates image](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#7-create-and-build-a-docker-postgres-image) and [install the certificates](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#11-copy-client-certificates)
 
 ### For Chat Mobile App
 

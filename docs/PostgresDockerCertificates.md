@@ -206,7 +206,7 @@ For psql:
 CD to "postgres/ssl/client" directory and run:
 
 	cp postgresql.crt postgresql.key ~/.postgresql/
-	cp ../myCA.pem ~/.postgresql/
+	cp ../SorelCA.pem ~/.postgresql/root.crt
 
 This will copy the client certificate and key and the CA root certificate for the psql client to use.
 
