@@ -17,7 +17,6 @@ let text3 = '';
 
 describe('Conversation', () => {
   beforeEach(async () => {
-    //await device.reloadReactNative();
   });
 
   it('should add message to the list', async () => {
@@ -55,8 +54,10 @@ describe('Conversation', () => {
     await expect(element(by.label(text3))).toBeNotVisible();
   });
 
-  it.skip('should show post sent', async () => {
+  it('should show post sent', async () => {
+    await device.reloadReactNative();
     lastAddedText = 'Post Me';
+    await element(by.id('messageText')).tap();
     await addMessage(lastAddedText);
     await expect(element(by.id('messageStatus'))).toBeVisible();
     await expect(element(by.id('messageStatus'))).toHaveText('(sent)');

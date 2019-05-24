@@ -3,18 +3,15 @@ import config from './config';
 
 class ChatService {
 
-	chatPostUrl = "" + config.chat.host + config.chat.path.post;
-
 	async post(message) {
-		logService.debug(this, `Posting to <${this.chatPostUrl}>: <${message}>`);
 		var data = {
 			body: message
 		};
-		const resp = await this.restJsonCall('POST', data);
-		return new Promise(function() {
+		const resp = await this.restJsonCall('POST', config.chat.path.posts, data);
+		return new Promise(function(resolve, reject) {
 			if (resp.success) {
-				if (resp.body == data.body) {
-					resolve();
+				if (resp.post.body == data.body) {
+					resolve(resp.post);
 				} else {
 					throw `Response from server is 'success' but for another message: <${resp.body}>`;
 				}
@@ -27,8 +24,10 @@ class ChatService {
 		});
 	}
 
-	async restJsonCall(restMethod, data) {
-		const response = await fetch(this.chatPostUrl, {
+	async restJsonCall(restMethod, path, data) {
+		chatPostUrl = "" + config.chat.host + path;
+		logService.debug(this, `Launching ${restMethod} to <${chatPostUrl}>: <${data.body}>`);
+		const response = await fetch(chatPostUrl, {
 			method: restMethod,
 			mode: 'cors',
 			cache: 'no-cache',

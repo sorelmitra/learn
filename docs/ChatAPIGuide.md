@@ -10,8 +10,8 @@ The Chat API is a RESTful server that offers APIs for a basic chat service.
 
 Resource/Method | POST <br/>Create | GET <br/>Read | PUT <br/>Update | DELETE <br/>Delete
 ---|---|---|---|---
-`/posts` | [Create Post](#create-post)  | [Read All Posts](#read-all-posts) | <span style="color: LightCoral">Method not allowed (405)</span> | [Delete All Posts](#delete-all-posts)
-`/posts/<id>` | <span style="color: LightCoral">Method not allowed (405)</span> | [Read Post with ID](#read-post-with-id) | <span style="color: Gray">*Not Implemented*</span> | <span style="color: Gray">*Not Implemented*</span>
+`/posts/` | [Create Post](#create-post)  | [Read All Posts](#read-all-posts) | <span style="color: LightCoral">Method not allowed (405)</span> | [Delete All Posts](#delete-all-posts)
+`/posts/<id>/` | <span style="color: LightCoral">Method not allowed (405)</span> | [Read Post with ID](#read-post-with-id) | <span style="color: Gray">*Not Implemented*</span> | <span style="color: Gray">*Not Implemented*</span>
 
 ### Create Post
 
