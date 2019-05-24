@@ -1,12 +1,12 @@
 To get Postgres in Docker to login users using certificates, you need to follow these steps:
 
-# 1) Get a Certificate Authority to Sign your Certificates
+# 1 Get a Certificate Authority to Sign your Certificates
 
 It can be your own CA for development or an official one for production.
 
 For your own CA, read this: https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/
 
-# 2) Create the Directory Structure
+# 2 Create the Directory Structure
 
 Before you start: Make sure the certificates and keys you're about to create are NOT added to Source Control. They must be kept under private access for restricted people.
 
@@ -16,7 +16,7 @@ Create a "postgres" directory with this structure:
 	- ssl
 		- client
 
-# 3) Create Server Certificates
+# 3 Create Server Certificates
 
 CD to "postgres/ssl" directory.
 
@@ -88,7 +88,7 @@ Edit "gen-certificates.sh"  and set:
 
 Run gen-certificates.sh. It will generate your server certificates.
 
-# 4) Create Client Certificates
+# 4 Create Client Certificates
 
 CD to "postgres/ssl/client" directory.
 
@@ -98,11 +98,11 @@ Edit "gen-certificates.sh" and set:
 
 Run gen-certificates.sh. It will generate your client certificates.
 
-# 5) Copy CA Root Certificate
+# 5 Copy CA Root Certificate
 
 Copy the CA Root certificate "myCA.pem" to "ssl" directory.
 
-# 6) Create Postgres Configuration Files
+# 6 Create Postgres Configuration Files
 
 CD to "postgres" directory.
 
@@ -124,7 +124,7 @@ Create "pg_hba.conf":
 	hostssl  all  all  0.0.0.0/0  cert  clientcert=1
 	hostnossl  all  all  0.0.0.0/0  reject
 
-# 7) Create and Build a Docker Postgres Image
+# 7 Create and Build a Docker Postgres Image
 
 CD to "postgres" directory.
 
@@ -146,13 +146,13 @@ Build that Docker image:
 
 	docker build -t postgres-cert:latest .
 
-# 8) Create a Docker Volume
+# 8 Create a Docker Volume
 
 Create a Docker volume to hold your Postgres DB:
 
 	docker volume create postgres10-data
 
-# 9) Create a Docker-Compose File to Launch Postgres
+# 9 Create a Docker-Compose File to Launch Postgres
 
 CD to "postgres".
 
@@ -190,7 +190,7 @@ Create "docker-compose.yml":
 
 Notice the use of "./" in the volumes - "." specifies to docker-compose we have a path, and that path is relative to the docker-compose.yml file, which is very important for running the docker-compose command from anywhere within the directory tree that has the yml file at the root.
 
-# 10) (Re)Start Postgres
+# 10 (Re)Start Postgres
 
 CD to where you've placed "docker-compose.yml" and run:
 
@@ -199,7 +199,7 @@ CD to where you've placed "docker-compose.yml" and run:
 
 This will stop, remove, and then start your Postgres Docker container.
 
-# 11) Copy Client Certificates
+# 11 Copy Client Certificates
 
 For psql:
 
@@ -212,7 +212,7 @@ This will copy the client certificate and key and the CA root certificate for th
 
 For another client refer to that client's documentation for setting up certificates.
 
-# 12) Connect to Postgres using Certificates
+# 12 Connect to Postgres using Certificates
 
 For psql:
 

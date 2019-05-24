@@ -48,6 +48,10 @@ The project folder is organized as follows:
 
 1. Install [Python 2 and 3 with pyenv](https://weknowinc.com/blog/running-multiple-python-versions-mac-osx)
 
+2. Install [Docker Machine](https://docs.docker.com/machine/install-machine/) and create and start a machine
+
+3. Build the [Postgres with Certificates image](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#7-create-and-build-a-docker-postgres Image)
+
 ### For Chat Mobile App
 
 1. Install [Node.js](https://nodejs.org)
@@ -69,6 +73,10 @@ The project folder is organized as follows:
 CD to the Chat API source directory:
 
 	cd src/chatapi
+
+Start Postgres in Docker
+
+	docker-compose up -d
 
 Create an isolated Python environment, and install dependencies:
 
