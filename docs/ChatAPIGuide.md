@@ -4,19 +4,19 @@ The Chat API is a RESTful server that offers APIs for a basic chat service.
 
 # API Reference
 
-## Posts API
+## Posts API v1
 
 ### Overview
 
 Resource/Method | POST <br/>Create | GET <br/>Read | PUT <br/>Update | DELETE <br/>Delete
 ---|---|---|---|---
-`/posts/` | [Create Post](#create-post)  | [Read All Posts](#read-all-posts) | <span style="color: LightCoral">Method not allowed (405)</span> | [Delete All Posts](#delete-all-posts)
-`/posts/<id>/` | <span style="color: LightCoral">Method not allowed (405)</span> | [Read Post with ID](#read-post-with-id) | <span style="color: Gray">*Not Implemented*</span> | <span style="color: Gray">*Not Implemented*</span>
+`/posts/v1/` | [Create Post](#create-post)  | [Read All Posts](#read-all-posts) | <span style="color: LightCoral">Method not allowed (405)</span> | [Delete All Posts](#delete-all-posts)
+`/posts/v1/<id>/` | <span style="color: LightCoral">Method not allowed (405)</span> | [Read Post with ID](#read-post-with-id) | <span style="color: Gray">*Not Implemented*</span> | <span style="color: Gray">*Not Implemented*</span>
 
 ### Create Post
 
 - **Request Type**: `POST`
-- **Path**: `/posts/`
+- **Path**: `/posts/v1/`
 - **Data**:
 	```json
 	{
@@ -56,13 +56,13 @@ curl \
     --data '{
         "body": "Hi there!" 
     }' \
-    http://localhost:8000/posts/
+    http://localhost:8000/posts/v1/
 ```
 
 ## Read All Posts
 
 - **Request Type**: `GET`
-- **Path**: `/posts/`
+- **Path**: `/posts/v1/`
 - **Data**:
 	```json
 	{}
@@ -102,13 +102,13 @@ curl \
     --header "Content-Type: application/json" \
     --request GET \
     --data '{}' \
-    http://localhost:8000/posts/
+    http://localhost:8000/posts/v1/
 ```
 
 ## Read Post with ID
 
 - **Request Type**: `GET`
-- **Path**: `/posts/<id>/`
+- **Path**: `/posts/v1/<id>/`
 - **Data**:
 	```json
 	{}
@@ -141,5 +141,5 @@ curl \
     --header "Content-Type: application/json" \
     --request GET \
     --data '{}' \
-    http://localhost:8000/posts/1/
+    http://localhost:8000/posts/v1/1/
 ```

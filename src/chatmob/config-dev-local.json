@@ -2,7 +2,7 @@
 	"chat": {
 		"host": "http://localhost:8000",
 		"path": {
-			"posts": "/posts/"
+			"posts": "/posts/v1/"
 		}
 	}
 }
