@@ -5,6 +5,5 @@ def loadJsonFromDataFile(filepath):
 	    data = json.load(json_file)
 	return data
 
-def areJsonsEqual(a, b):
-    a, b = json.dumps(a, sort_keys=True), json.dumps(b, sort_keys=True)
-    return a == b
+def sortedJson(a):
+    return json.dumps(a, sort_keys=True)

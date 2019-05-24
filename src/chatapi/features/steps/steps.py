@@ -1,5 +1,6 @@
 from librest import *
 from libjson import *
+from libtest import *
 
 @given(u'Chat API Host "{host}"')
 def step_impl(context, host):
@@ -19,5 +20,5 @@ def step_impl(context, expectedStatus, jsonFile):
     global receivedJson
     global status
     expectedJson = loadJsonFromDataFile(jsonFile)
-    assert(expectedStatus == status)
-    assert(areJsonsEqual(expectedJson, receivedJson))
+    assertAsStrEqual(expectedStatus, status, "status")
+    assertAsStrEqual(sortedJson(expectedJson), sortedJson(receivedJson), "content")

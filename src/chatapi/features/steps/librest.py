@@ -23,6 +23,6 @@ def launchRestMethodCall(method, url, data = None, login = None, params = None, 
     try:
         json = response.json()
     except ValueError:
-        json = {'status': response.status_code, 'text': response.text}
+        json = {'text': response.text}
     return (response.status_code, json)
 
