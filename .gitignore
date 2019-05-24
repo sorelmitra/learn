@@ -1,5 +1,5 @@
 **/.DS_Store
-src/conf/postgres/ssl
+src/postgres/ssl
 **/static
 **/bin
 
