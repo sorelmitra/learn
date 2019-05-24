@@ -1,4 +1,13 @@
+import re
+
 from colorama import Fore, Style
+
+groups = []
+
+def findMatches(reStr, s):
+	p = re.compile(reStr)
+	for m in p.finditer(s):
+		print(m.start(), m.group())
 
 def identityCompare(a, b):
 	return a == b
@@ -35,3 +44,26 @@ def assertAsStrEqual(a, b, itemName="item", compare=identityCompare):
 		return
 	(diffX, diffY) = computeStringDifferences(x, y)
 	raise Exception(f"Assertion for {itemName} failed: \n\t{Style.BRIGHT}Expected{Style.RESET_ALL}:\n\t{diffX}\n\t{Style.BRIGHT}Got{Style.RESET_ALL}:\n\t{diffY}")
+
+def assertAsStrContains(a, reStr, itemName="item"):
+	global groups
+	s = str(a)
+	m = re.search(reStr, s)
+	if m is not None:
+		print(f"Regex is <{reStr}>")
+		try:
+			g = m.group(1)
+			groups.append(g)
+			print(f"Group is {g}")
+		except:
+			pass
+		return
+	raise Exception(f"Assertion for {itemName} failed: \n\t{Style.BRIGHT}Expected{Style.RESET_ALL}:\n\t{s}\n\t{Style.BRIGHT}To Contain{Style.RESET_ALL}:\n\t{reStr}")
+
+def expandGroups(s):
+	global groups
+	try:
+		return s.replace('$1', groups[0])
+	except Exception as e:
+		print(f"Not replaced in <{s}> based on <{groups}>: {e}")
+		return s

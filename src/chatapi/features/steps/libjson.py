@@ -1,8 +1,8 @@
 import json
 
 def loadJsonFromDataFile(filepath):
-	with open(f"features/data/{filepath}") as json_file:  
-	    data = json.load(json_file)
+	with open(f"features/data/{filepath}") as jsonFile:
+	    data = json.load(jsonFile)
 	return data
 
 def sortedJson(a):

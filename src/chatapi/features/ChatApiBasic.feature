@@ -1,6 +1,26 @@
-Feature: CHAT_API_BASIC: Basic Chat API
+Feature: Basic Chat API
 
-Scenario: CHAT_API_BASIC_HELLO: Hello, World Chat API
+Scenario: Delete All Posts
+	Given Chat API Host "http://localhost:8000"
+	When "DELETE" "empty.json" to "/posts"
+	Then Status is "200" and response contains "reason.*all messages deleted.*success.*true"
+
+Scenario: Post Message
 	Given Chat API Host "http://localhost:8000"
 	When "POST" "message_1.json" to "/posts"
-	Then Status is "200" and response is "message_1_resp_success.json"
+	Then Status is "200" and response contains "body.*Message 1.*id.*: (\d+).*success.*true"
+
+Scenario: Get Post by ID
+	Given Chat API Host "http://localhost:8000"
+	When "GET" "empty.json" to "/posts/$1"
+	Then Status is "200" and response contains "body.*Message 1.*id.*$1+.*success.*true"
+
+Scenario: List All Posts
+	Given Chat API Host "http://localhost:8000"
+	When "GET" "empty.json" to "/posts"
+	Then Status is "200" and response contains "body.*Message 1.*id.*\d+.*success.*true"
+
+Scenario: Delete All Posts
+	Given Chat API Host "http://localhost:8000"
+	When "DELETE" "empty.json" to "/posts"
+	Then Status is "200" and response contains "reason.*all messages deleted.*success.*true"

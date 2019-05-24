@@ -10,13 +10,13 @@ The Chat API is a RESTful server that offers APIs for a basic chat service.
 
 Resource/Method | POST <br/>Create | GET <br/>Read | PUT <br/>Update | DELETE <br/>Delete
 ---|---|---|---|---
-`/posts` | [Create Post](#create-post)  | <span style="color: Gray">*Not Implemented*</span>   | <span style="color: Gray">*Not Implemented*</span>   | <span style="color: Gray">*Not Implemented*</span>
-`/posts/<id>` | <span style="color: LightCoral">Method not allowed (405)</span> | [Read Post with ID](#read-post-with-id) | <span style="color: Gray">*Not Implemented*</span>   | <span style="color: Gray">*Not Implemented*</span>
+`/posts` | [Create Post](#create-post)  | [Read All Posts](#read-all-posts) | <span style="color: LightCoral">Method not allowed (405)</span> | [Delete All Posts](#delete-all-posts)
+`/posts/<id>` | <span style="color: LightCoral">Method not allowed (405)</span> | [Read Post with ID](#read-post-with-id) | <span style="color: Gray">*Not Implemented*</span> | <span style="color: Gray">*Not Implemented*</span>
 
 ### Create Post
 
 - **Request Type**: `POST`
-- **Path**: `/posts`
+- **Path**: `/posts/`
 - **Data**:
 	```json
 	{
@@ -53,16 +53,62 @@ Example Request:
 curl \
     --header "Content-Type: application/json" \
     --request POST \
-    --data '{ \
-        "body": "Hi there!" \
+    --data '{
+        "body": "Hi there!" 
     }' \
-    http://localhost:8000/posts
+    http://localhost:8000/posts/
+```
+
+## Read All Posts
+
+- **Request Type**: `GET`
+- **Path**: `/posts/`
+- **Data**:
+	```json
+	{}
+	```
+- **Response**:
+    - *Success*:
+        ```json
+        {
+            "success": true,
+            "posts": [
+                {
+                    "id": <existing post id 1>,
+                    "body": "message text"
+                },
+                {
+                    "id": <existing post id 2>,
+                    "body": "message text"
+                },
+                ...
+            ]
+            "reason": "messages retrieved"
+        }
+        ```
+    - *Failure*:
+        ```json
+        {
+            "success": false,
+            "post": null,
+            "reason": "failure reason"
+        }
+        ```
+
+Example Request:
+
+```bash
+curl \
+    --header "Content-Type: application/json" \
+    --request GET \
+    --data '{}' \
+    http://localhost:8000/posts/
 ```
 
 ## Read Post with ID
 
 - **Request Type**: `GET`
-- **Path**: `/posts/<id>`
+- **Path**: `/posts/<id>/`
 - **Data**:
 	```json
 	{}
@@ -95,5 +141,5 @@ curl \
     --header "Content-Type: application/json" \
     --request GET \
     --data '{}' \
-    http://localhost:8000/posts/1
+    http://localhost:8000/posts/1/
 ```

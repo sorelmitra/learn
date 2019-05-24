@@ -1,9 +1,8 @@
 from django.urls import path
-from . import views
-from .ViewPost import *
+from .views import *
 
 app_name = 'chatapi'
 urlpatterns = [
-	path("", views.index, name="index"),
-	path("<int:post_id>/", ViewPost.as_view())
+	path("", ViewRestPosts.as_view()),
+	path("<int:post_id>/", ViewRestPostById.as_view())
 ]
