@@ -48,9 +48,19 @@ The project folder is organized as follows:
 
 1. Install [Python 2 and 3 with pyenv](https://weknowinc.com/blog/running-multiple-python-versions-mac-osx)
 
-2. Install [Docker Machine](https://docs.docker.com/machine/install-machine/) and create and start a machine
+2. Make Python 3 the default and Python 2 available
 
-3. Build the [Postgres with Certificates image](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#7-create-and-build-a-docker-postgres-image) and [install the certificates](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#11-copy-client-certificates)
+		pyenv global 3.7.2 2.7.15
+
+3. Install tools for automatic tests: Behave, Requests:
+
+		pip install behave
+		pip install requests
+		pip install colorama
+
+4. Install [Docker Machine](https://docs.docker.com/machine/install-machine/) and create and start a machine
+
+5. Build the [Postgres with Certificates image](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#7-create-and-build-a-docker-postgres-image) and [install the certificates](https://github.com/sorelmitra/botagg/blob/master/docs/PostgresDockerCertificates.md#11-copy-client-certificates)
 
 ### For Chat Mobile App
 
@@ -81,14 +91,12 @@ Start Postgres in Docker
 Create an isolated Python environment, and install dependencies:
 
 	virtualenv env
-	source env/bin/activate
-	pip install -r requirements.txt
+	npm run env-install
 
 Run the Django migrations to set up your models:
 
-	python manage.py makemigrations
-	python manage.py makemigrations chatapi
-	python manage.py migrate
+	npm run makemigrations
+	npm run migrate
 
 ### Start Chat API On a Local PC
 

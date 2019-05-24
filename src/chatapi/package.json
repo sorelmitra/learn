@@ -10,7 +10,8 @@
     "selenium-webdriver": "^4.0.0-alpha.1"
   },
   "scripts": {
-    "env": "source env/bin/activate && pip install -r requirements.txt",
+    "env-install": "source env/bin/activate && pip install -r requirements.txt",
+    "createsuperuser": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py createsuperuser",
     "makemigrations": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py makemigrations chatapi",
     "migrate": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py migrate",
     "start-dev-local": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py runserver",

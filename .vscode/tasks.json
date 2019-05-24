@@ -37,7 +37,7 @@
 		},
 		{
 			"type": "npm",
-			"script": "env",
+			"script": "env-install",
 			"path": "src/chatapi/",
 			"problemMatcher": []
 		},
@@ -56,6 +56,12 @@
 		{
 			"type": "npm",
 			"script": "start-dev-local",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "createsuperuser",
 			"path": "src/chatapi/",
 			"problemMatcher": []
 		}
