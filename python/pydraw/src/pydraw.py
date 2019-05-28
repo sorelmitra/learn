@@ -2,6 +2,9 @@ import tkinter
 import getopt
 import argparse
 import sys
+import asyncio
+import time
+import random
 
 from typing import *
 
@@ -167,10 +170,18 @@ print(s[1:3])
 ###########
 ###########
 
-print("\n\n---Lists---\n")
+print("\n\n---Lists (and generator expression)---\n")
 
 a = [i*2 for i in range(1,11) if i%2 == 0]
 print("List created with list comprehension and range(): ", a)
+
+a = (i*2 for i in range(1,11) if i%2 == 0)
+print("'List' created with generator and range(): ", a)
+# Note the syntax is almost identical to list comprehension ... only [] and () differ
+b = ''
+for i in a:
+    b = f'{i} plus {b}'
+print(f"The generator 'list' constructed via a 'for': {b}")
 
 print("Combination of 2 elems based on criteria: ")
 print("\tWith list comprehension: ", \
@@ -219,6 +230,20 @@ for [k, v] in d.items():
 # Sort them if you please
 for k in sorted(d.keys()):
     print("sorted item ", k, " - ", d[k])
+
+
+
+
+###########
+###########
+###########
+
+print("\n\n---Asterisk---\n")
+
+def doStuff(n):
+    return n + 1
+
+print("Expand function call tuple", *(doStuff(i) for i in range(3)))
 
 
 
@@ -368,6 +393,114 @@ print("Is file opened or not?")
 ###########
 
 print("\n\n---Generators---\n")
+
+def generateSome():
+    print("Generator: Step 1")
+    yield 243
+    print("Generator: Step 2");
+    yield 244
+
+it = generateSome()
+print(f"Generator: returned value 1 {next(it)}")
+print(f"Generator: returned value 2 {next(it)}")
+#print(f"Generator: returned value 3 {next(it)}")
+
+
+
+
+
+###########
+###########
+###########
+
+print("\n\n---Async IO---\n")
+
+#
+# Async version of 'Hello World'
+# 
+
+async def count(n):
+    sleepSeconds = 1 / (n - 1)
+    for i in range(1, n):
+        print(f"Count {i}")
+        await asyncio.sleep(sleepSeconds)
+
+async def asyncRoutine():
+    await asyncio.gather(count(3), count(4), count(5))
+
+s = time.perf_counter()
+asyncio.run(asyncRoutine())
+elapsed = time.perf_counter() - s
+print(f"async hello executed in {elapsed:0.2f} seconds.")
+
+#
+# How async calls are interlaced
+#
+  
+# ANSI colors
+c = (
+    "\033[0m",   # End of color
+    "\033[36m",  # Cyan
+    "\033[91m",  # Red
+    "\033[35m",  # Magenta
+)
+async def makerandom(idx: int, threshold: int = 6) -> int:
+    print(c[idx + 1] + f"Initiated makerandom({idx}).")
+    i = random.randint(0, 10)
+    while i <= threshold:
+        print(c[idx + 1] + f"makerandom({idx}) == {i} too low; retrying.")
+        await asyncio.sleep(idx + 1)
+        i = random.randint(0, 10)
+    print(c[idx + 1] + f"---> Finished: makerandom({idx}) == {i}" + c[0])
+    return i
+
+async def asyncRandom():
+    res = await asyncio.gather(*(makerandom(i, 10 - i - 1) for i in range(3)))
+    return res
+
+random.seed(444)
+r1, r2, r3 = asyncio.run(asyncRandom())
+print()
+print(f"r1: {r1}, r2: {r2}, r3: {r3}")
+
+#
+# Chaining async calls
+#
+
+async def part1(n: int) -> str:
+    i = random.randint(0, 10)
+    print(f"part1({n}) sleeping for {i} seconds.")
+    await asyncio.sleep(i)
+    result = f"result{n}-1"
+    print(f"Returning part1({n}) == {result}.")
+    return result
+
+async def part2(n: int, arg: str) -> str:
+    i = random.randint(0, 10)
+    print(f"part2{n, arg} sleeping for {i} seconds.")
+    await asyncio.sleep(i)
+    result = f"result{n}-2 derived from {arg}"
+    print(f"Returning part2{n, arg} == {result}.")
+    return result
+
+async def chain(n: int) -> None:
+    start = time.perf_counter()
+    p1 = await part1(n)
+    p2 = await part2(n, p1)
+    end = time.perf_counter() - start
+    print(f"-->Chained result{n} => {p2} (took {end:0.2f} seconds).")
+
+async def asyncChain(*args):
+    await asyncio.gather(*(chain(n) for n in args))
+
+random.seed(444)
+args = [9, 6, 3]
+start = time.perf_counter()
+asyncio.run(asyncChain(*args))
+end = time.perf_counter() - start
+print(f"async chain finished in {end:0.2f} seconds.")
+
+
 
 
 
