@@ -1,0 +1,132 @@
+Creating a Consul Cluster with Docker on Multiple Machines
+
+---
+Abstract
+---
+
+Consul supports running a cluster of nodes, with each node running on a different "computer". But when you run Consul via Docker, the Consul's "computer" is just the Docker container, which creates a bridge in which the containers are behind a NAT server.
+You can easily create a cluster of Consul nodes, all running in Docker containers on the same machine.
+The challenge here is creating the Consul cluster when you have at least one member running in a Docker container on a different physical machine. This means you must find a way for the packets from the two Docker networks to reach both networks.
+
+Last update: 2017-12-07
+
+
+---
+Overview
+---
+
+I succeeded to create a working Consul cluster with three Docker containers running on two physical machines. One machine was running a Consul server and client, the other one was running another Consul client and my two test components.
+
+I also connected my two test components to this cluster via Docker. These components are:
+- boatdirectory, which exposes a simple REST API returning a couple of boat names
+- boatdirectory-client, which looks up the boatdirectory service via Spring Consul and maps it to its own ("client") REST API. This also has a simple Angular UI that makes requests to the client REST API and displays the boat names in a list
+
+However, there are issues with having the Consul ran this way, because while two members use the public IPs of the machines, the third one uses the Docker internal IP, which confuses the test components.
+
+
+---
+Setup
+---
+
+1) Machine 1: Mac-mini Late 2012, i5 processor 2.5Ghz. Docker was installed natively.
+
+2) Machine 2: MacBook Pro Mid 2009, Intel Core 2 Duo with no virtualization capabilities. Docker was installed with docker-machine using Virtual Box.
+
+3) A router that connects both Macs.
+
+
+---
+Configuration
+---
+
+On Machine 1, I started two Consul instances:
+
+1) The Consul server in development mode with this configuration:
+- in Docker, explicitly map IP, TCP, and UDP on Serf ports
+- in Consul, use -advertise with the public IP of the machine and -client and -bind with 0.0.0.0 
+
+2) A Consul client in development mode with similar configuration, except that I used the Docker IP of the Consul server (no public IP).
+
+On Machine 2, I started the following:
+
+1) A Consul client in development mode with this configuration:
+- the same as on Machine 1
+- in Virtual Box, forward the Serf ports to the public IP of the machine (because docker-machine was running behind Virtual Box's NAT)
+
+2) My test components, via Docker.
+
+
+---
+Commands
+---
+
+Server (public IP 192.168.100.11, explicitly map TCP and UDP on Serf ports):
+
+docker container prune -f && docker run -d --name=dev-consul -p 192.168.100.11:8300:8300/tcp -p 192.168.100.11:8301:8301/tcp -p 192.168.100.11:8301:8301/udp -p 192.168.100.11:8302:8302/tcp -p 192.168.100.11:8302:8302/udp -p 8400:8400 -p8500:8500 -p 8600:8600/udp consul agent -dev -server -client=0.0.0.0 -bind=0.0.0.0 -advertise=192.168.100.11 && docker logs dev-consul --follow
+
+Client (public IP 192.168.100.9, explicitly map TCP and UDP on Serf ports):
+
+docker container prune -f && docker run -d --name=dev-consul -p 0.0.0.0:8300:8300/tcp -p 0.0.0.0:8301:8301/tcp -p 0.0.0.0:8301:8301/udp -p 0.0.0.0:8302:8302/tcp -p 0.0.0.0:8302:8302/udp -p 8400:8400 -p8500:8500 -p 8600:8600/udp consul agent -dev -client=0.0.0.0 -bind=0.0.0.0 -advertise 192.168.100.9 -join 192.168.100.11 && docker logs dev-consul --follow
+
+Second Client, on the same machine as the Server (use Docker IPs):
+
+docker container prune -f && docker run -d --name=dev-consul-1 -p 0.0.0.0:8300:8300/tcp -p 0.0.0.0:8301:8301/tcp -p 0.0.0.0:8301:8301/udp -p 0.0.0.0:8302:8302/tcp -p 0.0.0.0:8302:8302/udp -p 8401:8400 -p8501:8500 -p 8601:8600/udp consul agent -dev -client=0.0.0.0 -bind=0.0.0.0  -join 172.17.0.2 && docker logs dev-consul-1 --follow
+
+Start boatdirectory:
+
+docker container prune -f && docker run -d --name boatdirectory -p 8770:8770 boatdirectory:0.1 && docker logs boatdirectory --follow
+
+Start boatdirectory-client:
+
+docker container prune -f && docker run -d --name boatdirectory-client -p 8080:8080 boatdirectory-client:0.1 && docker logs boatdirectory-client --follow
+
+
+---
+Results
+---
+
+The Consul cluster went up.
+The test components connected and functioned properly, except the issues below.
+
+
+---
+Issues
+---
+
+A) With this configuration, the cluster works but keeps changing its leader because of latencies of keep-alives: I see "cluster leadership lost/acquired" messages - apparently the cluster keeps changing its leader, because the server "Failed to contact 48049e16-0eaf-a56f-69d1-a002754daa92 in 251.266375ms".
+
+Since my network is pretty fast, I think this is caused by the slowness of Machine 2.
+
+B) There are issues with having the Consul ran this way, because while two members use the public IPs of the machines, the third one uses the Docker internal IP. And at some point my test components started to want to communicate with the third Consul member, whose IP is a Docker internal one, and they fail:
+"failed to get conn: dial tcp <nil>->172.17.0.3:8300"
+
+172.17.0.3 is precisely the Docker IP of Consul member #2, from Machine 1.
+
+I'm not sure how to fix this. Initially I tried using the public IP for member #2, too, but Consul got confused with having two members with the same IP.
+
+C) Access to boatdirectory-client from the UI is very slow when running the component via Docker
+
+
+---
+TODOs
+---
+
+1) Solve issue B
+Ideas:
+- Try is to interconnect the two Docker LANs that exist on each machine - this way everybody will be using Docker IPs. It will need investigation
+- I don't see other option right now; interconnecting the networks should also be compatible with Docker Swarm
+
+2) Solve issue A
+Ideas:
+- Use more powerful machines or Linux machines where Docker is more "native"
+
+3) Find a root cause for issue C
+
+4) Test from a Docker Swarm, depends on #1
+
+5) Install both Consul and the test Docker components in at least two EC2 instances
+
+6) Start a Consul cluster in production mode
+
+7) Connect a Core component to Consul. E.g.: InfiniteVisitor
+

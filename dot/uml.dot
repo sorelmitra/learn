@@ -1,0 +1,38 @@
+digraph "Class Diagram" {
+	nodesep=4;
+	ranksep=4;
+	ordering=out;
+	splines=spline;
+
+	subgraph one {
+		label="A Class Diagram";
+		// labelloc=t;
+
+		// <GRAPHER>
+		//   <GRAPHER-CLASS>
+		node [shape=record, style=filled, fillcolor="lightyellow"];
+		// From SourceFileName
+		"Class.name" [label="{Class.name\l|Class.vars\l|Class.funcs\l}"];
+		//   </GRAPHER-CLASS>
+
+		//   <GRAPHER-EXTENDS>
+		edge [dir=back, arrowtail=empty, headport=n, style=filled];
+		// From SourceFileName
+		"Class_Extended.name" -> "Class.name";
+		//   </GRAPHER-EXTENDS>
+
+		//   <GRAPHER-REALIZES>
+		edge [dir=back, arrowtail=empty, headport=n, style=dotted];
+		// From SourceFileName
+		"Interface_Realized.name" -> "Class.name";
+		//   </GRAPHER-REALIZES>
+
+		//   <GRAPHER-ASSOC>
+		edge [dir=normal, arrowtail=vee, decorate="true", style=filled];
+		// From SourceFileName
+		"Class.name" -> "Association.target.name" [label="Association.name"];
+		//   </GRAPHER-ASSOC>
+		// </GRAPHER>
+	}
+}
+

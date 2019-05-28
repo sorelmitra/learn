@@ -1,0 +1,53 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BuildConfig	gen/sorel/android/BuildConfig.java	/^public final class BuildConfig {$/;"	c
+COORDS_PER_VERTEX	src/sorel/android/Triangle.java	/^    static final int COORDS_PER_VERTEX = 3;$/;"	f	class:Triangle
+DEBUG	gen/sorel/android/BuildConfig.java	/^    public final static boolean DEBUG = true;$/;"	f	class:BuildConfig
+DemoGLRenderer	src/sorel/android/DemoGLRenderer.java	/^public class DemoGLRenderer implements GLSurfaceView.Renderer {$/;"	c
+DemoGLSurfaceView	src/sorel/android/DemoGLSurfaceView.java	/^    public DemoGLSurfaceView(Context context) {$/;"	m	class:DemoGLSurfaceView
+DemoGLSurfaceView	src/sorel/android/DemoGLSurfaceView.java	/^class DemoGLSurfaceView extends GLSurfaceView {$/;"	c
+OpenGLActivity	src/sorel/android/OpenGLActivity.java	/^public class OpenGLActivity extends Activity$/;"	c
+OpenGLDrawActivity	src/sorel/android/OpenGLDrawActivity.java	/^public class OpenGLDrawActivity extends Activity$/;"	c
+R	gen/sorel/android/R.java	/^public final class R {$/;"	c
+ShaderUtils	src/sorel/android/ShaderUtils.java	/^public class ShaderUtils {$/;"	c
+Triangle	src/sorel/android/Triangle.java	/^    public Triangle() {$/;"	m	class:Triangle
+Triangle	src/sorel/android/Triangle.java	/^public class Triangle {$/;"	c
+app_name	gen/sorel/android/R.java	/^        public static final int app_name=0x7f040000;$/;"	f	class:R.string
+attr	gen/sorel/android/R.java	/^    public static final class attr {$/;"	c	class:R
+button_triangle	gen/sorel/android/R.java	/^        public static final int button_triangle=0x7f040002;$/;"	f	class:R.string
+button_triangle	gen/sorel/android/R.java	/^        public static final int button_triangle=0x7f050000;$/;"	f	class:R.id
+color	src/sorel/android/Triangle.java	/^    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };$/;"	f	class:Triangle
+draw	src/sorel/android/Triangle.java	/^    public void draw() {$/;"	m	class:Triangle
+drawTriangle	src/sorel/android/OpenGLActivity.java	/^    public void drawTriangle(View view)$/;"	m	class:OpenGLActivity
+draw_activity_name	gen/sorel/android/R.java	/^        public static final int draw_activity_name=0x7f040001;$/;"	f	class:R.string
+drawable	gen/sorel/android/R.java	/^    public static final class drawable {$/;"	c	class:R
+fragmentShaderCode	src/sorel/android/Triangle.java	/^    private final String fragmentShaderCode =$/;"	f	class:Triangle	file:
+glProgram	src/sorel/android/Triangle.java	/^    private int glProgram;$/;"	f	class:Triangle	file:
+glView	src/sorel/android/OpenGLDrawActivity.java	/^    private GLSurfaceView glView;$/;"	f	class:OpenGLDrawActivity	file:
+ic_launcher	gen/sorel/android/R.java	/^        public static final int ic_launcher=0x7f020000;$/;"	f	class:R.drawable
+id	gen/sorel/android/R.java	/^    public static final class id {$/;"	c	class:R
+layout	gen/sorel/android/R.java	/^    public static final class layout {$/;"	c	class:R
+loadShader	src/sorel/android/ShaderUtils.java	/^	public static int loadShader(int type, String shaderCode){$/;"	m	class:ShaderUtils
+main	gen/sorel/android/R.java	/^        public static final int main=0x7f030000;$/;"	f	class:R.layout
+onCreate	src/sorel/android/OpenGLActivity.java	/^    public void onCreate(Bundle savedInstanceState)$/;"	m	class:OpenGLActivity
+onCreate	src/sorel/android/OpenGLDrawActivity.java	/^    public void onCreate(Bundle savedInstanceState)$/;"	m	class:OpenGLDrawActivity
+onDrawFrame	src/sorel/android/DemoGLRenderer.java	/^    public void onDrawFrame(GL10 unused) {$/;"	m	class:DemoGLRenderer
+onSurfaceChanged	src/sorel/android/DemoGLRenderer.java	/^    public void onSurfaceChanged(GL10 unused, int width, int height) {$/;"	m	class:DemoGLRenderer
+onSurfaceCreated	src/sorel/android/DemoGLRenderer.java	/^    public void onSurfaceCreated(GL10 unused, EGLConfig config) {$/;"	m	class:DemoGLRenderer
+sorel.android	gen/sorel/android/BuildConfig.java	/^package sorel.android;$/;"	p
+sorel.android	gen/sorel/android/R.java	/^package sorel.android;$/;"	p
+sorel.android	src/sorel/android/DemoGLRenderer.java	/^package sorel.android;$/;"	p
+sorel.android	src/sorel/android/DemoGLSurfaceView.java	/^package sorel.android;$/;"	p
+sorel.android	src/sorel/android/OpenGLActivity.java	/^package sorel.android;$/;"	p
+sorel.android	src/sorel/android/OpenGLDrawActivity.java	/^package sorel.android;$/;"	p
+sorel.android	src/sorel/android/ShaderUtils.java	/^package sorel.android;$/;"	p
+sorel.android	src/sorel/android/Triangle.java	/^package sorel.android;$/;"	p
+string	gen/sorel/android/R.java	/^    public static final class string {$/;"	c	class:R
+triangle	src/sorel/android/DemoGLRenderer.java	/^    private Triangle triangle;$/;"	f	class:DemoGLRenderer	file:
+triangleCoords	src/sorel/android/Triangle.java	/^    static float triangleCoords[] = { \/\/ in counterclockwise order:$/;"	f	class:Triangle
+vertexBuffer	src/sorel/android/Triangle.java	/^    private FloatBuffer vertexBuffer;$/;"	f	class:Triangle	file:
+vertexShaderCode	src/sorel/android/Triangle.java	/^    private final String vertexShaderCode =$/;"	f	class:Triangle	file:

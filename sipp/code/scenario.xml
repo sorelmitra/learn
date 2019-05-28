@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<scenario name="_s01" timeout="3600000">
+
+  <pause milliseconds="300"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: pause_before_reg=300 ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <label id="1"/>
+  <send retrans="500">
+      <![CDATA[
+      REGISTER sip:[remote_ip] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: [field0]<sip:[field0]@[field1]:[local_port]>;tag=[call_number]
+      To: [field0]<sip:[field0]@[field1]:[remote_port]>
+      Call-ID: [call_id] 
+      CSeq: 1 REGISTER
+      Contact: sip:[field0]@[local_ip]:[local_port]
+      Content-Length: 0
+      Expires: 3600
+    ]]>
+  </send>
+
+  <!-- The previous REGISTER fails because the username/password are not supplied -->
+  <recv response="401" auth="true" timeout="10000" ontimeout="1">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: UNAUTHORIZED REGISTER 1 From:[field0]@[local_ip] TO:[field3]@[field1] OK.' >>scenario.log"/>
+    </action>
+  </recv>
+
+  <label id="2"/>
+  <send retrans="500">
+      <![CDATA[
+      REGISTER sip:[remote_ip] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: [field0]<sip:[field0]@[field1]:[local_port]>;tag=[call_number]
+      To: [field0]<sip:[field0]@[field1]:[remote_port]>
+      Call-ID: [call_id] 
+      CSeq: 2 REGISTER
+      Contact: sip:[field0]@[local_ip]:[local_port]
+      [field2]
+      Content-Length: 0
+      Expires: 3600
+    ]]>
+  </send>
+
+  <recv response="200" timeout="10000" ontimeout="1">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: REGISTER 2 From:[field0]@[local_ip] TO:[field3]@[field1] OK.' >>scenario.log"/>
+    </action>
+  </recv>
+
+  <pause milliseconds="400"/>
+
+  <ResponseTimeRepartition value="10, 20, 30, 40, 50, 100, 150, 200"/>
+  <CallLengthRepartition value="10, 50, 100, 500, 1000, 5000, 10000"/>
+
+  <label id="3"/>
+  <!-- Content-Type: application/sdp means Session Description Protocol (RFC 4566) -->
+  <send>
+    <![CDATA[
+
+      INVITE sip:[field3]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: [field0]<sip:[field0]@[local_ip]:[local_port]>;tag=[call_number]
+      To: Calee<sip:[field3]@[field1]:[remote_port]>
+      Call-ID: [call_id]
+      CSeq: [cseq] INVITE
+      Contact: <sip:[field0]@[local_ip]:[local_port]>
+      Max-Forwards: 70
+      Subject: Performance Test
+      Content-Type: application/sdp
+      Content-Length: [len]
+
+      v=0
+      o=user1 53655765 2353687637 IN IP[local_ip_type] [local_ip]
+      s=-
+      c=IN IP[media_ip_type] [media_ip]
+      t=0 0
+      m=audio [media_port] RTP/AVP 8 0 18
+      a=rtpmap:8 PCMA/8000
+      a=rtpmap:0 PCMU/8000
+      a=rtpmap:18 G729/8000
+      a=fmtp:18 annexb=no
+
+    ]]>
+  </send>
+
+  <recv response="100" optional="true"/>
+  <recv response="181" optional="true"/>
+  <recv response="180" optional="true"/>
+  <recv response="183" optional="true"/>
+
+  <!-- By adding rrs="true" (Record Route Sets), the route sets         -->
+  <!-- are saved and used for following messages sent. Useful to test   -->
+  <!-- against stateful SIP proxies/B2BUAs.                             -->
+  <recv response="200" rtd="true" timeout="10000" ontimeout="3">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: INVITE [cseq] From:[field0]@[local_ip] TO:[field3]@[field1] OK.' >>scenario.log"/>
+    </action>
+  </recv>
+
+  <label id="4"/>
+  <!-- Packet loss can be simulated in any send/recv message by by adding the 'lost="10"'. Value can be [1-100] percent. -->
+  <send>
+    <![CDATA[
+
+      ACK sip:[field3]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: <sip:[field0]@[field1]:[local_port]>;tag=[call_number]
+      To: Callee<sip:[field3]@[remote_ip]:[remote_port]>[peer_tag_param]
+      Call-ID: [call_id]
+      CSeq: [cseq] ACK
+      Contact: <sip:[field0]@[local_ip]:[local_port]>
+      Max-Forwards: 70
+      Subject: Performance Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+  <pause milliseconds="15900"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: ACK [cseq] sent and MYSIPP pause_after_ack=900 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- Most of the pauses below are to expect the various announcements and tones from the other party, in this case the voice mail robot -->
+
+  <!-- expect announcement: wait default 500 miliseconds -->
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(any)=500 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect swav: wait default 166 miliseconds -->
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_swav(any)=166 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+  <pause milliseconds="166"/>
+
+  <!-- expect announcement: wait default 500 miliseconds -->
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(688)=500 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect swav: wait default 166 miliseconds -->
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_swav(any)=166 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+  <pause milliseconds="166"/>
+
+  <!-- expect announcement: wait default 500 miliseconds -->
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(1146)=500 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect swav: wait default 166 miliseconds -->
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_swav(any)=166 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+  <pause milliseconds="166"/>
+
+  <!-- Play an out of band pcap: ../pcap/g711a_8sec.pcap -->
+  <nop>
+    <action>
+      <exec play_pcap_audio="../pcap/g711a_8sec.pcap"/>
+      <!--
+      <exec rtp_stream="/opt/vmpro/Wavs/en/mnu_6.wav"/>
+      -->
+      <exec command="echo '[timestamp] MYSIPP:   pcap=../pcap/g711a_8sec.pcap=started.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <nop>
+    <action>
+      <assignstr assign_to="1" value="[field4]" />
+      <!-- Converts the string value in 1 to a double-precision value stored in 2. -->
+      <todouble assign_to="2" variable="1" />
+      <exec command="echo '[timestamp] MYSIPP:   delay=[field4] ms started.' >>scenario.log"/>
+    </action>
+  </nop>
+  <pause variable="2"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   delay=[field4] ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <pause milliseconds="400"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_before_dtmf=400 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- Dial [field5] digit '#' -->
+  <send retrans="500">
+    <![CDATA[
+      
+      INFO sip:[remote_ip]:[remote_port];[transport] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: sipp <sip:[field0]@[field1]>;tag=[call_number]
+      [last_To:]
+      Call-ID: [call_id]
+      CSeq: [cseq] INFO
+      Contact: sip:[field0]@[local_ip]:[local_port]
+      Max-Forwards: 10
+      Content-Type: application/dtmf-relay
+      Content-Length: [len]
+      
+      Signal=[field5]
+      Duration=300
+    ]]>  
+  </send>  
+
+  <recv response="200" timeout="10000">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: INFO/dtmf [cseq] MYSIPP dtmf=[field5] sent.' >>scenario.log"/>
+    </action>
+  </recv>
+  <pause milliseconds="450"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_dtmf=450 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect announcement: wait default 500 miliseconds -->
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(519)=500 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect announcement: wait default 250 miliseconds -->
+  <pause milliseconds="83"/>
+  <pause milliseconds="83"/>
+  <pause milliseconds="83"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(518)=250 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect announcement: wait default 125 miliseconds -->
+  <pause milliseconds="41"/>
+  <pause milliseconds="41"/>
+  <pause milliseconds="41"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(340)=125 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <pause milliseconds="400"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_before_dtmf=400 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- Dial [field6] digit '#' -->
+  <send retrans="500">
+    <![CDATA[
+      
+      INFO sip:[remote_ip]:[remote_port];[transport] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: sipp <sip:[field0]@[field1]>;tag=[call_number]
+      [last_To:]
+      Call-ID: [call_id]
+      CSeq: [cseq] INFO
+      Contact: sip:[field0]@[local_ip]:[local_port]
+      Max-Forwards: 10
+      Content-Type: application/dtmf-relay
+      Content-Length: [len]
+      
+      Signal=[field6]
+      Duration=300
+    ]]>  
+  </send>  
+
+  <recv response="200" timeout="10000">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: INFO/dtmf [cseq] MYSIPP dtmf=[field6] sent.' >>scenario.log"/>
+    </action>
+  </recv>
+  <pause milliseconds="450"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_dtmf=450 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <!-- expect announcement: wait default 500 miliseconds -->
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <pause milliseconds="166"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_after_announcement(any)=500 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+
+  <pause milliseconds="300"/>
+  <pause milliseconds="300"/>
+  <pause milliseconds="300"/>
+  <nop>
+    <action>
+      <exec command="echo '[timestamp] MYSIPP:   pause_before_bye=900 ms ended.' >>scenario.log"/>
+    </action>
+  </nop>
+  <label id="96"/>
+  <send>
+    <![CDATA[
+
+      BYE sip:[field3]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: <sip:[field0]@[field1]:[local_port]>;tag=[call_number]
+      To: Calee<sip:[field3]@[remote_ip]:[remote_port]>[peer_tag_param]
+      Call-ID: [call_id]
+      CSeq: 96 BYE
+      Contact: <sip:sipp@[local_ip]:[local_port]>
+      Max-Forwards: 70
+      Subject: Performance Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+
+  <!-- The 'crlf' option inserts a blank line in the statistics report. -->
+  <recv response="200" crlf="true" timeout="10000" next="99">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: BYE 96 From:[field0]@[local_ip] TO:[field3]@[field1] OK.' >>scenario.log"/>
+    </action>
+  </recv>
+
+  <label id="97"/>
+  <send>
+    <![CDATA[
+
+      BYE sip:[field3]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: <sip:[field0]@[field1]:[local_port]>;tag=[call_number]
+      To: Calee<sip:[field3]@[remote_ip]:[remote_port]>[peer_tag_param]
+      Call-ID: [call_id]
+      CSeq: 97 BYE
+      Contact: <sip:sipp@[local_ip]:[local_port]>
+      Max-Forwards: 70
+      Subject: Performance Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+
+  <!-- The 'crlf' option inserts a blank line in the statistics report. -->
+  <recv response="200" crlf="true" timeout="10000" ontimeout="97">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: BYE 97 From:[field0]@[local_ip] TO:[field3]@[field1] OK.' >>scenario.log"/>
+    </action>
+  </recv>
+
+  <label id="98"/>
+  <send retrans="500">
+      <![CDATA[
+      REGISTER sip:[remote_ip] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: [field0]<sip:[field0]@[field1]:[local_port]>;tag=[call_number]
+      To: [field0]<sip:[field0]@[field1]:[remote_port]>
+      Call-ID: [call_id] 
+      CSeq: 98 REGISTER
+      Contact: sip:[field0]@[local_ip]:[local_port]
+      Content-Length: 0
+      Expires: 0
+    ]]>
+  </send>
+
+<recv response="200" timeout="10000" ontimeout="98" next="1">
+    <action>
+      <exec command="echo '[timestamp] MYSIPP: DEREGISTER 98 From:[field0]@[local_ip] TO:[field3]@[field1] OK.' >>scenario.log"/>
+    </action>
+  </recv>
+
+  <label id="99"/>
+
+  <!-- definition of the response time repartition table (unit is ms)   -->
+  <ResponseTimeRepartition value="10, 20, 30, 40, 50, 100, 150, 200"/>
+
+  <!-- definition of the call length repartition table (unit is ms)     -->
+  <CallLengthRepartition value="10, 50, 100, 500, 1000, 5000, 10000"/>
+
+</scenario>
+

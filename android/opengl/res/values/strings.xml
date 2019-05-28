@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sorel\'s OpenGL Demo</string>
+    <string name="draw_activity_name">OpenGL Triangle</string>
+    <string name="button_triangle">Triangle</string>
+</resources>

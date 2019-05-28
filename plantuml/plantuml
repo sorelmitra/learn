@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export GRAPHVIZ_DOT=/usr/local/bin/dot
+java -jar /usr/local/bin/plantuml.jar $*

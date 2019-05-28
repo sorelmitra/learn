@@ -1,0 +1,23 @@
+@startuml
+left to right direction
+
+actor Caller
+actor Agent
+
+usecase call as "Phone Call"
+usecase reconnect as "Re-connect to iLoc8"
+usecase update as "Receive Event Updates"
+usecase adashb as "Agent Dashboard"
+
+reconnect .> update
+update .> adashb
+
+Caller -- call
+call -- Agent
+
+reconnect <-- Agent
+update <-- Agent
+
+adashb -- Agent: use
+
+@enduml

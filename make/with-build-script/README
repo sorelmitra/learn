@@ -1,0 +1,6 @@
+This contains a sample Makefile along with compilable sources, as long as you have Google Protocol Buffers installed.
+
+Read the Makefile for further information.
+
+You can run ./bb if you want to avoid cd-ing to build directory.
+

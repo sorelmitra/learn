@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package messages;
+
+message ScanFilesList {
+	repeated string fileNames = 1;
+}
+
+message ScanFileData {
+	string fileName = 1;
+	int32 bufferNr = 2;
+	int32 offset = 3;
+}
+
+message ScanFileRequest {
+	ScanFileData scanFileData = 1;
+	int32 length = 2;
+}
+
+message ScanFileBuffer {
+	ScanFileData scanFileData = 1;
+	bytes buffer = 2;
+}
+
+message DetectionResult {
+	bool infected = 1;
+	int32 offset = 2;
+	string pluginName = 3;
+}
+
+message DetectionResultsList {
+	string fileName = 1;
+	repeated DetectionResult detectionResult = 2;
+}

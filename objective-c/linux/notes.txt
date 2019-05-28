@@ -1,0 +1,38 @@
+---
+2014-01-23:
+---
+
+We can get an idea of how Cocoa works from on-line sources, but to really understand the framework we may need to buy books (e.g. the autorelease feature is badly explained in the Appled doc; the wikibook above explains it somewhat cleaner, but not enough).
+
+---
+2014-02-13:
+---
+
+Apple online documentation is poor.
+
+---
+
+Retained Property
+
+I tried to find what is a "retained" property.
+Up so far I only found a document describing the "declared property" syntax, that states: "Refer to the document that definitively describes property lists for descriptions of these attributes."
+
+In the end I've found a page: http://calvinx.com/2012/06/16/property-attributes-in-objective-c/ that explains some properties on its own, without reference to Apple official docs. It says <<“retain” is needed when the attribute is a pointer to an object [...] release the object when you are finished with it>>
+
+Looking at related questions on stackoverflow, it results that this is the state with Apple documentation - people would point to pages from Apple docs, but those pages dissappear sometimes.
+
+---
+2014-02-18:
+---
+
+What is required in order to become a MacOS developer - how do you learn this?
+
+There exists a Mac Developer Program, which offers:
+- Ability to sell via App Store
+- 2 Technical Support Incidents per year
+- Access to member-only developer forums
+
+The program costs $99/year and it does not offer more documentation than the freely available one.
+
+So to do Objective-C/Cocoa development, you need to learn from books and from the online (poor) documentation.
+

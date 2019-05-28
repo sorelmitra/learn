@@ -1,0 +1,996 @@
+\documentclass{article}
+
+% XeTeX - for Unicode and TTF
+\usepackage{fontspec}
+\setmainfont[Ligatures=TeX]{Arial}
+
+% For loading images
+\usepackage{graphicx}
+
+% Page Left Margin
+%\addtolength{\hoffset}{-2cm}
+% Text Width (and implicitly, Right Margin)
+%\addtolength{\textwidth}{+4cm}
+
+% Clickable TOC and references
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+    citecolor=magenta,
+    filecolor=brown,
+    linkcolor=blue,
+    urlcolor=brown
+}
+
+% Make \paragraph a 4-th section, although it will not appear in TOC
+\usepackage{titlesec}
+\setcounter{secnumdepth}{4}
+\titleformat{\paragraph}{\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+% Count \subparagraph, but without outline numbering
+% Used for references to sub-paragraphs: You have to count the subparagraph (thus, don't put an *), and add a label after it. Then you can reference that label, and it will produce the number of the subparagraph. When you want normal subparagraph without counter, add the *, but you won't be able to reference it
+\usepackage{chngcntr}
+\setcounter{secnumdepth}{5}
+\counterwithout{subparagraph}{paragraph}
+
+\renewcommand\thesubsection{\thesection.\arabic{subsection}}
+
+\usepackage{longtable}
+
+% For easy calculations
+\usepackage{calc}
+
+% For coloring text
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+
+\title{iLoc8 High Level Design \\ \large version 0.5 draft}
+\author{Sorel Mitra}
+\date{\today}
+
+% Custom bullets
+\usepackage{bbding}
+\usepackage{pifont}
+\usepackage{enumitem}
+
+% Macros
+\def\tbd #1 {\textbf{\color{red} TBD:} #1}
+
+\begin{document}
+
+	\maketitle
+	
+	\section*{Referenced Documents}
+	
+	\subparagraph{} Avaya-iLoc8-Roadmap-SAAED-2016-11-08.pptx \label{doc:roadmap}
+	\subparagraph{} iLoc8\_Package\_SRS\_vX10.doc \label{doc:srs}
+	\subparagraph{} EPT - iLoc8 Design Architecture – v7.pptx \label{doc:design_original}
+	\subparagraph{} EPT - Englebart- v1.pptx \label{doc:design_engelbart}
+	
+	\section*{History}
+	\begin{longtable}[l]{ | l | l | p{0.7\textwidth} |}
+		\hline
+		\textbf{Date} & \textbf{Version} & \textbf{Changes} \\ \hline
+		\endhead
+		2016-10-20 & 0.1 & Created. Added General Architecture, Overview. \\ \hline
+		2016-10-24 & 0.2 & Added Server Application. \\ \hline
+		2016-11-11 & 0.3 & Re-started. Added use cases, Product description. \\ \hline
+		2016-11-15 & 0.4 & Added Architecture. Enhanced use cases. Added All Components. Added sections for Security, HA, Scalability\\ \hline
+		2016-10-16 & 0.5 & Added Session Sharing mechanisms. Enhanced HA section. \\ \hline
+	\end{longtable}
+	
+	\newpage
+	
+	\tableofcontents
+	
+	\newpage
+	
+	\section{Introduction}
+
+	A citizen, denoted here as the Caller, has a phone audio discussion with the Agent. The phone discussion takes place outside of iLoc8. After mutual agreement, discussion is upgraded to have a data and video channels. iLoc8 starts after this upgrade (see Figure \ref{fig:usecase_general}), and offers the following features:
+	
+	\begin{itemize}
+		\item Data channel with:
+		\begin{itemize}
+			\item Automatic upload of Caller's location, language, and device battery percentage
+			\item Manual upload of photos, videos, and Caller's address
+			\item Negotiating and managing the Video channel
+			\item Text Chat
+		\end{itemize}
+		\item Video channel for a video conversation
+		\item Storage for:
+		\begin{itemize}
+				\item Files
+				\item Events
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{figure}[htbp]
+		\hspace{2cm}
+		\includegraphics[width=\textwidth - 2cm]{usecase_general}
+		\caption{The iLoc8 Solution}
+		\label{fig:usecase_general}
+	\end{figure}
+    
+	This document provides a high level view of the iLoc8 Solution:
+	\begin{itemize}
+		\item Use Cases
+		\item Technical Solution
+		\item Phases
+	\end{itemize}
+	
+	\textbf{Note on Phases}: In [\ref{doc:roadmap}], there are a few phases outlined. This document all phases, unless specifically stated otherwise. Whenever the high-level design is different between phases, this is clearly specified.
+
+	\section{Use Cases}
+
+	\subsection{Start iLoc8}
+	
+	The Agent initiates iLoc8 from his computer. The Caller starts iLoc8 Dashboard by clicking on the SMS he receives.
+	
+	\begin{figure}[htbp]
+		\hspace{2cm}
+		\includegraphics[width=\textwidth - 2cm]{usecase_start}
+		\caption{Start iLoc8}
+		\label{fig:usecase_start}
+	\end{figure}
+
+	\newpage
+	
+	\subsection{iLoc8 Features}
+	
+	Main features of iLoc8.
+	
+	\begin{figure}[htbp]
+		\hspace{1.5cm}
+		\includegraphics[width=\textwidth - 1.5cm]{usecase_features}
+		\caption{Use iLoc8}
+		\label{fig:usecase_features}
+	\end{figure}
+
+	\newpage
+	
+	\subsection{Agent Comes Back}
+	
+	Agent comes back after a failure of his dashboard.
+	
+	\begin{figure}[htbp]
+		\hspace{2cm}
+		\includegraphics[width=\textwidth - 2cm]{usecase_agent_back}
+		\caption{Use iLoc8}
+		\label{fig:usecase_agent_back}
+	\end{figure}
+
+	\newpage
+	
+	\subsection{Agent Transfer}
+	
+	Agent transfers iLoc8 session to another Agent. (Phone call transfer is not shown.)
+	
+	\begin{figure}[htbp]
+		\hspace{2.5cm}
+		\includegraphics[width=\textwidth - 2.5cm]{usecase_agent_transfer}
+		\caption{Use iLoc8}
+		\label{fig:usecase_agent_transfer}
+	\end{figure}
+
+	\newpage
+
+	\section{Product}
+	
+	\subsection{Overview}
+	
+	The iLoc8 Product consists of three components: A Server and two Clients: Caller and Agent.
+
+	The Server consists of:
+	\begin{itemize}
+		\item Physical Deployment
+		\item Supporting Software
+		\item Server Application
+	\end{itemize}
+
+	The Caller consists of an application that runs on the citizen's smart phone, and which connects to the Server. The application can be:
+	\begin{itemize}
+		\item JavaScript-based, running in a browser
+		\item Native, for Android and iOS
+	\end{itemize}
+	
+	The Agent consists of an application that runs on the agent's computer, and which connects to the Server. The application can be:
+	\begin{itemize}
+		\item JavaScript-based, running in the Chrome browser
+		\item C\#-based, running in Interaction Center
+	\end{itemize}
+
+	\subsection{Server}
+	
+	\subsubsection{Physical Deployment}
+	
+	\subparagraph*{Phase 1}
+	
+	The Physical Deployment consists of:
+	\begin{itemize}
+		\item The iLoc8 Hardware: VMWare ESXi virtualization server
+		\item Customer Hardware for File and Event Storage
+		\item A network infrastructure provided and configured by the Customer, for connecting the iLoc8 and Customer Hardware
+		\item Reverse Proxy Hardware
+		\item Documentation on how to configure the iLoc8 and Reverse Proxy Hardware
+	\end{itemize}
+
+	\subparagraph*{Phase 2}
+	
+	The same as Phase 1
+
+	\subparagraph*{Phase 3}
+	
+	\textbf{\color{red} TBD}: HA might require changes to Physical Deployment
+
+	\subsubsection{Supporting Software}
+	
+	\subparagraph*{Phase 1}
+	
+	The Supporting Software is:
+	\begin{itemize}
+		\item A single Avaya Breeze node installed in the iLoc8 HW, for running the Server Components
+		\item Avaya SBC, installed in the Reverse Proxy HW
+		\item Customer's Web API and Software for File and Event Storage, installed in Customer's HW
+		\item Documentation on how to configure the Avaya Supporting Software
+	\end{itemize}
+	
+	\subparagraph*{Phase 2}
+	
+	The same as Phase 1
+
+	\subparagraph*{Phase 3}
+	
+	\textbf{\color{red} TBD}: HA might require changes to Supporting Software
+
+	\subsubsection{Server Application}
+
+	\subparagraph*{Phase 1}
+	
+	The Server Application consists of:
+	\begin{itemize}
+		\item Server Components, running on the Supporting Software
+		\item A Server API for the Caller
+		\item A Server API for the Agent
+		\item Documentation on how to:
+		\begin{itemize}
+			\item Install the Server Components
+			\item Use the API
+		\end{itemize}
+	\end{itemize}
+
+	\subparagraph*{Phase 2}
+	
+	The same as Phase 1
+
+	\subparagraph*{Phase 3}
+	
+	The same as Phase 2
+
+	\subsection{Caller}
+	
+	\subparagraph*{Phase 1}
+	
+	The Caller consists of:
+	\begin{itemize}
+		\item A Caller SDK that:
+		\begin{itemize}
+			\item Uses the Server API
+			\item Allows for implementation of a Caller Application
+		\end{itemize}
+		\item The Caller Application, developed over the Caller SDK
+	\end{itemize}
+
+	\subparagraph*{Phase 2}
+	
+	The same as Phase 1
+
+	\subparagraph*{Phase 3}
+	
+	The same as Phase 1
+
+	\subsection{Agent}
+	
+	\subparagraph*{Phase 1}
+	
+	The Agent consists of:
+	\begin{itemize}
+		\item An Agent SDK that:
+		\begin{itemize}
+			\item Uses the Server API
+			\item Allows for implementation of an Agent Application
+		\end{itemize}
+		\item The Agent Application, developed over the Agent SDK
+	\end{itemize}
+
+	\newpage
+
+	\section{Architecture}
+	
+	\subsection{Bird's Eye View}
+	
+	An overview of the iLoc8 architecture in the general context is shown in Figure \ref{fig:architecture_birds_eye}.
+	
+	\begin{figure}[htbp]
+		\hspace{-2cm}
+		\includegraphics[width=\textwidth + 5cm]{architecture_birds_eye}
+		\caption{Bird's Eye View}
+		\label{fig:architecture_birds_eye}
+	\end{figure}
+
+	\newpage
+	
+	\subsection{System Components}
+	
+	The components of the iLoc8 solution are shown in Figure \ref{fig:architecture_components}. There are three types of components:
+	\begin{itemize}
+		\item Services: They do the main work
+		\item Adaptors: The components that unify access to the various non-iLoc8 interfaces that the Core and Clients use
+		\item Clients: The Caller and Agent applications
+	\end{itemize}
+	
+	\begin{figure}[htbp]
+		\hspace{-2cm}
+		\includegraphics[width=\textwidth + 5cm]{architecture_components}
+		\caption{Components}
+		\label{fig:architecture_components}
+	\end{figure}
+
+	\subsection{Non-iLoc8 Service Adaptors}
+	
+	iLoc8 Adaptors hide details of accessing non-iLoc8 services. Each adaptor is designed for a particular service and provides:
+	\begin{itemize}
+		\item An uniform interface for accessing that service
+		\item Implementation particular to that service
+	\end{itemize}
+	
+	Each iLoc8 installation comes with its own version of Adaptors. Thus, the Adaptors to be used within the iLoc8 solution are chosen at install-time rather than at compile-time or runtime (Figure \ref{fig:architecture_adaptors}).
+
+	\textbf{Note}: It is part of the Detailed Design to find a solution to assure uniformity of the Adaptor's interface and avoid duplication of interfaces.
+
+	\begin{figure}[htbp]
+		\hspace{0cm}
+		\includegraphics[width=\textwidth + 1cm]{architecture_adaptors}
+		\caption{Non-iLoc8 Service Adaptors}
+		\label{fig:architecture_adaptors}
+	\end{figure}
+	
+	\newpage
+	
+	\subsubsection{Media Store Adaptor}
+	
+	The Media Store Adaptor is a particular case of the Adaptors, in that, aside from the standard interface for Core, it also offers a File Transfer API for the Clients
+
+	\begin{figure}[htbp]
+		\hspace{-3cm}
+		\includegraphics[width=\textwidth + 6cm]{architecture_adaptor_media}
+		\caption{Media Store Adaptor}
+		\label{fig:architecture_adaptor_media}
+	\end{figure}
+	
+	\subsection{Server API}
+	
+	\subsubsection{API Parts}
+	
+	The Server API has two parts (See Figure \ref{fig:architecture_server_api}):
+	\begin{itemize}
+		\item The Caller API. This is the API that the Caller uses for all its interaction with iLoc8. It offers two types of features:
+		\begin{itemize}
+			\item General Caller Features
+			\item File Upload Features
+		\end{itemize}
+		\item The Agent API. Used by the Agent for all its interaction with iLoc8. It offers two types of features:
+		\begin{itemize}
+			\item General Agent Features
+			\item File Download Features
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{figure}[htbp]
+		\hspace{0cm}
+		\includegraphics[width=\textwidth + 2cm]{architecture_server_api}
+		\caption{Server API Parts}
+		\label{fig:architecture_server_api}
+	\end{figure}
+
+	There's a third part of the Server API: The Caller Web Loader, whose' purpose is just to load the Caller Web App into the Caller's browser. \\
+	
+	Externally, each Client sees its own API and only that.\footnote{How do we enforce this?}
+
+	Also, the Client does not know to which iLoc8 Component is talking. Internally, the APIs are exposed by:
+	\begin{itemize}
+		\item iLoc8 Core, for the General APIs
+		\item Media Store Adaptor, for the File Transfer APIs
+	\end{itemize}
+	
+	\subsubsection{API Target Clients}
+	
+	The Server API is designed for usage from two Client application types:
+	\begin{itemize}
+		\item JavaScript Web Apps:
+		\begin{itemize}
+			\item Mobile
+			\item Desktop
+		\end{itemize}
+		\item Native Apps:
+		\begin{itemize}
+			\item Windows - .NET
+			\item iOS
+			\item Android
+		\end{itemize}
+	\end{itemize}
+	
+	\subsubsection{API Type}
+	
+	The Server API:
+	\begin{itemize}
+		\item Is RESTful
+		\item Uses long-polls
+		\item Could implement \href{http://timelessrepo.com/haters-gonna-hateoas}{HATEOAS}\footnote{This requires more investigation in the detailed design phase}
+	\end{itemize}
+	
+	Since REST APIs are based on simple HTTP requests, they're can be accessed from any modern language/framework, including JavaScript, .NET, iOS Objective-C/Swift, and Android Java.
+	
+	For long-polling (or Comet programming), there are options for each target client platform. Some of them are:
+	\begin{itemize}
+		\item JavaScript: Native support via Async request and Callbacks
+		\item .NET: \href{https://msdn.microsoft.com/en-us/library/system.net.httpwebrequest.getresponse(v=vs.110).aspx}{HttpWebRequest.GetResponse()}
+		\item iOS:  \href{http://stackoverflow.com/questions/6300756/long-polling-in-objective-c}{NSURLConnection sendSynchronousRequest}
+		\item Android: One could simply use a Service to launch a Sync HTTP request
+	\end{itemize}
+	
+	For the CometD library:
+	\begin{itemize}
+		\item This may be used by the Agent only\footnote{Need more investigation during detailed design}
+		\item In .NET, you have \href{https://github.com/Oyatel/CometD.NET}{CometD.NET}
+	\end{itemize}
+	
+	\section{Server Application}
+	
+	The Server Application is the central part of the iLoc8 Solution.
+	
+	\subsection{Responsibilities}
+	
+	\subparagraph*{Phase 1}
+	
+	The Server Application is responsible for:
+	\begin{itemize}
+		\item Implementing the Data Channel
+		\item Negotiating and facilitating File Transfers between the Customer's storage and Clients
+		\item Negotiating the Video Channel between Clients
+		\item Saving events to Customer's storage
+	\end{itemize}
+
+	\subparagraph*{Phase 2}
+	
+	The same as Phase 1, plus:
+	\begin{itemize}
+		\item Session Transfer from Agent to Agent
+	\end{itemize}
+
+	\subparagraph*{Phase 3}
+
+	The same as Phase 2, plus:
+	\begin{itemize}
+		\item Facilitate Video Recording on the Customer's storage
+		\item Session Transfer with Conference
+		\item \tbd{Video + audio? Not clear to me}
+	\end{itemize}
+
+	\subsection{Components}
+	
+	The responsibilities of the Server Application are split between the Breeze components shown in Figure \ref{fig:architecture_components}.
+	
+	There are two types of server components:
+	\begin{itemize}
+		\item Services, that do the main work
+		\item Adaptors, that provide an uniform interface to the non-iLoc8 services
+	\end{itemize}
+	
+	\subsubsection{iLoc8 Core}
+	
+	\subparagraph*{Phase 1}
+	
+	The iLoc8 Core is a Service that performs the main activities of the Server Application. Its roles are:
+	\begin{itemize}
+		\item Send SMS to the Caller via the SMS Adaptor
+		\item Create, maintain, and delete sessions between Caller and Agent
+		\item Implement Data Channel with Caller and Agent, except for File Transfers
+		\item Negotiate File Transfers with Caller and Agent
+		\item Negotiate Video Channel between Caller and Agent
+		\item Serve Web version of the Caller Application
+		\item Supervise and approve uploads and downloads done to the Customer Storage via the Media Store Adaptor
+		\item \tbd{Anything for the languages, besides the Caller Dashboard choosing language?}
+		\item Save Events to Customer Storage
+		\item Maintain Event Numbering for all events and communicate those event numbers to the Agent SDK
+	\end{itemize}
+	
+	\subparagraph*{Phase 2}
+	
+	\tbd{}
+	
+	\subparagraph*{Phase 3}
+	
+	\tbd{}
+	
+	\paragraph{Data Channel}
+	
+	The Data Channel consists of:
+	\begin{itemize}
+		\item Automatic sending of data from Caller to Server:
+		\begin{itemize}
+			\item GPS Location
+			\item Battery Status
+			\item Preferred Language
+		\end{itemize}
+		\item Manual sending from Caller to Server:
+		\begin{itemize}
+			\item Address
+			\item File Uploads
+		\end{itemize}
+		\item File Downloads by Agent
+		\item Textual Chats between Caller and Agent
+		\item Events:
+		\begin{itemize}
+			\item Events generated by Server for all the Caller's activity. They are sent to the Agent
+			\item Events generated by Server for failures. They are sent to both Caller and Agent to allow them to retry
+			\item All Events are saved by Server to Customer Storage via the Event Adaptor
+		\end{itemize}
+	\end{itemize}
+	
+	\paragraph{Video Channel}
+	
+	\tbd{}
+	
+	\paragraph{Event Numbering}
+	
+	The Core assigns numbers to all events that come from the Caller.
+	These numbers are communicated to the Agent SDK, and are used to put an Agent up-to-date when it comes back after a failure.
+	
+	\subsubsection{Media Store Adaptor}
+	
+	The Media Store Adaptor is an Adaptor for the Customer's Media Storage. It provides:
+	\begin{itemize}
+		\item An uniform Interface for using the Media Storage
+		\item Several Implementations for particular Media Storages used by various Customers
+		\item A REST Web API for File Transfers
+		\item Integration with iLoc8 Core to allow the latter to supervise and approve File Transfers
+	\end{itemize}
+	
+	\subsubsection{Event Adaptor}
+	
+	The Event Adaptor is an Adaptor for the Customer's Event Storage. It provides:
+	\begin{itemize}
+		\item An uniform Interface for using the Event Storage
+		\item Several Implementations for particular Event Storages used by various Customers
+	\end{itemize}
+
+	\subsubsection{SMS Adaptor}
+	
+	The Event Adaptor is an Adaptor for the Customer's SMS Service. It provides:
+	\begin{itemize}
+		\item An uniform Interface for using the SMS Service
+		\item Several Implementations for particular SMS Services used by various Customers\footnote{We could just get away with using the Breeze SMS API}
+	\end{itemize}
+
+	\section{Caller Application}
+
+	\subsection{Caller SDK}
+
+	The Caller SDK is a set of interfaces and implementations, used for developing the Caller Application.
+	
+	\subparagraph*{Phase 1}
+	
+	The Caller SDK provides the following functionalities:
+	\begin{itemize}
+		\item Register with the iLoc8 Server
+		\item Get location, battery, and language from the smartphone OS
+		\item Automatically send location, battery, and language
+		\item Automatically change UI language to match the OS when possible
+		\begin{itemize}
+			\item Notify upper layer when this is not possible, along with the list of available languages
+			\item \tbd{Is this part of SDK, or App?}
+		\end{itemize}
+		\item Upload file from smartphone to a server
+		\item Send an Address Location to the iLoc8 Server
+		\item Notify the upper layer of the following internal events:
+		\begin{itemize}
+			\item Language mismatch \& list of available languages
+			\item Automatic info sent (location, battery, language)
+			\item Manual info sent (location)
+			\item Upload sent
+			\item Video Conference started/ended
+		\end{itemize}
+		\item Long-polling for subscribing to:
+		\begin{itemize}
+			\item Failure Events for its own activities (such as upload, text chat)
+		\end{itemize}
+		\item Process failure events sent by Server and:
+		\begin{itemize}
+			\item For failure of the automatic sending of data:
+			\begin{itemize}
+				\item Automatically retry sending it a number of times
+				\item Notify the upper layer after that number of retries
+				\item Allow for restarting automatic retrying
+			\end{itemize}
+			\item Notify the upper layer about failure of manually-initiated events
+		\end{itemize}
+	\end{itemize}
+
+	The Caller SDK is developed in:
+	\begin{itemize}
+		\item JavaScript\footnote{Or enhanced related frameworks, such as AngularJS} for Mobile Web
+		\item Objective-C for iOS
+		\item Java for Android
+	\end{itemize}
+	
+	\subparagraph*{Phase 2}
+	
+	\tbd{}
+
+	\subparagraph*{Phase 3}
+
+	\tbd{}
+	
+	\subsection{Caller Reference Application}
+	
+	The Caller Reference Application is a fully functional sample application, whose purpose is to show how to use the SDK, and demo the whole iLoc8 solution.
+	
+	\subsection{Caller Application}
+	
+	The caller application is developed in JavaScript\footnote{Or enhanced related frameworks, such as AngularJS}, using the Caller SDK.
+	
+	
+	Each customer will have their own customised version of the Caller Application.
+	
+	\section{Agent Application}
+
+	\subsection{Agent SDK}
+
+	The Agent SDK is a set of interfaces and implementations, used for developing the Agent Application.
+	
+	\subparagraph*{Phase 1}
+	
+	The Agent SDK provides the following functionalities:
+	\begin{itemize}
+		\item Register with the iLoc8 Server
+		\item Long-polling for subscribing to:
+		\begin{itemize}
+			\item Data Channel Events from the Server:
+			\begin{itemize}
+				\item Receive location, battery, preferred language
+				\item Caller Dashboard Language Change
+				\item Receive manually input location
+				\item Pre-recorded video upload start/end/fail
+				\item Picture upload start/end/fail
+				\item Video Conference started/ended
+				\item \tbd{Phone details?} - see §2.1.3 from [\ref{doc:srs}]
+			\end{itemize}
+			\item Failure Events for its own activities (such as download, text chat)
+		\end{itemize}
+		\item A notification mechanism for the upper layer, that includes event types and data
+		\item Download file
+		\item Event Numbering:
+		\begin{itemize}
+			\item Store the number for the latest event it has
+			\item Request for event re-sending when the latest event number it has is lower than the latest event number received from the server
+		\end{itemize}
+	\end{itemize}
+
+	The Agent SDK is developed in C\#, and offers Programming Interfaces in C\#.
+	
+	\subparagraph*{Phase 2}
+	
+	The same as Phase 1, plus:
+	\begin{itemize}
+		\item \tbd{Video negotiation}
+		\item \tbd{Video streaming}
+	\end{itemize}
+
+	\subparagraph*{Phase 3}
+
+	\tbd{}
+	
+	\subsection{Agent Reference Application}
+	
+	The Agent Reference Application is a fully functional sample application, whose purpose is to show how to use the SDK, and demo the whole iLoc8 solution.
+	
+	\subsection{Agent Application}
+	
+	The agent application is developed in C\#, using the Agent SDK.
+	
+	Each customer will have their own customised version of the Agent Application.
+	
+	\section{Scalability and Performance}
+	
+	\subparagraph*{Phase 1}
+
+	There is a single Breeze node. The system will scale as much as this single node allows it. The performance will be limited by the same.
+	
+	\subparagraph*{Phase 2}
+
+	The same as Phase 1.
+	
+	\subparagraph*{Phase 3}
+
+	The product runs in a Breeze Cluster of multiple nodes. Because of this, scalability and performance is be assured by:
+	\begin{itemize}
+		\item The Cluster's ability to add more nodes
+		\item The Cluster's Load Balancer that will distribute load to all nodes
+		\item The iLoc8's mechanism of \nameref{sec:session_sharing} that allows any node to access any session
+	\end{itemize}
+	
+	Although it is acknowledged that using another load balancer would mean loosing the Breeze Cluster, an alternative solution is shown below, for completenes.
+	
+	\subparagraph*{Alternative Load Balancer \& Reverse Proxy}
+	
+	\href{http://www.haproxy.org}{HAProxy} is a:
+	\begin{itemize}
+		\item Load balancer with 3 modes of operation: round-robin, station, less loaded
+		\item TLS/SSL terminator: install certificates only on HAProxy
+		\item HTTP header manipulation
+		\item Reverse Proxy
+	\end{itemize}
+	
+	\tbd{Feasibility of having two load-balancers, or of disabling HAProxy's load balancer}
+	
+	\section{High-Availability and Failover}
+	
+	\subparagraph*{Phase 1}
+
+	There is a single Breeze node. Because of this, there will be no HA in this phase, nor failover.
+	
+	\subparagraph*{Phase 2}
+
+	The same as Phase 1.
+	
+	\subparagraph*{Phase 3}
+
+	A \nameref{sec:session_sharing} mechanism is added that allows any node to access any session. Because of this, the other nodes can take over when a node fails.
+	
+	\section{Session Sharing}
+	\label{sec:session_sharing}
+	
+	\subsection{Session Sharing Options}
+	
+	The following options for session sharing were investigated:
+	\begin{itemize}
+		\item Apache Ignite
+		\item Gigaspaces XAP
+		\item Redis
+		\item Avaya Context Store
+	\end{itemize}
+	
+	\subsubsection{Key Features}
+	\label{sec:key_features}
+	
+	The mechanisms above are analysed in the following sections for the following key features:
+	\begin{itemize}
+		\item Speed: Access speed to data
+		\item Persistence: Ability to persist data
+		\item HA: Ability to get data when node(s) fail
+		\item Usability: How we use this for iLoc8
+		\item Integration: With Breeze
+		\item Complexity: How complex is this solution
+	\end{itemize}
+	
+	\subsubsection{Apache Ignite}
+	
+	\subparagraph*{Description}
+	
+	\href{https://ignite.apache.org}{Apache Ignite} is an in-memory \href{https://en.wikipedia.org/wiki/Data_grid}{data-grid} framework. It also has tailored usage for various scenarios, including \href{https://ignite.apache.org/use-cases/caching/web-session-clustering.html}{Web Session Clustering}.
+	
+	\subparagraph*{Speed}
+	
+	Ignite claims that access to the distributed data stored in it is fast.
+	
+	\subparagraph*{Persistence}
+	
+	Ignite integrates very well with \href{https://ignite.apache.org/features/igfs.html}{Apache Hadoop}.
+	
+	\subparagraph*{HA}
+	
+	Ignite assures HA by means of being distributed and replicating data.
+	
+	\subparagraph*{Usability}
+	
+	For iLoc8 session sharing, Ignite would be used as a distributed session storage mechanism with replication, where sessions would be stored in-memory on Ignite instances on each Breeze node (and possibly other nodes).
+	
+	\subparagraph*{Integration}
+	
+	Inside Breeze, Ignite would be used:
+	\begin{itemize}
+		\item Either from Maven or as a Standalone JAR
+		\item Either as a separated service running from Linux
+	\end{itemize}
+	
+	\subparagraph*{Complexity}
+	
+	Ignite looks moderately complex - i.e. it is not more complex than the things it does require it to be. Various usage examples on their site look pretty simple.
+	
+	\subsubsection{Gigaspaces XAP}
+	
+	\subparagraph*{Description}
+	
+	\href{http://www.gigaspaces.com/xap-in-memory-caching-scaling/datagrid}{Gigaspaces XAP} is an in-memory data-grid framework. It also has a tailored usage for \href{http://docs.gigaspaces.com/xap110/global-http-session-sharing-overview.html}{session sharing}.
+	
+	\subparagraph*{Speed}
+	
+	Gigaspaces XAP claims that access to the distributed data stored in it is fast.
+	
+	\subparagraph*{Persistence}
+	
+	Gigaspaces can write-behind to a database for persistent storage.
+	
+	\subparagraph*{HA}
+	
+	Gigaspaces assures HA by means of being distributed and replicating data.
+	
+	\subparagraph*{Usability}
+	
+	For iLoc8 session sharing, Gigaspaces would be used as a distributed session storage mechanism with replication, where sessions would be stored in-memory on each Breeze node.
+	
+	\subparagraph*{Integration}
+	
+	Inside Breeze, Gigaspaces is already integrated.
+	
+	\subparagraph*{Complexity}
+	
+	Gigaspaces XAP looks complex. This may be due to it addressing a lot of things\footnote{E.g. Ignite delegates persistence to Hadoop, while Gigaspaces does persistence, too}, but this complexity might challenge the developers. 
+	
+	\subsubsection{Redis}
+	
+	\subparagraph*{Description}
+	
+	\href{http://redis.io}{Redis} is an in-memory data structure store. It has automatic session storing for Apache Tomcat, and can be used manually to store sessions otherwise.
+	
+	\subparagraph*{Speed}
+	
+	Being in-memory, Redis is fast.
+	
+	\subparagraph*{Persistence}
+	
+	Redis has a module for \href{http://redis.io/topics/persistence}{persistent storage}.
+	
+	\subparagraph*{HA}
+	
+	Redis was designed mostly to be locally used, but has some modules that extend it beyond local usage: \href{http://redis.io/topics/sentinel}{Sentinel} for high availability/monitoring, and \href{http://redis.io/topics/cluster-tutorial}{Cluster} for distributed storage.
+
+	Despite all these modules, our impression is that Redis is mostly designed for local usage, and that using it in a distributed manner requires more work and is prone to bugs.
+	
+	\subparagraph*{Usability}
+	
+	For iLoc8 session sharing, it would be used to store sessions in a distributed, replicated manner on some/all nodes that run Breeze.
+	
+	\subparagraph*{Integration}
+	
+	Inside Breeze, Redis would be used as a separated service running from Linux.
+	
+	\subparagraph*{Complexity}
+	
+	Redis looks the most simple of all, but the HA modules might increase its complexity in unwanted ways.
+	
+	\subsubsection{Avaya Context Store}
+	
+	\subparagraph*{Description}
+	
+	\href{https://www.devconnectprogram.com/site/global/products_resources/avaya_breeze/avaya_snap_ins/context_store/overview/index.gsp}{Avaya Context Store} is a Breeze ``snap-in that enables context-sensitive, real-time customer contact information to be updated from multiple sources and shared between the various components and touch points in the enterprise through which a customer passes.''
+	
+	As opposed to Ignite and Gigaspaces XAP, Context Store is not a distributed in-memory storage mechanism, but is a standalone persistent caching mechanism, with high-availability and scalability in mind.
+	
+	\subparagraph*{Speed}
+	
+	Thus, it's slow when compared to in-memory mechanisms.
+	
+	Assuring performance when using it requires a session affinity load balancing mechanism, so that all requests for a session go to the same node. Thus, we only use Context Store as a backup in case of failure, and don't depend on it for session retrieval.
+	
+	\subparagraph*{Persistence}
+	
+	Built-in.
+	
+	\subparagraph*{HA}
+	
+	Built-in.
+	
+	\subparagraph*{Usability}
+	
+	For iLoc8 session sharing, it is not suitable except for a backup mechanism.
+	
+	\subparagraph*{Integration}
+	
+	Inside Breeze, Context Store would be used as a separated service running in a different VM, with a REST/SOAP interface.
+	
+	\subparagraph*{Complexity}
+
+	Context Store looks complex to us.
+	
+	\subsection{Comparison of Session Sharing Options}
+	
+	The \nameref{sec:key_features} of the session sharing mechanisms analysed above are put in this table as PROS/CONS/Neutral at a glance.
+	
+	\begin{longtable}[l]{ | p{0.2\textwidth} | p{0.25\textwidth} | p{0.25\textwidth} | p{0.25\textwidth} |}
+		\hline
+		\textbf{Mechanism} & \textbf{PROS} & \textbf{CONS} & \textbf{Neutral}\\ \hline
+		\endhead
+		
+		Apache Ignite
+		&
+		\begin{itemize}[label=\Checkmark]
+			\item Speed
+			\item Persistence
+			\item HA
+			\item Complexity
+		\end{itemize}
+		&
+		&
+		\begin{itemize}[label=\SquareShadowBottomRight]
+			\item Usability
+			\item Integration
+		\end{itemize}
+		\\ \hline
+		
+		Gigaspaces XAP
+		&
+		\begin{itemize}[label=\Checkmark]
+			\item Speed
+			\item Persistence
+			\item HA
+			\item Integration
+		\end{itemize}
+		&
+		\begin{itemize}[label=\XSolidBrush]
+			\item Complexity
+		\end{itemize}
+		&
+		\begin{itemize}[label=\SquareShadowBottomRight]
+			\item Usability
+		\end{itemize}
+		\\ \hline
+		
+		Redis
+		&
+		\begin{itemize}[label=\Checkmark]
+			\item Speed
+			\item Complexity
+		\end{itemize}
+		&
+		\begin{itemize}[label=\XSolidBrush]
+			\item Persistence
+			\item HA
+		\end{itemize}
+		&
+		\begin{itemize}[label=\SquareShadowBottomRight]
+			\item Usability
+			\item Integration
+		\end{itemize}
+		\\ \hline
+		
+		Avaya Context Store
+		&
+		\begin{itemize}[label=\Checkmark]
+			\item HA
+			\item Persistence
+		\end{itemize}
+		&
+		\begin{itemize}[label=\XSolidBrush]
+			\item Speed
+			\item Usability
+			\item Complexity
+		\end{itemize}
+		&
+		\begin{itemize}[label=\SquareShadowBottomRight]
+			\item Integration
+		\end{itemize}
+		\\ \hline
+	\end{longtable}
+
+	\section{Security}
+	
+	The security of this application is assured by:
+	\begin{itemize}
+		\item Using a Reverse Proxy
+		\item Using HTTPS
+		\item Following OWASP recommendations
+	\end{itemize}
+	
+\end{document}

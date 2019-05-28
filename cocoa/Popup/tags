@@ -1,0 +1,107 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+ARROW_HEIGHT	Popup/BackgroundView.h	/^#define ARROW_HEIGHT 8$/;"	M	interface:
+ARROW_WIDTH	Popup/BackgroundView.h	/^#define ARROW_WIDTH 12$/;"	M	interface:
+ApplicationDelegate	Popup/ApplicationDelegate.h	/^@interface ApplicationDelegate : NSObject <NSApplicationDelegate, PanelControllerDelegate>$/;"	i	interface:
+ApplicationDelegate	Popup/ApplicationDelegate.m	/^@implementation ApplicationDelegate$/;"	I	interface:
+BackgroundView	Popup/BackgroundView.h	/^@interface BackgroundView : NSView$/;"	i	interface:
+BackgroundView	Popup/BackgroundView.m	/^@implementation BackgroundView$/;"	I	interface:
+CLOSE_DURATION	Popup/PanelController.m	/^#define CLOSE_DURATION .1$/;"	M	interface:
+CORNER_RADIUS	Popup/BackgroundView.m	/^#define CORNER_RADIUS 6.0f$/;"	M	interface:
+FILL_OPACITY	Popup/BackgroundView.m	/^#define FILL_OPACITY 0.9f$/;"	M	interface:
+LINE_THICKNESS	Popup/BackgroundView.m	/^#define LINE_THICKNESS 1.0f$/;"	M	interface:
+MENU_ANIMATION_DURATION	Popup/PanelController.m	/^#define MENU_ANIMATION_DURATION .1$/;"	M	interface:
+MenubarController	Popup/MenubarController.h	/^@interface MenubarController : NSObject {$/;"	i	interface:
+MenubarController	Popup/MenubarController.m	/^@implementation MenubarController$/;"	I	interface:
+OPEN_DURATION	Popup/PanelController.m	/^#define OPEN_DURATION .15$/;"	M	interface:
+PANEL_WIDTH	Popup/PanelController.m	/^#define PANEL_WIDTH 280$/;"	M	interface:
+POPUP_HEIGHT	Popup/PanelController.m	/^#define POPUP_HEIGHT 122$/;"	M	interface:
+Panel	Popup/Panel.h	/^@interface Panel : NSPanel$/;"	i	interface:
+Panel	Popup/Panel.m	/^@implementation Panel$/;"	I	interface:
+PanelController	Popup/PanelController.h	/^@interface PanelController : NSWindowController <NSWindowDelegate>$/;"	i	protocol:
+PanelController	Popup/PanelController.m	/^@implementation PanelController$/;"	I	interface:
+PanelControllerDelegate	Popup/PanelController.h	/^@protocol PanelControllerDelegate <NSObject>$/;"	p	protocol:PanelControllerDelegate
+SEARCH_INSET	Popup/BackgroundView.m	/^#define SEARCH_INSET 10.0f$/;"	M	interface:
+SEARCH_INSET	Popup/PanelController.m	/^#define SEARCH_INSET 17$/;"	M	interface:
+STATUS_ITEM_VIEW_WIDTH	Popup/MenubarController.h	/^#define STATUS_ITEM_VIEW_WIDTH 24.0$/;"	M	interface:
+STROKE_OPACITY	Popup/BackgroundView.m	/^#define STROKE_OPACITY 1.0f$/;"	M	interface:
+StatusItemView	Popup/StatusItemView.h	/^@interface StatusItemView : NSView {$/;"	i	interface:
+StatusItemView	Popup/StatusItemView.m	/^@implementation StatusItemView$/;"	I	interface:
+action	Popup/StatusItemView.h	/^    SEL _action;$/;"	F	interface:StatusItemView
+action	Popup/StatusItemView.h	/^@property (nonatomic) SEL action;$/;"	p	interface:StatusItemView
+alternateImage	Popup/StatusItemView.h	/^    NSImage *_alternateImage;$/;"	F	interface:StatusItemView
+alternateImage	Popup/StatusItemView.h	/^@property (nonatomic, strong) NSImage *alternateImage;$/;"	p	interface:StatusItemView
+applicationDidFinishLaunching:	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+applicationShouldTerminate:	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+arrowX	Popup/BackgroundView.h	/^    NSInteger _arrowX;$/;"	F	interface:BackgroundView
+arrowX	Popup/BackgroundView.h	/^@property (nonatomic, assign) NSInteger arrowX;$/;"	p	interface:BackgroundView
+awakeFromNib	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+backgroundView	Popup/PanelController.h	/^    __unsafe_unretained BackgroundView *_backgroundView;$/;"	F	interface:PanelController
+backgroundView	Popup/PanelController.h	/^@property (nonatomic, unsafe_unretained) IBOutlet BackgroundView *backgroundView;$/;"	p	interface:PanelController
+canBecomeKeyWindow	Popup/Panel.m	/^- (BOOL)canBecomeKeyWindow;$/;"	m	implementation:Panel
+cancelOperation:	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+closePanel	Popup/PanelController.h	/^- (void)closePanel;$/;"	p	interface:PanelController
+closePanel	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+dealloc	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+dealloc	Popup/MenubarController.m	/^{$/;"	m	implementation:MenubarController
+dealloc	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+delegate	Popup/PanelController.h	/^    __unsafe_unretained id<PanelControllerDelegate> _delegate;$/;"	F	interface:PanelController
+delegate	Popup/PanelController.h	/^- (id)initWithDelegate:(id<PanelControllerDelegate>)delegate;$/;"	p	interface:PanelController
+delegate	Popup/PanelController.h	/^@property (nonatomic, unsafe_unretained, readonly) id<PanelControllerDelegate> delegate;$/;"	p	interface:PanelController
+drawRect:	Popup/BackgroundView.m	/^{$/;"	m	implementation:BackgroundView
+drawRect:	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+globalRect	Popup/StatusItemView.h	/^@property (nonatomic, readonly) NSRect globalRect;$/;"	p	interface:StatusItemView
+globalRect	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+hasActiveIcon	Popup/MenubarController.h	/^@property (nonatomic) BOOL hasActiveIcon;$/;"	p	interface:MenubarController
+hasActiveIcon	Popup/MenubarController.m	/^{$/;"	m	implementation:MenubarController
+hasActivePanel	Popup/PanelController.h	/^    BOOL _hasActivePanel;$/;"	F	interface:PanelController
+hasActivePanel	Popup/PanelController.h	/^@property (nonatomic) BOOL hasActivePanel;$/;"	p	interface:PanelController
+hasActivePanel	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+image	Popup/StatusItemView.h	/^    NSImage *_image;$/;"	F	interface:StatusItemView
+image	Popup/StatusItemView.h	/^@property (nonatomic, strong) NSImage *image;$/;"	p	interface:StatusItemView
+init	Popup/MenubarController.m	/^{$/;"	m	implementation:MenubarController
+initWithDelegate:	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+initWithStatusItem:	Popup/StatusItemView.h	/^- (id)initWithStatusItem:(NSStatusItem *)statusItem;$/;"	m	interface:StatusItemView
+initWithStatusItem:	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+isHighlighted	Popup/StatusItemView.h	/^    BOOL _isHighlighted;$/;"	F	interface:StatusItemView
+isHighlighted	Popup/StatusItemView.h	/^@property (nonatomic, setter = setHighlighted:) BOOL isHighlighted;$/;"	p	interface:StatusItemView
+kContextActivePanel	Popup/ApplicationDelegate.m	/^void *kContextActivePanel = &kContextActivePanel;$/;"	m	implementation:ApplicationDelegate
+main	Popup/main.m	/^int main(int argc, char *argv[])$/;"	f	interface:
+menubarController	Popup/ApplicationDelegate.h	/^@property (nonatomic, strong) MenubarController *menubarController;$/;"	p	interface:ApplicationDelegate
+mouseDown:	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+observeValueForKeyPath:ofObject:change:context:	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+openPanel	Popup/PanelController.h	/^- (void)openPanel;$/;"	p	interface:PanelController
+openPanel	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+panelController	Popup/ApplicationDelegate.h	/^@property (nonatomic, strong, readonly) PanelController *panelController;$/;"	p	interface:ApplicationDelegate
+panelController	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+runSearch	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+searchField	Popup/PanelController.h	/^    __unsafe_unretained NSSearchField *_searchField;$/;"	F	interface:PanelController
+searchField	Popup/PanelController.h	/^@property (nonatomic, unsafe_unretained) IBOutlet NSSearchField *searchField;$/;"	p	interface:PanelController
+sender	Popup/ApplicationDelegate.h	/^- (IBAction)togglePanel:(id)sender;$/;"	p	interface:ApplicationDelegate
+setAlternateImage:	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+setArrowX:	Popup/BackgroundView.m	/^{$/;"	m	implementation:BackgroundView
+setHasActiveIcon:	Popup/MenubarController.m	/^{$/;"	m	implementation:MenubarController
+setHasActivePanel:	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+setHighlighted:	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+setImage:	Popup/StatusItemView.m	/^{$/;"	m	implementation:StatusItemView
+statusItem	Popup/MenubarController.h	/^@property (nonatomic, strong, readonly) NSStatusItem *statusItem;$/;"	p	interface:MenubarController
+statusItem	Popup/MenubarController.m	/^{$/;"	m	implementation:MenubarController
+statusItem	Popup/StatusItemView.h	/^    NSStatusItem *_statusItem;$/;"	F	interface:StatusItemView
+statusItem	Popup/StatusItemView.h	/^@property (nonatomic, strong, readonly) NSStatusItem *statusItem;$/;"	p	interface:StatusItemView
+statusItemView	Popup/MenubarController.h	/^    StatusItemView *_statusItemView;$/;"	F	interface:MenubarController
+statusItemView	Popup/MenubarController.h	/^@property (nonatomic, strong, readonly) StatusItemView *statusItemView;$/;"	p	interface:MenubarController
+statusItemViewForPanelController:	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+statusItemViewForPanelController:	Popup/PanelController.h	/^- (StatusItemView *)statusItemViewForPanelController:(PanelController *)controller;$/;"	m	protocol:PanelControllerDelegate
+statusRectForWindow:	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+target	Popup/StatusItemView.h	/^    __unsafe_unretained id _target;$/;"	F	interface:StatusItemView
+target	Popup/StatusItemView.h	/^@property (nonatomic, unsafe_unretained) id target;$/;"	p	interface:StatusItemView
+textField	Popup/PanelController.h	/^    __unsafe_unretained NSTextField *_textField;$/;"	F	interface:PanelController
+textField	Popup/PanelController.h	/^@property (nonatomic, unsafe_unretained) IBOutlet NSTextField *textField;$/;"	p	interface:PanelController
+togglePanel:	Popup/ApplicationDelegate.m	/^{$/;"	m	implementation:ApplicationDelegate
+windowDidResignKey:	Popup/PanelController.m	/^- (void)windowDidResignKey:(NSNotification *)notification;$/;"	m	implementation:PanelController
+windowDidResize:	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController
+windowWillClose:	Popup/PanelController.m	/^{$/;"	m	implementation:PanelController

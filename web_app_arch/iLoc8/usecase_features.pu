@@ -1,0 +1,39 @@
+@startuml
+left to right direction
+
+actor Caller
+actor Agent
+
+usecase keep as "Keep iLoc8 Dashboard Open"
+usecase periodic as "Receive periodic updates\nof location and battery"
+
+usecase upload as "Upload File"
+usecase download as "Download and View File"
+
+usecase send_addr as "Send Address Manually"
+usecase recv_addr as "Display Manually sent Address"
+
+usecase video as "Video conversation"
+
+usecase chat as "Textual chat"
+
+keep .> periodic
+upload .> download
+send_addr .> recv_addr
+
+Caller -- keep
+periodic -- Agent
+
+Caller -- upload
+download -- Agent
+
+Caller -- send_addr
+recv_addr -- Agent
+
+Caller -- video
+video -- Agent
+
+Caller -- chat
+chat -- Agent
+
+@enduml

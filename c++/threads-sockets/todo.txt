@@ -1,0 +1,6 @@
+TODO:
+- Send partial buffers rather than a single buffer with the entire file content
+- Create multiple threads that read files in client
+- Timeout a client that hasn't sent buffers on a specific file
+- Scan on buffers rather than on the whole file
+- Use a Strategy pattern for ordering files from client

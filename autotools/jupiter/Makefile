@@ -1,0 +1,61 @@
+package = jupiter
+version = 1.0
+tarname = jupiter
+distdir = $(tarname)-$(version)
+srcdir = .
+
+
+prefix=/usr/local
+exec_prefix = ${prefix}
+bindir = ${exec_prefix}/bin
+
+all clean install uninstall jupiter:
+	$(MAKE) -C src $@
+
+extra:
+	./config.status --file extra
+
+check: extra
+	cat extra | grep "My package.*jupiter"
+	@echo "*** ALL TESTS PASSED ***"
+	$(MAKE) -C src $@
+
+dist: $(distdir).tar.gz
+
+$(distdir):
+	mkdir -p $(distdir)/src
+	cp $(srcdir)/configure $(distdir)
+	cp $(srcdir)/config.h.in $(distdir)
+	cp $(srcdir)/install-sh $(distdir)
+	cp $(srcdir)/Makefile.in $(distdir)
+	cp $(srcdir)/src/Makefile.in $(distdir)/src
+	cp $(srcdir)/src/main.c $(distdir)/src
+	cp $(srcdir)/extra.in $(distdir)
+
+$(distdir).tar.gz: FORCE $(distdir)
+	tar chof - $(distdir) |\
+	  gzip -9 -c >$(distdir).tar.gz
+	rm -rf $(distdir)
+
+distcheck: $(distdir).tar.gz
+	gzip -cd $+ | tar xvf -
+	cd $(distdir); ./configure
+	$(MAKE) -C $(distdir) all extra check
+	$(MAKE) -C $(distdir) DESTDIR=$${PWD}/$(distdir)/_inst install uninstall
+	$(MAKE) -C $(distdir) clean
+	rm -rf $(distdir)
+	@echo "*** Package $(distdir).tar.gz\
+	  ready for distribution."
+
+Makefile: Makefile.in config.status
+	./config.status $@
+
+config.status: configure
+	./config.status --recheck
+
+FORCE:
+	-rm $(distdir).tar.gz
+	-rm -rf $(distdir)
+
+.PHONY: FORCE all clean check dist distcheck
+.PHONY: install uninstall

@@ -1,0 +1,86 @@
+@startuml
+
+title Starting the Dashboards, Web Version
+caption Figure 1
+
+''' Definitions
+
+actor "Caller / Smart Phone" as Caller
+entity "Caller Dashboard" as CD
+boundary "Avaya SBC" as SBC
+box "Secured Network" #WhiteSmoke
+    entity "SMS Adaptor" as SMS
+    entity "iLoc8 Core" as Core
+    entity "Dashboards Server" as DS
+    entity "Agent Dashboard" as AD
+    entity "IC"
+    actor "Agent"
+endbox
+
+autonumber "<b>[00]"
+
+== Initiate iLoc8 ==
+
+note over Core
+	Loading the dashboards is shown here for a web version
+	of the dashboards. For a native iOS or Android dashboard
+	implementation, the flow will be similar, with a small
+	difference on how the dashboards are actually started.
+endnote
+
+note over Core
+	All PARAMs are encrypted, unless specifically
+	stated otherwise.
+endnote
+
+Caller -> Agent: PSTN call
+Caller <--> Agent: Phone discussion, agreement on starting iLoc8
+Agent --> IC: Initiate iLoc8
+
+activate IC #Silver
+IC -> Core: POST Start iLoc8 Session\nPARAM callerPhoneNr 
+deactivate IC
+
+activate Core
+
+''' Send SMS
+
+activate SMS #SkyBlue
+Core -> SMS: Send SMS - Link https://<SBC Public IP>:<iLoc8 SBC Port>\nPARAM runOnceConnectionToken\nPARAM callerPhoneNr
+SMS -> Caller: Send SMS - Link https://<SBC Public IP>:<iLoc8 SBC Port>\nPARAM runOnceConnectionToken
+deactivate SMS
+
+''' Start Dashboards
+
+activate SBC #Red
+Caller -> SBC: GET https://<SBC Public IP>:<iLoc8 SBC Port>\nPARAM runOnceConnectionToken
+SBC -> Core: GET https://<Breeze Internal IP>/<iLoc8 Core>/CallerDashboard\nPARAM runOnceConnectionToken
+
+activate DS #Plum
+Core -> DS: Caller Dashboard request
+DS --> Core: Caller Dashboard response
+Core -> DS: Agent Dashboard request
+DS --> Core: Agent Dashboard response
+deactivate DS
+
+Core -> SBC: Dashboard, iLoc8CallerSessionToken
+
+activate CD #Orange
+SBC -> CD: Dashboard, iLoc8CallerSessionToken
+
+activate AD #OliveDrab
+Core -> AD: Dashboard, iLoc8AgentSessionToken
+note left
+	Agent Dashboard could actually be loaded
+	**before** Caller Dashboard
+endnote
+
+autonumber stop
+
+== iLoc8 Communication ==
+
+CD <--> SBC: HTTPS Communication\nPARAM iLoc8CallerSessionToken
+SBC <--> Core: HTTPS Communication\nPARAM iLoc8CallerSessionToken
+AD <--> Core: HTTPS Communication\nPARAM iLoc8AgentSessionToken
+
+@enduml

@@ -1,0 +1,4 @@
+src/foofiles/foo.o src/foofiles/foo.o: src/foofiles/foo.cc \
+  src/foofiles/foo.h
+
+src/foofiles/foo.h:

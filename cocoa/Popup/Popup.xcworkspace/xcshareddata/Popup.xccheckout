@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>A6658B41-C52A-4621-9217-F543E977102E</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Popup</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>F4281E4D-9EFB-4797-BA6C-9D62BE952088</key>
+		<string>https://github.com/shpakovski/Popup</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Popup.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>F4281E4D-9EFB-4797-BA6C-9D62BE952088</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/shpakovski/Popup</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>F4281E4D-9EFB-4797-BA6C-9D62BE952088</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>F4281E4D-9EFB-4797-BA6C-9D62BE952088</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Popup</string>
+		</dict>
+	</array>
+</dict>
+</plist>

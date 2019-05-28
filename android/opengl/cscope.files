@@ -1,0 +1,8 @@
+./gen/sorel/android/BuildConfig.java
+./gen/sorel/android/R.java
+./src/sorel/android/ShaderUtils.java
+./src/sorel/android/DemoGLSurfaceView.java
+./src/sorel/android/Triangle.java
+./src/sorel/android/DemoGLRenderer.java
+./src/sorel/android/OpenGLDrawActivity.java
+./src/sorel/android/OpenGLActivity.java

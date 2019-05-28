@@ -1,0 +1,9 @@
+To create a Django sample app is easy with their online tutorial.
+
+This focuses on making it work in Google Cloud.
+
+Google's tutorial on this is good, but they don't  show you what you need to alter in a Django app to make it GPC-ready.
+
+This document attempts to fill in this gaps. So:
+
+1. The Google Cloud app shows you a 

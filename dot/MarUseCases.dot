@@ -1,0 +1,72 @@
+digraph example {
+	rankdir=LR;
+	bgcolor="#eeeeff";
+	node [fontname=Arial, fontsize=10];
+	edge [color=red, style=bold, fontsize=9];
+
+	// Actors
+	{
+		node [shape=custom, shapefile="Actor.png", 
+			width=.352, height=0.77, fixedsize=true, 
+			color="#ffffaa", label="\n\n\n\n\n\n\N"]
+
+		Shark
+		Submariner
+		Pirate
+		Merchant
+	}
+
+	// System Use Cases
+	subgraph clusterSystem
+	{
+		label="Sea"; // Name your system here
+		fillcolor="#ffffdd"; style=filled; color=black; // The system box
+		node [shape=ellipse, style=filled, fillcolor="#ccffcc", color="#558855"]
+
+		Batism
+		Inmersion
+		"Eat pirates" // You can name it with spaces
+		// But is better to use a 'label' property to make easier the references
+		Tresour [label="Find a tresour"] 
+		Attack [label="Attack ships"]
+		Escafandrarse [label="Put on the\nescafandre"] // Multiline
+		Ron [label="Drink Ron"]
+		SellGoods
+		Navigate
+		GaleonPiloting [label="Navigate in galeon"]
+		BuyGoods [label="Buy Goods"]
+	}
+
+	// Uses
+	Submariner -> Inmersion
+	Submariner -> Batism
+	Pirate -> Attack
+	Pirate -> Ron
+	Merchant -> SellGoods
+	Shark -> "Eat pirates"
+
+	// Extensions
+	{
+		edge [label="<<extends>>", dir=back]
+
+		Inmersion -> Tresour
+	}
+
+	// Inclusions
+	{
+		edge [label="<<includes>>"]
+	
+		Inmersion -> Escafandrarse
+		SellGoods -> Navigate
+		SellGoods -> BuyGoods
+		Attack -> GaleonPiloting
+	}
+
+	// Generalizations
+	{
+		edge [arrowsize=1.5, arrowtail=empty, dir=back, constraint=false]
+	
+		Inmersion -> Batism
+		Navigate -> GaleonPiloting
+	}
+}

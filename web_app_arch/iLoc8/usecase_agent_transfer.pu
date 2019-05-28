@@ -1,0 +1,32 @@
+@startuml
+left to right direction
+
+actor Agent1 as "Agent 1"
+actor Agent2 as "Agent 2"
+
+usecase Connect as "Connect to iLoc8"
+usecase NotifyTransfer as "Notify iLoc8 to Transfer Session"
+usecase ReceiveTransfer as "Receive Session from iLoc8"
+usecase ReceiveEvents as "Receive Events"
+usecase Dashboard as "Agent Dashboard"
+usecase DoneTransfer as "Receive Update Transfer Done"
+usecase Close as "Close Dashboard"
+
+Connect .> NotifyTransfer
+NotifyTransfer .> ReceiveTransfer
+ReceiveTransfer .> ReceiveEvents
+ReceiveEvents .> Dashboard
+Dashboard .> DoneTransfer
+DoneTransfer .> Close
+
+Connect <-- Agent2
+Agent1 --> NotifyTransfer
+Agent2 --> ReceiveTransfer
+Agent2 --> ReceiveEvents
+
+Agent2 -- Dashboard: use
+
+Agent1 --> DoneTransfer
+Agent1 --> Close
+
+@enduml

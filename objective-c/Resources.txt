@@ -1,0 +1,9 @@
+- Carte Objective-C: http://www.techotopia.com/index.php/Objective-C_2.0_Essentials
+
+- Objective-C pe Linux: http://ubuntuforums.org/showthread.php?t=1064045
+
+- Objective-C++: http://web.archive.org/web/20081220155600/http://developer.apple.com/documentation/Cocoa/Conceptual/ObjectiveC/Articles/chapter_14_section_2.html#//apple_ref/doc/uid/TP30001163-CH10-TPXREF166
+
+- A little from Apple Official Docs: https://developer.apple.com/library/mac/documentation/General/Conceptual/CocoaEncyclopedia/ClassFactoryMethods/ClassFactoryMethods.html#//apple_ref/doc/uid/TP40010810-CH8-SW1
+
+- Cocoa & Objective-C: http://en.wikibooks.org/wiki/Programming_Mac_OS_X_with_Cocoa_for_Beginners
