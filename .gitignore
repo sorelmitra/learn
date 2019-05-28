@@ -7,3 +7,4 @@
 **/*.opensdf
 **/*.VC.opendb
 **/*.vcxproj.user
+**/*.class
