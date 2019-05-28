@@ -1866,10 +1866,12 @@ executes a chunk of code */
 
 function *generateSome(){
     console.log("Generator: Step 1");
-    yield
+    yield 243
     console.log("Generator: Step 2");
+    return 244
 }
 
 var it = generateSome();
-it.next();
-it.next();
+console.log(`Generator: returned value 1`, it.next());
+console.log(`Generator: returned value 2`, it.next());
+console.log(`Generator: returned value 3`, it.next());
