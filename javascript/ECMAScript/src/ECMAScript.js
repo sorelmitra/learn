@@ -595,7 +595,8 @@ sets "this" to the newly created object,
 and calls the given function (in this case Number) making it return 
 the new object (instead of its primitive type number) */
 
-/* primitive types are not objects, but we can call methods of their corresponding object type on them. How come? */
+/* primitive types are not objects, but we can call methods of their 
+corresponding object type on them. How come? */
 var pi = 3.1415926;
 showTypeofAndValue(pi, "pi"); /* it is a primitive number type */
 console.log("Objects: pi is a %s with the value ~ %s", typeof pi, pi.toFixed(2));
@@ -689,9 +690,13 @@ console.log("Objects: I changed a property that's by default writable: %d", myOb
 Object.defineProperty( myObject, "a", {
     value: myObject.a, /* I can use it's previous value */
     writable: false, /* not writable */
-    configurable: false, /* not configurable. This is a one-way road, you cannot revert it! */
-    enumerable: true /* whether it appears in for ... in loops and other enumerations */
-} ); /* This property also happens to be an object CONSTANT (non-writable, non-configurable) */
+    configurable: false, /* not configurable. This is a one-way road, 
+                            you cannot revert it! */
+    enumerable: true /* whether it appears in for ... in loops 
+                        and other enumerations */
+} ); 
+/* This property also happens to be an object CONSTANT
+(non-writable, non-configurable) */
 
 myObject.a = 5; /* useless, no change will be perfomed */
 console.log("Objects: I changed a property that's NOT writable anymore: %d", myObject.a);
@@ -757,7 +762,8 @@ console.log("Objects: myObject is frozen: %d", myObject.b);
 /*
 [Get]] and [[Set]]
 
-These are two built-in operations that are used whenever accessing object properties.
+These are two built-in operations that are used whenever accessing 
+object properties.
 
 [[Get]] returns the property that was requested to be accesed on the object 
 by using this algorithm:
@@ -884,7 +890,18 @@ for (var v of x) {
  *****************************************************************/
 
 /*
-From the ECMAScript 6 specification: "All ordinary objects have an internal slot called [[Prototype]]. The value of this internal slot is either null or an object and is used for implementing inheritance. Data properties of the [[Prototype]] object are inherited (are visible as properties of the child object) for the purposes of get access, but not for set access. Accessor properties are inherited for both get access and set access." Actually inheritance may be a wrong word here, as there's no class to inherit from. It's just that [[Prototype]] is a reference to another object, whose properties are accessible via the current object by means of the internal [[Get]] and [[Set]] operations.
+From the ECMAScript 6 specification: "All ordinary objects have 
+an internal slot called [[Prototype]]. The value of this internal slot 
+is either null or an object and is used for implementing inheritance. 
+Data properties of the [[Prototype]] object are inherited (are visible as 
+    properties of the child object) for the purposes of get access, 
+but not for set access. 
+Accessor properties are inherited for both get access and set access." 
+
+Actually "inheritance" may be a wrong word here, as there's no class 
+to inherit from. It's just that [[Prototype]] is a reference to another object, 
+whose properties are accessible via the current object by means of the 
+internal [[Get]] and [[Set]] operations.
 */
 
 var anotherObject = {
@@ -895,31 +912,70 @@ var anotherObject = {
     }
 };
 
-var myObject = Object.create( anotherObject ); /* anotherObject is the prototype of myObject. myObject's [[Prototype]] now points to anotherObject */
-console.log("Property from the prototype chain", anotherObject.a, myObject.a, anotherObject.hasOwnProperty( "a"), myObject.hasOwnProperty("a"));
-myObject.f(); /* call function from the prototype. Note that "this" is bound to myObject, and that the properties a, b, f are actually part of anotherObject. The internal [[Get]] operation resolves them by inspecting the prototype chain */
+var myObject = Object.create( anotherObject );
+/* anotherObject is the prototype of myObject. myObject's [[Prototype]] now 
+points to anotherObject */
 
-myObject.a++; /* oops, implicit shadowing! This translates to myObject.a = myObject.a + 1, which, by the rules described at the [[Put]] operation, shadows anotherObject.a, setting it's value to anotherObject.a + 1 */
+console.log("Prototypes: Property from the prototype chain", 
+    anotherObject.a, myObject.a, anotherObject.hasOwnProperty( "a"), 
+    myObject.hasOwnProperty("a"));
 
-console.log("implicit shadowing: %d %d %s", anotherObject.a, myObject.a, myObject.hasOwnProperty("a"));
+myObject.f(); 
+/* call function from the prototype. Note that "this" is bound to myObject, 
+and that the properties a, b, f are actually part of anotherObject. 
+The internal [[Get]] operation resolves them by inspecting 
+the prototype chain */
 
-console.log("accesing an object's prototype:", Object.getPrototypeOf(myObject));
+myObject.a++;
+/* oops, implicit shadowing! This translates to myObject.a = myObject.a + 1, 
+which, by the rules described at the [[Set]] operation, shadows 
+anotherObject.a, setting it's value to anotherObject.a + 1 */
+
+console.log("Prototypes: implicit shadowing: %d %d %s", 
+    anotherObject.a, myObject.a, myObject.hasOwnProperty("a"));
+
+console.log("Prototypes: accesing an object's prototype:", 
+    Object.getPrototypeOf(myObject));
 
 
 /*// Constructor */
-/* All functions, being objects, have their [[Prototype]]. Function's prototype are accessible via the "prototype" property. */
-/* From ECMAScript 6 Spec: "Unless otherwise specified every built-in function object has the %FunctionPrototype% object (19.2.3) as the initial value of its [[Prototype]] internal slot. The value of Function.prototype is %FunctionPrototype%, the intrinsic Function prototype object (19.2.3)." */
+/* All functions, being objects, have their [[Prototype]]. 
+Function's prototype is accessible via the "prototype" property.
+From ECMAScript 6 Spec: "Unless otherwise specified every built-in 
+function object has the %FunctionPrototype% object (19.2.3) as the 
+initial value of its [[Prototype]] internal slot. 
+The value of Function.prototype is %FunctionPrototype%, the intrinsic 
+Function prototype object (19.2.3)." */
 function Foo() {
     /* ... */
 }
 var a = new Foo();
-console.log("prototype's constructor %s, constructed object's constructor %s prototype %s, instance of %s", Foo.prototype.constructor === Foo, a.constructor === Foo, Object.isProto, a instanceof Foo);
-/* instanceof answers the following question: in the entire [[Prototype]] chain of a, does the object arbitrarily pointed to by Foo.prototype ever appear? */
+console.log("Prototypes: prototype's constructor %s", 
+    Foo.prototype.constructor === Foo);
+console.log("Prototypes: constructed object's constructor %s", 
+    a.constructor === Foo);
+console.log("Prototypes: instance of %s", a instanceof Foo);
+/* instanceof answers the following question: in the entire 
+[[Prototype]] chain of a, does the object arbitrarily pointed to by 
+Foo.prototype ever appear? */
 
 Foo.prototype = {};
-a = new Foo(); /* oops, now a's "constructor" is no longer Foo's prototype's constructor, but Object's prototype's constructor */
-console.log("prototype's constructor %s, constructed object's constructor %s, Object's prototype constructor %s", Foo.prototype.constructor === Foo, a.constructor === Foo, a.constructor === Object.prototype.constructor);
-/* What happened? a.constructor resolves in a's prototype chain. It resolves to a.prototype.constructor, which in the first case is Foo.prototype.constructor, but in the second case we overrriden Foo.prototype to an empty object, meaning that now Foo.prototype no longer has a "constructor" property, so a.constructor [[Get]] operation goes further in the chain, ending at Object.prototype, which DOES have a "constructor" property. */
+a = new Foo();
+/* oops, now a's "constructor" is no longer Foo's prototype's constructor, 
+but Object's prototype's constructor */
+console.log("Prototypes: prototype's constructor %s", 
+    Foo.prototype.constructor === Foo);
+console.log("Prototypes: constructed object's constructor %s", 
+    a.constructor === Foo);
+console.log("Prototypes: Object's prototype constructor %s", 
+    a.constructor === Object.prototype.constructor);
+/* What happened? a.constructor resolves in a's prototype chain. 
+It resolves to a.prototype.constructor, which in the first case is 
+Foo.prototype.constructor, but in the second case we overrriden Foo.prototype 
+to an empty object, meaning that now Foo.prototype no longer has 
+a "constructor" property, so a.constructor [[Get]] operation goes further 
+in the chain, ending at Object.prototype, which DOES have a 
+"constructor" property. */
 
 
 
@@ -935,14 +991,16 @@ console.log("prototype's constructor %s, constructed object's constructor %s, Ob
  * 
  *****************************************************************/
 
-/* Demo: Implement a general Widget and a specific Button with all three mechanisms */
+/* Demo: Implement a general Widget and a specific 
+Button with all three mechanisms */
 /* Use jQuery for DOM and CSS manipulation */
 
 /*// Get jQuery into our DOM and wait for it to be loaded */
 function jQueryLoader(handler) {
     var jqScriptElem = document.createElement("script");
     jqScriptElem.setAttribute("lang", "javascript");
-    jqScriptElem.setAttribute("src", "node_modules/jquery/dist/jquery.js");
+    jqScriptElem.setAttribute("src", 
+        "https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js");
     document.getElementsByTagName("head")[0].appendChild(jqScriptElem);
 
     var count = 0;
@@ -951,7 +1009,22 @@ function jQueryLoader(handler) {
             console.log("jQuery did not load in %d seconds", count);
             return;
         }
-        if (typeof jQuery == "undefined") { /* What we are doing here? If we would check for undefined without quotes, it will only catch the situation when jQuery is NOT DECLARED. But if jQuery is declared (I don't know how would that happen) and undefined, typeof would return "undefined". When the variable is declared, typeof always returns a string. Now, the test we have catches all situations because of type coercion: if jQuery is declared but is undefined, typeof returns "undefined". If jQuery is not declared, typeof returns undefined, which will be coerced to string "undefined"... */
+        /* What we are doing here?
+        
+        If we would check for undefined without quotes, it will only catch 
+        the situation when jQuery is NOT DECLARED.
+        
+        But if jQuery is declared (I don't know how would 
+        that happen) and undefined, typeof would return "undefined".
+
+        When the variable is declared, typeof always returns a string. 
+        Now, the test we have catches all situations because of 
+        type coercion:
+        - If jQuery is declared but is undefined,
+            typeof returns "undefined". 
+        - If jQuery is not declared, typeof returns undefined, which 
+            will be coerced to string "undefined"... */
+        if (typeof jQuery == "undefined") {
             setTimeout(waitForJQLoading, 1000);
             return;
         }
@@ -960,12 +1033,14 @@ function jQueryLoader(handler) {
     setTimeout(waitForJQLoading, 1000);
 }
 
+/* Because we need to wait for jQuery to load, all our code 
+is called async, so wrap it up in a function called 
+below via jQueryLoader */    
 function whenJQueryIsReady() {
     
-    /* Because we need to wait for jQuery to load, all our code is called async, so wrap it up in a function called below via jQueryLoader */
-    
     /* jQuery loaded, say a green bold hi */
-    $("body").append($("<p>").text("Hi there from jQuery").css("font-weight", "bold").css("color", "darkgreen"));
+    $("body").append($("<p>").text("Hi there from jQuery")
+        .css("font-weight", "bold").css("color", "darkgreen"));
 
 
     /*// 1. Widget and Button with classic JS "class" */
@@ -974,11 +1049,15 @@ function whenJQueryIsReady() {
         function Widget(width, height) {
             this.width = width || 50;
             this.height = height || 50;
-            this.$elem = null; /* our jQuery HTML element that will represent the widget */
+            this.$elem = null;
+            /* our jQuery HTML element that will represent the widget */
         }
         
-        /* base class render function: put our element where specified and apply its properties */
-        Widget.prototype.render = function($where) { /* prefixed "where" with $ so that I know this function expects a jQuery element */
+        /* base class render function: put our element where specified 
+        and apply its properties */
+        Widget.prototype.render = function($where) {
+            /* Prefixed "where" with $ so that I know this function expects 
+            a jQuery element. It's just a convention */
             this.$elem.css({
                 width: this.width + "px",
                 height: this.height + "px"
@@ -989,7 +1068,12 @@ function whenJQueryIsReady() {
             Widget.call(this, width, height);
             this.label = label;
             this.$elem = $("<button>").text(label);
-            this.$elem.bind("click", Button.prototype.onClick.bind(this)); /* YKDJS has this line in Button.prototype.render(), but I'm not sure this is "rendering". In the OOLO version (Objects Linked-to Other Objects, as oppsed to Object Oriented) I moved this to the equivalent of "render", as it seems to fit better there */
+            this.$elem.bind("click", Button.prototype.onClick.bind(this));
+            /* YKDJS has this line in Button.prototype.render(), but 
+            I'm not sure this is "rendering". In the OOLO version 
+            (Objects Linked-to Other Objects, as oppsed to Object Oriented) 
+            I moved this to the equivalent of "render", as it seems 
+            to fit better there */
         }
         
         /* inherit from the Widget class */
@@ -1004,7 +1088,8 @@ function whenJQueryIsReady() {
         }
         
         Button.prototype.onClick = function() {
-            alert("I'm a button created using a classic JS 'class' approach: " + this.label);
+            alert("I'm a button created using a classic JS 'class' approach: "
+                + this.label);
         }
 
         var b1 = new Button(150, 30, "Classic JS Class");
@@ -1016,10 +1101,12 @@ function whenJQueryIsReady() {
     
     (function ECMAScript6Class() {
         class Widget {
-            constructor(width, height) { /* equivalent of function Widget from above */
+            /* equivalent of function Widget from above */
+            constructor(width, height) {
                 this.width = width || 50;
                 this.height = height || 50;
-                this.$elem = null; /* our jQuery HTML element that will represent the widget             */
+                this.$elem = null;
+                /* our jQuery HTML element that will represent the widget */
             }
             
             render($where) {
@@ -1035,7 +1122,12 @@ function whenJQueryIsReady() {
                 super(width, height);
                 this.label = label;
                 this.$elem = $("<button>").text(label);
-                this.$elem.bind("click", this.onClick.bind(this)); /* YKDJS has this line in Button.prototype.render(), but I'm not sure this is "rendering". In the OOLO version (Objects Linked-to Other Objects, as oppsed to Object Oriented) I moved this to the equivalent of "render", as it seems to fit better there */
+                this.$elem.bind("click", this.onClick.bind(this));
+                /* YKDJS has this line in Button.prototype.render(), but 
+                I'm not sure this is "rendering". In the OOLO version
+                (Objects Linked-to Other Objects, as oppsed to Object Oriented) 
+                I moved this to the equivalent of "render", as it seems 
+                to fit better there */
             }
         
             render($where) {
@@ -1058,11 +1150,15 @@ function whenJQueryIsReady() {
     /*// 3. Widget and Button with Behavior Delegation */
     
     (function behaviorDelegation() {
-        var Widget = { /* Widget is just an object with a couple of functions and data. We could have created it with Object.create() for consistency with the way we create Button below */
+        /* Widget is just an object with a couple of functions and data. 
+        We could have created it with Object.create() for consistency with 
+        the way we create Button below */
+        var Widget = { 
             init: function (width, height) {
                 this.width = width || 50;
                 this.height = height || 50;
-                this.$elem = null; /* our jQuery HTML element that will represent the widget             */
+                this.$elem = null; 
+                /* our jQuery HTML element that will represent the widget */
             },
             placeAndStyle: function($where) {
                  this.$elem.css({
@@ -1072,7 +1168,9 @@ function whenJQueryIsReady() {
            }
         };
         
-        var Button = Object.create(Widget); /* Button has Widget as its [[Prototype]], so now it can call to Widget functions directly */
+        var Button = Object.create(Widget);
+        /* Button has Widget as its [[Prototype]], so now it can call to 
+        Widget functions directly */
         Button.setup = function(width, height, label) {
             this.init(width, height);
             this.label = label;
@@ -1089,7 +1187,9 @@ function whenJQueryIsReady() {
             alert("I'm a button created using ECMAScript 6 classes: " + this.label);
         }
         
-        var b1 = Object.create(Button); /* b1 has Button as its [[Prototype]], so now it can call Widget and Button functions directly */
+        var b1 = Object.create(Button);
+        /* b1 has Button as its [[Prototype]], so now it can call 
+        Widget and Button functions directly */
         b1.setup(180, 30, "Behavior Delegation");
         b1.build($("body"));
     })();
@@ -1106,10 +1206,19 @@ var some = {
         if (a > 4) {
             return a;
         }
-        doStuff(a + 1); /* oops, the Engine doesn't know who's doStuff(). See commented console.log() below */
+        doStuff(a + 1);
+        /* oops, the Engine doesn't know who's doStuff(). 
+        See commented console.log() below */
     }
 };
-/*console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1)); // ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" syntax doStuff(a) {} actually resolves to doStuff: function() {}, so its an anonymous function, you cannot call it. In this case it is fixed by saying some.doStuff(a + 1); in the function recursive call, but in some other cases it might not be that simple. */
+/*
+console.log("recursive calling using ES6 nicer syntax:", some.doStuff(1));
+*/
+/* ReferenceError: doStuff is not defined. Why? Because the ES6 "nicer" 
+syntax doStuff(a) {} actually resolves to doStuff: function() {}, 
+so its an anonymous function, you cannot call it. 
+In this case it is fixed by saying "some.doStuff(a + 1);" in the function 
+recursive call, but in some other cases it might not be that simple. */
 
 
 
@@ -1129,24 +1238,38 @@ showTypeof("42");
 showTypeof(true);
 showTypeof(undefined);
 showTypeof({a: 2});
-showTypeof(null); /* surprise: "object", due to an old JS bug that wasn't fixed long enough so that a lot of code depends on it */
+showTypeof(null); /* surprise: "object", due to an old JS bug that 
+                     wasn't fixed long enough so that 
+                     a lot of code depends on it */
 showTypeof(Symbol()); /* "symbol", new ECMAScript 6 type */
 showTypeof(function() {}); /* "function", although a function is an object */
 
-console.log("Types: ", function(a, b) {}.length); /* 2; a function has a length property specifying the number of parameters it accepts */
+console.log("Types: ", function(a, b) {}.length); 
+/* 2; a function has a length property specifying the number of parameters 
+it accepts */
 
 /* In JavaScript, types are associated with VALUES, not VARIABLES */
-var showMyType;  showTypeof(showMyType); /* it has no value - but this actually means it has the "undefined" value */
+var showMyType;  showTypeof(showMyType); 
+/* it has no value - but this actually means it has the "undefined" value */
 showMyType = 42;   showTypeof(showMyType); /* number */
 showMyType = "ab";  showTypeof(showMyType); /* string */
 
-/* console.log(someUndeclaredVariable); // ReferenceError. Although the message might be confusing, actually this means the variable is "undeclared", as opposed to being declared and "undefined" */
+/*
+console.log(someUndeclaredVariable);
+*/
+/* ReferenceError. Although the message might be confusing, actually this means 
+the variable is "undeclared", as opposed to being declared and "undefined" */
 
-/* We can however use typeof to verify if a variable or function is declared or not. This behavior exists in order to allow checking for existence of variables in the code. */
-console.log("Types: ", typeof someUndeclaredVariable); /* suprise: "undefined" */
+/* We can however use typeof to verify if a variable or function is 
+declared or not. This behavior exists in order to allow checking for existence 
+of variables in the code. */
+console.log("Types: ", typeof someUndeclaredVariable); 
+/* suprise: "undefined" */
 
-/* undefined cannot be compared with boolean (coercion allowed), but testing it for trueness (or falseness) is allowed and works fine */
-console.log("Types: 'undefined' coerces to 'boolean': %s %s; but applying ! (not) on it gives us %s", undefined == true, undefined == false, !undefined);
+/* undefined cannot be compared with boolean (coercion allowed), 
+but testing it for trueness (or falseness) is allowed and works fine 
+'undefined' coerces to 'boolean' but applying ! (not) on it gives us true*/
+console.log("Types: %s, %s, %s", undefined == true, undefined == false, !undefined);
 
 console.log("Types: window.DEBUG", window.DEBUG); /* undefined */
 /* an undefined value is not equal to either true or false, but it
@@ -1157,61 +1280,81 @@ if (!window.DEBUG) {
 
 /* Numbers */
 var a = Number.MAX_VALUE;
-var b = a + 1; /* woops, still a value, not Infinity; you have to overflow MAX_VALUE more to obtain Infinity */
-var c = -a -1; /* woops, still a value, not -Infinity */
+var b = a + 1;
+/* oops, still a value, not Infinity; you have to overflow MAX_VALUE more 
+to obtain Infinity */
+var c = -a -1; /* oops, still a value, not -Infinity */
 var d = 1/0; /* Infinity, not some error */
 var e = -1/0; /* -Infinity, not some error */
 var f = 1/b; /* 0? close to it but  not quite */
-var g = 0/-3; /* -0 (!) -0 exists to allow games which have a negative speed that reaches 0 still detect the previous direction of motion */
+var g = 0/-3;
+/* -0 (!) -0 exists to allow games which have a negative speed that reaches 0 
+still detect the previous direction of motion */
 
-console.log("My special numbers are", a, b, c, d, e, f, g);
-console.log("-0 as - string:", "" + -0, ";- JSON", JSON.stringify(-0), ";- as parsed JSON", JSON.parse("-0"));
+console.log("Types: My special numbers are", a, b, c, d, e, f, g);
+console.log("Types: -0 as - string:", "" + -0, ";- JSON", JSON.stringify(-0), ";- as parsed JSON", JSON.parse("-0"));
 
-function isNegZero(n) { /* because -0 === 0, you have to provide a special function to detect it */
+/* because -0 === 0, you have to provide a special function to detect it */
+function isNegZero(n) { 
     n = Number( n );
     return (n === 0) && (1 / n === -Infinity);
 }
-console.log("am I -0?", isNegZero( -0 ), isNegZero( 0 / -3 ), isNegZero( 0 ));
+console.log("Types: am I -0?", isNegZero( -0 ), isNegZero( 0 / -3 ), isNegZero( 0 ));
 
 var a = 2 / "hi"; /* Nan */
 var b = NaN;
-console.log(" NaN is not equal to itself:", a === b);
-console.log("I have to do special checks to test both:",
+console.log("Types: NaN is not equal to itself:", a === b);
+console.log("Types: I have to do special checks to test both:",
     a !== a ? b !== b : false,
     "or use Object.is():", Object.is(a, b));
 
-/* Wrapper objects for primitive types are just that - wrapper objects. The VALUE is still the immutable primitive, so trying to wrap the number in a Number() to allow changing it fails: */
+/* Wrapper objects for primitive types are just that - wrapper objects. 
+The VALUE is still the immutable primitive, so trying to wrap the number 
+in a Number() to allow changing it fails: */
 function changeSome(x) {
-    x = x + 1; /* if x is a Number(), what happens here is a de-wrapping: the primitive value is incremented and reassigned-back. This doesn't modify the original variable, which is still passed by VALUE */
-    console.log("I changed x to", x); /* 3 */
+    x = x + 1;
+    /* if x is a Number(), what happens here is a de-wrapping: the primitive 
+    value is incremented and reassigned-back. This doesn't modify the original 
+    variable, which is still passed by VALUE */
+    console.log("Types: I changed x to", x); /* 3 */
 }
 var a = 2;
 var b = new Number( a ); /* or equivalently `Object(a)` */
 changeSome( b );
-console.log("Did I change b?", b == 3); /* 2, not 3 */
+console.log("Types: Did I change b?", b == 3); /* 2, not 3 */
 
 
 /*// Natives - i.e. Built-ins. Some of them are object wrappers */
 
 var a = new String("42");
 showTypeof(a);
-console.log("a's prototype is", Object.getPrototypeOf(a), "[[Class]] of a is", Object.prototype.toString.call(a));
+console.log("a's prototype is", Object.getPrototypeOf(a), 
+    "[[Class]] of a is", Object.prototype.toString.call(a));
 
-/* There's no need to use object wrappers directly. Moreover, there are gotchas: */
+/* There's no need to use object wrappers directly. 
+Moreover, there are gotchas: */
 var a = new Boolean( false );
 if (!a) {
-    console.log( "Oops" ); /* never runs */
+    console.log( "Types: Oops" ); /* never runs */
 }
 
 /* Unboxing object wrappers values: */
-console.log("my value is", a.valueOf());
+console.log("Types: my value is", a.valueOf());
 /* Arrays */
-var arr1 = new Array(3); /* don't use empty slots, as they don't work well with all Array functions */
-console.log("array of length 3 with empty slots", arr1);
+var arr1 = new Array(3);
+/* don't use empty slots, as they don't work well with all Array functions */
+console.log("Types: array of length 3 with empty slots", arr1);
 
-var arr2 = [undefined, undefined, undefined]; /* better this way, instead of empty slots we have undefined values */
+var arr2 = [undefined, undefined, undefined];
+/* better this way, instead of empty slots we have undefined values */
 console.log("array of length 3 with manually set undefined values", arr2);
-var arr3 = Array.apply(null, {length: 3}); /* same as arr2, but produced by Function.prototype.apply(). The second argument of apply() should be an array, and we provided an array with empty slots (!). But because of the way apply() works, we end up with an array of undefined values. apply() iterates over its second argument (say arr), accesing elements arr[i]. Because no element was defined, it ends up calling Array(undefined, undefined, undefined) */
+var arr3 = Array.apply(null, {length: 3});
+/* same as arr2, but produced by Function.prototype.apply(). 
+The second argument of apply() should be an array, and we provided an array
+ with empty slots (!). But because of the way apply() works, we end up with 
+ an array of undefined values. apply() iterates over its second argument 
+ (say arr), accesing elements arr[i]. Because no element was defined, 
+ it ends up calling Array(undefined, undefined, undefined) */
 console.log("array of length 3 with undefined values produced by Array.apply()", arr3);
 
 console.log("map with empty slots produces empty slots:", arr1.map(function(val, i) {return i;}));
@@ -1231,14 +1374,19 @@ showTypeofAndValue(s);
 
 
 /*// JSON converting & parsing */
-console.log("I'm a JSON stringified - string: %s, number: %d", JSON.stringify("abc"), JSON.stringify(42));
-console.log("I'm a JSON stringified object", JSON.stringify({a: 42, b: "abc", c: true}));
+console.log("I'm a JSON stringified - string: %s, number: %d", 
+    JSON.stringify("abc"), JSON.stringify(42));
+console.log("I'm a JSON stringified object", 
+    JSON.stringify({a: 42, b: "abc", c: true}));
 var o = {
     a: 42,
     b: "abc",
     d: function() {},
-    toJSON: function() { /* we can design our own JSON-ify method that needs to return an object that's used by JSON */
-        return {a: this.a, b: this.b, c: false}; /* you can even include non-existent properties */
+    toJSON: function() {
+        /* we can design our own JSON-ify method that needs to return 
+        an object that's used by JSON */
+        return {a: this.a, b: this.b, c: false}; 
+        /* you can even include non-existent properties */
     }
 }
 console.log("I'm a JSON stringified object with custom toJSON()", JSON.stringify(o));
@@ -1248,7 +1396,9 @@ console.log("I'm a JSON stringified object with a replacer",
         if (k !== "a") { /* o.toJSON() excludes d, here we also exclude a */
             return v;
         }
-    })); /* the replacer could also be an array with the names of the properties to be included in JSON */
+    })); 
+/* the replacer could also be an array with the names of the properties 
+to be included in JSON */
 
 
 /*// Boolean Falsy values & Implicit Conversion to Boolean */
@@ -1256,9 +1406,9 @@ console.log("I'm a JSON stringified object with a replacer",
 function falsyTruthy(x) {
     /* Check if x is falsy; also exhibits implicit conversion to boolean */
     if (x) {
-        console.log(x, "is truthy");
+        console.log("Types: %s is truthy", x);
     } else {
-        console.log(x, "is falsy");
+        console.log("Types: %s is falsy", x);
     }
 }
 
@@ -1282,18 +1432,24 @@ falsyTruthy(document.all); /* falsy to suggest it's deprecated */
 
 var a = 34;
 var d = new Date();
-console.log("Explicit Coercion",
+console.log("Types: Explicit Coercion",
     Number("43.4"),
     Number("gh"),
     String(34),
-    a.toString(), /* explicit-implicit: a is first converted to Number, then toString() is called on that */
+    a.toString(),
+    /* explicit-implicit: a is first converted to Number, then 
+    toString() is called on that */
     +"23", /* +something converts that something to a number */
     -"23", /* -something does the same */
     +d,
-    ~"Hello".indexOf("lo"), /* ~3 which is -4, which is truthy - some use it for doing checks (!) */
-    parseInt("58", 10), /* explicit conversion; always specify the base when using parseInt() */
+    ~"Hello".indexOf("lo"), 
+    /* ~3 which is -4, which is truthy - some use it for doing checks (!) */
+    parseInt("58", 10), 
+    /* explicit conversion; always specify the base when using parseInt() */
     Boolean(undefined),
-    !!undefined, /* !something converts that something to a boolean but flips the value; !!something flips it back */
+    !!undefined, 
+    /* !something converts that something to a boolean but flips the value; 
+    !!something flips it back */
     !![],
     String(Symbol("cool")),
     ""
@@ -1302,27 +1458,35 @@ console.log("Explicit Coercion",
 
 /*// Implicit Coercion */
 
-console.log("Implicit Coercion",
+console.log("Types: Implicit Coercion",
     "42" + "0",
     "42" + 0, 
-    0 + "42", /* "042": if one of the operands is a string, the other one is converted to string */
+    0 + "42", /* "042": if one of the operands is a string, the other one 
+                is converted to string */
     [1,2] + [3,4], /* "1,23,4": both are first converted to strings */
     "" + 507, /* to string */
     507 + "", /* idem */
     "3.14" - 0, /* to number: "-" is only defined for numbers */
-    [5] - [3], /* 2: each array is converted to string, then each string is converted to number */
+    [5] - [3], /* 2: each array is converted to string, then each string is 
+                     converted to number */
     true + 3, /* 4: "true" is converted to number (1) first */
     [] + 0,
-    /*"" + Symbol("cool"), // TypeError: implicit coercion to Symbol is not allowed */
+    /*"" + Symbol("cool"), */ /* TypeError: implicit coercion to Symbol 
+                                 is not allowed */
     "42.7" == 42.7, /* in case of comparison, string is converted to number */
-    "42" == true, /* oops: false: true is first converted to number, so is "42", so: 41 == 1 is false! */
-    "42" == false, /* false again, for the same reason: it coerces to 42 == 0 which is false */
+    "42" == true, /* oops: false: true is first converted to number, 
+                     so is "42", so: 41 == 1 is false! */
+    "42" == false, /* false again, for the same reason: it coerces to 42 == 0 
+                      which is false */
     "0" == false, /* true: 0 == 0 */
-    /* so never use such comparisons; instead use if (a) - implicit conversion to Boolean - or if(!!a) - implicit conversion to Boolean - */
+    /* so never use such comparisons; instead use if (a) - implicit 
+    conversion to Boolean - or if(!!a) - implicit conversion to Boolean - */
     null == undefined,
     undefined == null,
     [42].valueOf(),
-    "42" == [42], /* true, because when objects are involved they are converted to primitive first, so this coerces to "42" == 42, i.e. 42 == 42 which is true */
+    "42" == [42], /* true, because when objects are involved they are 
+                     converted to primitive first, so this coerces to 
+                     "42" == 42, i.e. 42 == 42 which is true */
     [4, 2].valueOf(),
     "42" == [4, 2], 
     "less or greater than",
@@ -1335,35 +1499,48 @@ var oldNumberValueOf = Number.prototype.valueOf;
 Number.prototype.valueOf = function() {
     return 3;
 };
-console.log("I hijacked Number's valueOf():", new Number( 2 ) == 3); /* true: Because == coerces Number to number using valueOf(), it calls my function above... */
+console.log("Types: I hijacked Number's valueOf():", new Number( 2 ) == 3); 
+/* true: Because == coerces Number to number using valueOf(), 
+it calls my function above... */
 
 Number.prototype.valueOf = oldNumberValueOf; /* restore valueOf() */
-console.log("I put back Number's valueOf():", new Number( 2 ) == 3); /* false, as expected   */
+console.log("Types: I put back Number's valueOf():", new Number( 2 ) == 3); 
+/* false, as expected   */
 
-/*// the || and && operators are not logical ones, but selectors - they select one of their values (much like "or" in Perl) */
+/*// the || and && operators are not logical ones, but selectors - 
+they select one of their values (much like "or" in Perl) */
 
 var a = new Boolean(false);
 var b = 6;
 var c = "a";
 
-var d1 = a && b && c; /* && tests the first operand as boolean: it selects the second operand if the test is true, the first operand otherwise */
-console.log("&& selects operands, in this case it selected c:", d1);
+var d1 = a && b && c; 
+/* && tests the first operand as boolean: it selects the second operand 
+if the test is true, the first operand otherwise */
+console.log("Types: && selects operands, in this case it selected c:", d1);
 
-var d2 = Boolean(a && b && c); /* && behaves te same, but wrapping it in Boolean converts it to true/false */
-console.log("to get the same bool result as in C++, we need to wrap the expression in Boolean():", d2);
+var d2 = Boolean(a && b && c);
+/* && behaves the same, but wrapping it in Boolean converts it to true/false.
+To get the same bool result as in C++, we need to wrap 
+the expression in Boolean() */
+console.log("Types: && inside Boolean selected the 'boolean' value of c: ", d2);
 
-var d3 = a || b || c; /* || tests the first operand as boolean: it selects the first operand if the expression is true, the second operand otherwise */
-console.log("|| selects operands, in this case it selected a:", d3);
+var d3 = a || b || c; 
+/* || tests the first operand as boolean: it selects the first operand 
+if the test is true, the second operand otherwise */
+console.log("Types: || selects operands, in this case it selected a:", d3);
 
 /* || as default values */
 function sayHi(x, y) {
     x = x || "World";
     y = y || "Hello,";
-    console.log(y, x);
+    console.log("Types: ", y, x);
 }
 sayHi();
 sayHi("Sorel");
-sayHi("", "Oops default param wrong"); /* oops, "" is falsy, so if we wanted to display an empty string, we got it wrong! */
+sayHi("", "Oops default param wrong"); 
+/* oops, "" is falsy, so if we wanted to display an empty string, 
+we got it wrong! */
 
 /* && as shortcut for if() {} */
 var a = new Boolean(false);
@@ -1376,26 +1553,29 @@ a && sayHi("Boolean is truthy 'cause it's an object");
 var a = "42";
 switch (true) {
     case a == 10:
-        console.log( "10 or '10'" );
+        console.log( "Types: 10 or '10'" );
         break;
     case a == 42:
-        console.log( "42 or '42'" );
+        console.log( "Types: 42 or '42'" );
         break;
     default:
         /* never gets here */
 }
 
-/* ...but be careful to always return a boolean value, otherwise the strict comparison will fail */
+/* ...but be careful to always return a boolean value, otherwise 
+the strict comparison will fail */
 
 /* this is wrong */
 var a = "hello world";
 var b = 10;
 switch (true) {
-    case (a || b == 10): /* || operator selects its operands, so the result of this expression is truthy, but not true */
+    case (a || b == 10): 
+        /* || operator selects its operands, so the result 
+        of this expression is truthy, but not true */
         /* never gets here */
         break;
     default:
-        console.log( "Oops" );
+        console.log( "Types: Oops wrong case" );
 }
 
 /* this is correct */
@@ -1403,7 +1583,7 @@ var a = "hello world";
 var b = 10;
 switch (true) {
     case !!(a || b == 10): /* we explicitly coerce the result of this expression to boolean */
-        console.log( "Right" );
+        console.log( "Types: Right case" );
         break;
     default:
         /* never gets here */
@@ -1414,8 +1594,11 @@ switch (true) {
 
 if (window) {
     window.onload = function browserInit() {
-        /* Putting an ID to an HTML element defines a JS variable with the name equal to that ID and value an object of specific HTML prototype */
-        console.log("This is a variable from HTML:", htmlVar, Object.getPrototypeOf(htmlVar));
+        /* Putting an ID to an HTML element defines a JS variable 
+        with the name equal to that ID and value an object of 
+        specific HTML prototype */
+        console.log("Types: This is a variable from HTML:", htmlVar, 
+            Object.getPrototypeOf(htmlVar));
     }
 }
 
@@ -1432,38 +1615,79 @@ if (window) {
 
 /*
 JS has a concurency model based on the Event Loop.
-The Event Loop is something like that (from MDN):
-while(queue.waitForMessage()){
-  queue.processNextMessage();
+
+Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop
+
+The Call Stack
+
+Function calls form a stack of frames. The outermost script is also on the 
+call stack.
+
+function foo(b) {
+  var a = 10;
+  return a + b + 11;
 }
-queue.waitForMessage waits synchronously for a message to arrive if there is none currently. When a message is available, it is executed.
-Each message has a function (callback) associated with it (it can be undefined or null). If the function is defined, it is called.
-Each message must execute completely before another message can be taken out of the queue.
 
-As I get it, the entire JavaScript script is executed in the same way - if it wouldn't finish fast, then no other events would be possible.
+function bar(x) {
+  var y = 3;
+  return foo(x * y);
+}
 
-Messages are placed in the event loop by:
-- browsers in response to various events (script loaded, server data arrived, button clicked, etc). The callbacks are provided by your app (the script itself, by registering a function with an AJAX request, with a button's onclick, etc.)
-- your own app by calling setTimeout(fn, 0)
+console.log(bar(7)); //returns 42
+console.log("Hi");
+
+When calling bar, a first frame is created containing bar's arguments and 
+local variables. When bar calls foo, a second frame is created and 
+pushed on top of the first one containing foo's arguments and local variables. 
+When foo returns, the top frame element is popped out of the stack 
+(leaving only bar's call frame). When bar returns, the stack is empty.
+Execution continues then with the "Hi" log.
+After that, messages can be processed from the queue.
+
+HeapSection
+
+Objects are allocated in a heap which is just a name to denote a large mostly 
+unstructured region of memory.
+
+QueueSection
+
+A JavaScript runtime uses a message queue, which is a list of messages 
+to be processed. Each message has an associated function which gets called 
+in order to handle the message.
+
+At some point during the event loop, (usually when the call stack is empty)
+the runtime starts handling the messages on the queue, 
+starting with the oldest one. To do so, the message 
+is removed from the queue and its corresponding function is called with 
+the message as an input parameter. As always, calling a function creates 
+a new stack frame for that function's use.
+
+The processing of functions continues until the stack is once again empty; 
+then the event loop will process the next message in the queue 
+(if there is one).
 */
-
-/* Uncomment this to prove that the entire script is ran on the Event Loop. The scripts will not be executed until the browser detects the blockage and offers to stop the script. */
-/* while(true) {} */
-
 
 /*// Job Queue */
 
 /*
-ECMAScript 6 also has a Job Queue. This is a mechanism to put messages in the Event Loop queue in the FRONT, instead of at the end of the queue. This allows for the Promise mechanism to exist - when a promise is resolved, the corresponding callback is called asynchronously by using the Job Queue.
+ECMAScript 6 also has a Job Queue. This is a mechanism to put messages 
+in the Event Loop queue in the FRONT, instead of at the end of the queue. 
+This allows for the Promise mechanism to exist - when a promise is resolved, 
+the corresponding callback is called asynchronously by using the Job Queue.
 */
 
 
 /* // Fake Promise-like code - values */
 
-/* Suppose we want to add x and y when one or both could get their values somewhere later (maybe async). Rather than doing ugly checks in a loop, waiting for both of them to get their values, we write a mechanism that allows us to be informed async when both values are available:
+/* Suppose we want to add x and y when one or both could get their values 
+somewhere later (maybe async). Rather than doing ugly checks in a loop, 
+waiting for both of them to get their values, we write a mechanism that 
+allows us to be informed async when both values are available:
 */
 
-/* Get the value of x when it is avaliable - simulate by setting a timeout instead of running some AJAX request. When x becomes available - i.e. the timeout expires - call a callback function with the value of x */
+/* Get the value of x when it is avaliable - simulate by setting a timeout 
+instead of running some AJAX request. When x becomes available - 
+i.e. the timeout expires - call a callback function with the value of x */
 function fetchX(cb) {
     setTimeout(function() {
         cb(3);
@@ -1477,14 +1701,23 @@ function fetchY(cb) {
     }, 1100);
 }
 
-/* We have getX and getY functions, that we call in order to get our x and y value. Both functions receive a callback that they call when the x, respectively y values are available. */
+/* We have getX and getY functions, that we call in order to get 
+our x and y value. Both functions receive a callback that they call when the x, 
+respectively y values are available. */
 /* We also have a cb callback that we call when the sum is ready */
 function add(getX, getY, cb) {
-    var x, y; /* undefined, will be initialized later by calling getX and getY */
+    var x, y;
+    /* undefined, will be initialized later by calling getX and getY */
     
-    getX(function gotX(xVal) { /* call getX() which will call our calback when the x value is available. Note that our callback has a closure over both x and y. It is a good practice to name all functions - they will be more easily seen in call stacks and debuggers */
+    /* call getX() which will call our calback when the x value is available. 
+    Note that our callback has a closure over both x and y. It is a 
+    good practice to name all functions - they will be more easily seen 
+    in call stacks and debuggers */
+    getX(function gotX(xVal) { 
         x = xVal; /* the x value is availabe, copy it in x */
-        if (y !== undefined) { /* if y value is available too, then do the sum, otherwise we just keep the closure over x available */
+        if (y !== undefined) { 
+            /* if y value is available too, then do the sum, otherwise we just 
+            keep the closure over x available */
             cb(x + y);
         }
     });
@@ -1495,26 +1728,36 @@ function add(getX, getY, cb) {
         }
     });
     
-    /* when both callbacks provided to getX and getY will have been called, both x and y will have values. In either case we call the callback with the sum value */
+    /* when both callbacks provided to getX and getY will have been called, 
+    both x and y will have values. In either case we call the callback
+    with the sum value */
 }
 
 /* use our async adding function */
 add(fetchX, fetchY, function showSum(sum) {
-    console.log("The sum computed from async-got values is", sum);
+    console.log("Fake-Promise: Values: The sum computed from async-got values is", sum);
 });
 
 
 /* // Fake Promise-like code - completion events */
 
-/* We have an async function that, when it completes, it can return information on the way it completed: with success or error, in both cases providing some data - useful data for success, error info for error. We want to listen for this information without the "callback hell" - having control over when our callback would be called */
+/* We have an async function that, when it completes, it can return 
+information on the way it completed: with success or error, in both cases 
+providing some data - useful data for success, error info for error. 
+We want to listen for this information without the "callback hell" - 
+having control over when our callback would be called */
 
 
-/* We have to make our "promise" global - as opposed to real ECMAScript 6 Promises */
+/* We have to make our "promise" global - as opposed to real 
+ECMAScript 6 Promises */
 var o = {
     value: undefined
 };
 
-/* This function returns a "promise" that has two "events" associated: success and error. To make it async, it uses setTimeout(). To provide success/error cases it tests for a random number. On the success case, the error "event" is empty, and viceversa. */
+/* This function returns a "promise" that has two "events" associated: 
+success and error. To make it async, it uses setTimeout(). To provide 
+success/error cases it tests for a random number. On the success case, 
+the error "event" is empty, and viceversa. */
 function doWork() {
     
     if ((o.value = Math.random()) < 0.5) {
@@ -1527,20 +1770,22 @@ function doWork() {
     
     /* error case */
     setTimeout(function() {
-        o.error("My number was too large: " + o.value)
+        o.error("Fake-Promise: Events: My number was too large: " + o.value)
     }, 1200);
     return o;
 }
 
 var fakePromise = doWork();
 fakePromise.success = function(val) {
-    console.log("Fake promise success:", val);
+    console.log("Fake-Promise: Events: Success:", val);
 }
 fakePromise.error = function(err) {
     console.log(err);
 }
 
-/* Note that this approach does not do actual inversion of control - it's more of a syntactic example of how real promises work. Our success and error functions are still called whenever the doWork() function pleases.
+/* Note that this approach does not do actual inversion of control - it's more 
+of a syntactic example of how real promises work. Our success and error 
+functions are still called whenever the doWork() function pleases.
 With real promises, we control when our code is called.
 */
 
@@ -1560,12 +1805,19 @@ With real promises, we control when our code is called.
 
 /* We return a promise that x will get a value */
 function fetchX(cb) {
-    return new Promise(function(resolve, reject) { /* this is the worker function, called before the Promise() constructor returns the promise object */
+    /* this is the worker function, called before the Promise() constructor 
+    returns the promise object */
+    return new Promise(function(resolve, reject) { 
         setTimeout(function() {
             if (Math.random() < 0.5) {
-                resolve(5); /* resolve() is the function we call when our promise was resolved (e.g. an AJAX request got its response back) - in this case we use a random value for testing */
+                resolve(5);
+                /* resolve() is the function we call when our promise
+                 was resolved (e.g. an AJAX request got its response back) - 
+                 in this case we use a random value for testing */
             } else {
-                reject("x: my random number was too big"); /* reject() is used for when the promise cannot be resolved - in our case, the random number was too big */
+                reject("x: my random number was too big");
+                /* reject() is used for when the promise cannot be resolved - 
+                in our case, the random number was too big */
             }
         }, 1300);
     });
@@ -1585,42 +1837,50 @@ function fetchY(cb) {
 }
 
 function add(xPromise, yPromise) {
-    return Promise.all([xPromise, yPromise]) /* this creates a promise that waits on the x & y promises */
-        /* Promise.prototype.then() registers the provided callbacks to be called when the promise is resolved/rejected. It also returns the promise - so we can chain .then() calls. */
-        .then(function(values) { /* when the promise is done, we can handle the success/error cases with two functions */
+    /* this creates a promise that waits on the x & y promises */
+    return Promise.all([xPromise, yPromise])
+        /* Promise.prototype.then() registers the provided callbacks 
+        to be called when the promise is resolved/rejected. It also 
+        returns the promise - so we can chain .then() calls. */
+        .then(function(values) {
+            /* when the promise is done, we can handle the success/error cases 
+            with two functions */
             return values[0] + values[1];
-        }); /* this function actually returns another promise - that the sum is ready */
+        });
+        /* this function actually returns another promise - 
+        that the sum is ready */
 }
 
 /* Call add(), which returns a Promise, and chain the .then() function */
 add(fetchX(), fetchY()).then(
     function(sum) {
-        console.log("The sum with real Promises is", sum);
+        console.log("Promise: The sum is", sum);
     },
     function(err) {
-        console.log("The promise was rejected:", err);
+        console.log("Promise: The promise was rejected:", err);
     }
 );
 
 /* retain the promise and watch it */
 var promise = add(fetchX(), fetchY());
 
-/* We can watch the promise later, many times: it is immutable, and it will retain its value no matter how many times we watch it */
+/* We can watch the promise later, many times: it is immutable, and it will 
+retain its value no matter how many times we watch it */
 promise.then(
     function(sum) {
-        console.log("1st: The sum with a promise var is", sum);
+        console.log("Promise: 1st: The sum with a promise var is", sum);
     },
     function(err) {
-        console.log("1st: The promise was rejected:", err);
+        console.log("Promise: 1st: The promise was rejected:", err);
     }
 );
 
 promise.then(
     function(sum) {
-        console.log("2nd: The sum with a promise var is", sum);
+        console.log("Promise: 2nd: The sum with a promise var is", sum);
     },
     function(err) {
-        console.log("2nd: The promise was rejected:", err);
+        console.log("Promise: 2nd: The promise was rejected:", err);
     }
 );
 
@@ -1643,12 +1903,13 @@ function isPromise(p) {
     }
 }
 
-console.log("Did we get a promise (duck typing)?", isPromise(promise));
+console.log("Promise: Did we get a promise (duck typing)?", isPromise(promise));
 
 
-/*// Order of Promise calls */
+/*// Order of Promise Calls */
 
-/* Promise callbacks are called in the order of their registration - see the .then() explanation above */
+/* Promise callbacks are called in the order of their registration - 
+see the .then() explanation above */
 
 function doSomething() {
     return new Promise(function(resolve, reject) {
@@ -1661,13 +1922,16 @@ function doSomething() {
 var p = doSomething();
 p.then( function(){
     p.then( function(){
-        console.log( "C" );
+        console.log( "Promise: C" );
     } );
-    console.log( "A" );
+    console.log( "Promise: A" );
 } );
 p.then( function(){
-    console.log( "B" );
-} ); /* A B C, because the registered callbacks are called in the order of registration: A and B are registered synchronously first, while C is registered only when the async call of A happens */
+    console.log( "Promise: B" );
+} );
+/* A B C, because the registered callbacks are called in the 
+order of registration: A and B are registered synchronously first, 
+while C is registered only when the async call of A happens */
 
 
 /*// Resolving a promise via another one */
@@ -1679,7 +1943,9 @@ var p3 = new Promise( function(resolve,reject){
 var p1 = new Promise( function(resolve,reject){
     resolve( p3 );
     /*
-    Here, we resolve this promise via another one (i.e. p3). This means that we actually watch p3 for completion, and only then resolve our own. It's as if we would have written:
+    Here, we resolve this promise via another one (i.e. p3). 
+    This means that we actually watch p3 for completion, and only then 
+    resolve our own. It's as if we would have written:
     */
     /*
     p3.then(function() {
@@ -1695,12 +1961,14 @@ var p2 = new Promise( function(resolve,reject){
     resolve( "A" );
 } );
 
-/* Although both A and B are resolved immediately, the order of calls here is A B, because A is resolved via another promise, which introduces another asynchrony level */
+/* Although both A and B are resolved immediately, the order of calls here is 
+A B, because A is resolved via another promise, which introduces 
+another asynchrony level */
 p1.then( function(v){
-    console.log( v );
+    console.log( "Promise: ", v );
 } );
 p2.then( function(v){
-    console.log( v );
+    console.log( "Promise: ", v );
 } );
 
 
@@ -1727,7 +1995,9 @@ var timerPromise = new Promise(function(resolve, reject) {
     }, 2000);
 });
 
-/* Promise.race() creates a "race" between an array of promises: which one resolves first, that one's response will be passed to the resolve/reject functions */
+/* Promise.race() creates a "race" between an array of promises: 
+which one resolves first, that one's response will be passed to the 
+resolve/reject functions */
 Promise.race([p4, timerPromise]).then(
     function(something) {
         console.log(something);
@@ -1737,7 +2007,8 @@ Promise.race([p4, timerPromise]).then(
 
 /*// Throwing Errors with Promises */
 
-/* Throwing an error while trying to resolve a promise will result in the reject function being called, with the exception as the argument */
+/* Throwing an error while trying to resolve a promise will result in the 
+reject function being called, with the exception as the argument */
 
 var p4 = new Promise(function(resolve, reject) {
     someUndefinedFunction(); /* throws an error */
@@ -1749,7 +2020,7 @@ p4.then(
         console.log(msg);
     },
     function(err) {
-        console.log("I got this error from a Promise:", err);
+        console.log("Promise: I got this error", err);
     }
 );
 
@@ -1757,25 +2028,31 @@ p4.then(
 p1.then(
     function(v) {
         someUndefinedFunction(); /* throws an error - is it lost? */
-        /* - the error is not lost, but is captured via the promise that p1.then() returns */
+        /* - the error is not lost, but is captured via the promise 
+        that p1.then() returns */
         console.log( v );
     }
 ).then(
     function(v) {
-        console.log("You won't see this message");
+        console.log("Promise: You won't see this message");
     },
     function(err) {
-        console.log("I got this error from the promise returned by the handler of p1:", err);
+        console.log("Promise: I got this error from the promise returned by the handler of p1", err);
     }
 );
 
 
 /*// Trusting Unknown Promises */
 
-/* If we have some library that it seems to be returning Promises but we're not sure whether they're real Promises (and duck typing won't help because they use "then"), we can wrap those promises into Promise.resolve() */
+/* If we have some library that it seems to be returning Promises 
+but we're not sure whether they're real Promises 
+(and duck typing won't help because they use "then"), we can wrap those 
+promises into Promise.resolve() */
 
-/* If a Promise-like thing is passed to Promise.resolve(), it will listen on it and return a promise insted. */
-/* If a real Promise is passed to Promise.resolve(), it will just return it back (or the behavior is the same, which doesn't matter) */
+/* If a Promise-like thing is passed to Promise.resolve(), it will listen on it 
+and return a promise insted. */
+/* If a real Promise is passed to Promise.resolve(), it will just 
+return it back (or the behavior is the same, which doesn't matter) */
 
 var evilPromise = {
     then: function(cb,errcb) {
@@ -1787,11 +2064,11 @@ var evilPromise = {
 evilPromise
 .then(
     function fulfilled(val){
-        console.log( val ); /* 42 */
+        console.log( "Evil-Promise: ", val ); /* 42 */
     },
     function rejected(err){
         /* oops, shouldn't have run */
-        console.log( err ); /* evil laugh */
+        console.log( "Evil-Promise: ", err ); /* evil laugh */
     }
 ); /* surprise */
 
@@ -1799,11 +2076,11 @@ evilPromise
 Promise.resolve(evilPromise)
 .then(
     function fulfilled(val){
-        console.log( val ); /* 42 */
+        console.log( "Evil-Promise: Fixed", val ); /* 42 */
     },
     function rejected(err){
         /* will not run */
-        console.log( err );
+        console.log( "Evil-Promise: Fixed", err );
     }
 );
 
@@ -1811,14 +2088,17 @@ Promise.resolve(evilPromise)
 /*// Chaining Promises */
 
 /*
-Every time you call then(..) on a Promise, it creates and returns a new Promise, which we can chain with.
-Whatever value you return from the then(..) call's fulfillment callback (the first parameter) is automatically set as the fulfillment of the chained Promise (from the first point).
+Every time you call then(..) on a Promise, it creates and returns 
+a new Promise, which we can chain with.
+Whatever value you return from the then(..) call's fulfillment callback 
+(the first parameter) is automatically set as the fulfillment of the 
+chained Promise (from the first point).
 */
 
 var p = Promise.resolve( 2189 );
 
 var p2 = p.then( function(v){
-    console.log( v );
+    console.log( "Promise: Chain", v );
 
     /* fulfill `p2` by doubling the value */
     return v * 2;
@@ -1826,7 +2106,7 @@ var p2 = p.then( function(v){
 
 /* chain off `p2` */
 p2.then( function(v){
-    console.log( v );
+    console.log( "Promise: Chain", v );
 } );
 
 
@@ -1835,7 +2115,7 @@ p2.then( function(v){
 var p = Promise.resolve( 3421 );
 
 p.then( function(v){
-    console.log( v );
+    console.log( "Promise: Chain2", v );
 
     /* create a promise to return */
     return new Promise( function(resolve,reject){
@@ -1848,7 +2128,7 @@ p.then( function(v){
 } )
 .then( function(v){
     /* runs after the delay in the previous step */
-    console.log( v );
+    console.log( "Promise: Chain2", v );
 } );
 
 
