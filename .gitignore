@@ -9,6 +9,7 @@
 **/*.class
 **/*.pyc
 **/*.pch
+**/*.ipch
 **/*.o
 **/*.bin
 **/*.elf

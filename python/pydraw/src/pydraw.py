@@ -5,6 +5,7 @@ import sys
 import asyncio
 import time
 import random
+import functools
 
 from typing import *
 
@@ -387,6 +388,46 @@ print("Is file opened or not?")
 
 
 
+###########
+###########
+###########
+
+print("\n\n---Decorators---\n")
+
+# A Decorator is simply a function (my_decorator() below) that wraps 
+# another function (func below) within an inner function (wrapper() below)
+# and then returns the inner function without calling it.
+# Usually the inner function adds some functionality before and/or after
+# the original function, thus the name "decorator".
+# 
+# Once a decorator is defined, it can be imported and accessed with the
+# "@" syntactic prefix as below.
+def my_decorator(func):
+    @functools.wraps(func)   # Make sure func() appears as itself in Introspection
+    def wrapper(*args, **kwargs):    # Accept any arguments so that any func works
+        print("Something is happening before the function is called.")
+        result =func(*args, **kwargs)  # Save the result for returning
+        print("Something is happening after the function is called.")
+        return result   # Return the result to have a complete wrapping
+    return wrapper
+
+def manual_decorator():
+    print("Whee! (manual)")
+    return 17
+
+# decorate the manual_decorator() function manually
+manual_decorator = my_decorator(manual_decorator)
+
+# decorate the say_whee() function with the "@" syntax
+@my_decorator
+def say_whee():
+    print("Whee!")
+    return 25
+
+print("Decorated return", manual_decorator())
+print("Decorated return", say_whee())
+
+
 
 ###########
 ###########
@@ -429,9 +470,12 @@ async def asyncRoutine():
     await asyncio.gather(count(3), count(4), count(5))
 
 s = time.perf_counter()
+# As of Python 3.7, asyncio.run() is a provisional API, but is convenient
 asyncio.run(asyncRoutine())
 elapsed = time.perf_counter() - s
 print(f"async hello executed in {elapsed:0.2f} seconds.")
+
+print()
 
 #
 # How async calls are interlaced
@@ -460,15 +504,16 @@ async def asyncRandom():
 
 random.seed(444)
 r1, r2, r3 = asyncio.run(asyncRandom())
-print()
 print(f"r1: {r1}, r2: {r2}, r3: {r3}")
+
+print()
 
 #
 # Chaining async calls
 #
 
 async def part1(n: int) -> str:
-    i = random.randint(0, 10)
+    i = random.randint(6, 10)
     print(f"part1({n}) sleeping for {i} seconds.")
     await asyncio.sleep(i)
     result = f"result{n}-1"
@@ -476,7 +521,7 @@ async def part1(n: int) -> str:
     return result
 
 async def part2(n: int, arg: str) -> str:
-    i = random.randint(0, 10)
+    i = random.randint(0, 5)
     print(f"part2{n, arg} sleeping for {i} seconds.")
     await asyncio.sleep(i)
     result = f"result{n}-2 derived from {arg}"
@@ -485,22 +530,72 @@ async def part2(n: int, arg: str) -> str:
 
 async def chain(n: int) -> None:
     start = time.perf_counter()
-    p1 = await part1(n)
-    p2 = await part2(n, p1)
+    result1 = await part1(n)
+    result2 = await part2(n, result1)
     end = time.perf_counter() - start
-    print(f"-->Chained result{n} => {p2} (took {end:0.2f} seconds).")
+    print(f"-->Chained result{n} => {result2} (took {end:0.2f} seconds).")
 
+# So what happens here?
+# asyncChain() calls asyncio.gather() which in turn schedules its
+# coroutine arguments to run on an event loop.
+# Then, each chain() coroutine call starts doing its stuff as follows:
+# - gets result1 awaiting for part1()
+# - gets result2 awaiting for part2() and feeding it result1
+# Because chain() awaits first on part1() and only afterwards awaits part2(),
+# part2() is only started after part1() finished.
+# The mixed output you get when running this code comes from the fact there
+# are multiple chain() calls scheduled.
 async def asyncChain(*args):
     await asyncio.gather(*(chain(n) for n in args))
 
 random.seed(444)
 args = [9, 6, 3]
 start = time.perf_counter()
-asyncio.run(asyncChain(*args))
+# Let's use the Python 3.7 official API (as opposed to provisional)
+# for starting a coroutine.
+# For that, we need to create an event loop, start it, then create the task.
+# Finally, we close the event loop.
+loop = asyncio.new_event_loop()
+task = loop.run_until_complete(asyncChain(*args))
 end = time.perf_counter() - start
 print(f"async chain finished in {end:0.2f} seconds.")
 
+print()
 
+#
+# Custom awaitable Futures
+#
+
+def mark_done(f):
+    f.set_result(17)
+
+def futureWork(loop):
+    f = loop.create_future()
+    loop.call_later(3, mark_done, f)
+    return f
+
+loop = asyncio.new_event_loop()
+print(f"Awaiting for future work to complete...")
+f = futureWork(loop)
+loop.run_until_complete(f)
+print(f"Future work completed: {f.result()}")
+
+#
+# So how does one actually implement from scratch a non-blocking long work
+# without threads?
+# - For your own code, you split it into chunks with generators or asyncio
+# - For a work you don't control, such as a blocking network request, you rely
+#   on the language library to do this under the hood. They may do this with 
+#   threads or events, but the big idea is that they're *hiding* this away from you
+# More details below (refers to JS, but applies to Python as well):
+"""
+Below the covers, javascript has an event queue. Each time a javascript thread of execution finishes, it checks to see if there is another event in the queue to process. If there is, it pulls it off the queue and triggers that event (like a mouse click, for example).
+
+The native code networking that lies under the ajax call will know when the ajax response is done and an event will get added to the javascript event queue. How the native code knows when the ajax call is done depends upon the implementation. It may be implemented with threads or it may also be event driven itself (it doesn't really matter). The point of the implementation is that when the ajax response is done, some native code will know it's done and put an event into the JS queue.
+
+https://stackoverflow.com/questions/7575589/how-does-javascript-handle-ajax-responses-in-the-background/7575649#7575649
+
+"""
 
 
 

@@ -1798,6 +1798,7 @@ With real promises, we control when our code is called.
  * 
  *****************************************************************/
 
+// See pydraw.py for a discussion on "non-blocking long work" implementation
 
 /*// Basic Promises */
 
