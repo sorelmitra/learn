@@ -1,6 +1,6 @@
 VPATH=..
 
-DOT=/opt/local/bin/dot
+DOT=/usr/local/bin/dot
 UMLGRAPH=/usr/local/bin/umlgraph
 PIC2PLOT=/opt/local/bin/pic2plot
 

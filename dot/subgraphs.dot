@@ -14,8 +14,8 @@ digraph G {
         node [style=filled];
         b0 -> b1 -> b2 -> b3;
     }
-    start -> a0;
-    start -> b0;
+    start -> a0 [label="edge label\nstuff"];
+    start -> b0 [label="another edge label"];
     a1 -> b3;
     b2 -> a3;
     a3 -> a0;
