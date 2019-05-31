@@ -7,4 +7,4 @@ This is what is currently implemented:
 * **Chat API**. This is a chat RESTful API that allows posting messages
 * **Chat Mobile**. This is a mobile app where the visitors can write messages
 
-![Solution](https://github.com/sorelmitra/botagg/blob/master/docs/diagrams/BotAggSolution.png "Bot Agg Solution")
+![Solution](https://github.com/sorelmitra/botagg/blob/master/docs/diagrams/BotAggSolution.svg "Bot Agg Solution")
