@@ -25,7 +25,7 @@ Additionally, this platform will conform to the following constraints (initially
 * **Flexible Deploy**. The system can be deployed on premise as well as in a cloud environment
 * **Cloud-Vendor Independence**. The cloud deploying can be done on any cloud vendor with minimal additional development
 * **New Bots**. The platform should support adding new bots, whether via internal development or external
-* **New Visitor Channels**. The platform should support adding new visitor channels
+* **New Caller Channels**. The platform should support adding new channels for the entities that come to talk to the bots (named "Caller" here)
 * **Open to Contact Centers**. The platform should support future additions of Contact Centers of any kind
 
 # Team, Tools, and Process
