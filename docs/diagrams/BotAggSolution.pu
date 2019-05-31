@@ -2,7 +2,7 @@
 
 !include ./style.pu
 
-package "Chat API <img:images/Cloud.png{scale=.50}>" as packageChat {
+package "Chat API <img:images/OnPremise.png{scale=.50}>" as packageChat {
 	FA_SERVER(serviceChatApi,"Chat API")
 	FA_DATABASE(dbChatApi,"Chat DB")
 }
