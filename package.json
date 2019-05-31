@@ -4,7 +4,8 @@
   "description": "Chat Bot Aggregator Demo",
   "main": "README.md",
   "scripts": {
-    "postgres": ""
+    "postgres": "",
+    "docs": "cd docs/diagrams && make dist"
   },
   "repository": {
     "type": "git",

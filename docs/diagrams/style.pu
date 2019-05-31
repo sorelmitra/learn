@@ -1,0 +1,103 @@
+
+
+' This is a common style file intended to be included in other files
+
+!define ICONURL_FAWSOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.0.0
+
+!define ICONURL_OFFICE https://raw.githubusercontent.com/Roemer/plantuml-office/master/office2014
+
+!includeurl ICONURL_FAWSOME/common.puml
+!includeurl ICONURL_FAWSOME/font-awesome/server.puml
+!includeurl ICONURL_FAWSOME/font-awesome/database.puml
+!includeurl ICONURL_FAWSOME/font-awesome/mobile_phone.puml
+
+!includeurl ICONURL_OFFICE/Users/communications.puml
+!includeurl ICONURL_OFFICE/Concepts/on_premises.puml
+!includeurl ICONURL_OFFICE/Clouds/cloud.puml
+
+skinparam shadowing false
+skinparam nodesep 100
+skinparam ranksep 20
+skinparam roundCorner 10
+skinparam ArrowColor Black
+
+skinparam node {
+	fontSize 16
+	fontName Arial
+}
+
+skinparam file {
+	borderColor Transparent
+	backgroundColor Transparent
+	fontColor gray
+	fontSize 12
+	fontName Arial
+}
+
+skinparam card {
+	borderColor Transparent
+	backgroundColor Transparent
+	fontColor gray
+	fontSize 16
+	fontName Arial
+}
+
+skinparam rectangle {
+	fontSize 16
+	fontName Arial
+	fontColor Black
+	backgroundColor #Ivory
+	stereotypeFontColor #Ivory
+	backgroundColor<<external>> #F0F0F0
+	stereotypeFontColor<<external>> #F0F0F0
+	borderColor<<icon>> Transparent
+	backgroundColor<<icon>> Transparent
+	stereotypeFontColor<<icon>> Transparent
+}
+
+skinparam database {
+	fontSize 16
+	fontName Arial
+	fontColor Black
+	backgroundColor #Ivory
+	stereotypeFontColor #Ivory
+	backgroundColor<<external>> #F0F0F0
+	stereotypeFontColor<<external>> #F0F0F0
+}
+
+skinparam entity {
+	fontSize 16
+	fontName Arial
+	fontColor #808080
+	backgroundColor #F0F0F0
+	borderColor Black
+}
+
+skinparam actor {
+	backgroundColor White
+	stereotypeFontColor Transparent
+	borderColor Maroon
+	borderColor<<agent>> MediumBlue
+}
+
+' For updating the legend when changing style
+' FA_SERVER(legendExternalService,"External Service") <<external>>
+' FA_DATABASE(legendDb,"Database")
+' OFF_COMMUNICATIONS(legendCaller,"Caller")
+' FA_MOBILE_PHONE(legendMobileApp,"Mobile App")
+' OFF_ON_PREMISES(legendOnPremise,"") <<icon>>
+' OFF_CLOUD(legendCloud,"") <<icon>>
+
+file legend [
+	<color:Black><size:18>**Legend**</size></color>
+
+	<img:images/ExternalService.png{scale=.50}>
+
+	Deployment Type: <img:images/Cloud.png{scale=.50}> cloud <img:images/OnPremise.png{scale=.50}> on premises
+
+	<color:Maroon>**__ Message from Caller**</color>
+	<color:MediumBlue>**__ Agent Response**</color>
+	<color:DarkGreen>**__ Chat Bot Response**</color>
+	<color:DarkGoldenRod>**__ Chat Service Response**</color>
+	<color:Black>**__ General Communication**</color>
+]

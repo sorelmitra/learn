@@ -64,6 +64,11 @@
 			"script": "createsuperuser",
 			"path": "src/chatapi/",
 			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "docs",
+			"problemMatcher": []
 		}
 	]
 }

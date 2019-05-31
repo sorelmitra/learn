@@ -1,5 +1,10 @@
-**/.DS_Store
+# Security
 src/postgres/ssl
+
+# OS
+**/.DS_Store
+
+# Other distribution files
 **/static
 **/bin
 

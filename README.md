@@ -63,6 +63,10 @@ This project demonstrates software development with the following tools and tech
 
 # Documentation
 
+## Solution & Architecture
+
+- Solution & Architecture [Document](https://github.com/sorelmitra/botagg/blob/master/docs/SolutionArchitecture.md)
+
 ## User & API Guides
 
 - User Guide for [Chat Mobile](https://github.com/sorelmitra/botagg/blob/master/docs/ChatMobileUserGuide.md)
