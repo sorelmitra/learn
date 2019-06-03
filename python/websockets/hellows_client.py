@@ -6,40 +6,45 @@ import os
 import asyncio
 import websockets
 
+class Client:
 
-async def do_action(websocket, name):
-	action = name.lower()
-	if name.lower() == "stop":
-		return action
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.__stop = False
+		self.__websocket = None
 
-	if name.lower() == "close":
-		await websocket.close()
-		return action
+	async def __do_action(self, name):
+		if name.lower() == "stop":
+			self.__stop = True
+			return True
 
-	if name.lower() == "kill":
-		await os._exit(0)
-		return action
-	
-	return ''
+		if name.lower() == "restart":
+			await self.__websocket.close()
+			self.__websocket = await websockets.connect('ws://localhost:8765')
+			return True
 
-async def hello():
-	stop = False
-	while not stop:
-		async with websockets.connect(
-				'ws://localhost:8765') as websocket:
+		if name.lower() == "kill":
+			await os._exit(0)
+			return True
+		
+		return False
+
+	async def hello(self):
+		self.__websocket = await websockets.connect('ws://localhost:8765')
+		while not self.__stop:
 			name = input("What's your name? ")
 
-			action = await do_action(websocket, name)
-			if action == 'stop':
-				stop = True
-				continue
-			elif len(action) > 0:
+			if await self.__do_action(name):
 				continue
 
-			await websocket.send(name)
+			await self.__websocket.send(name)
 			print(f"> {name}")
 
-			greeting = await websocket.recv()
+			greeting = await self.__websocket.recv()
 			print(f"< {greeting}")
+	
+		print(f"Graceful exit")
+		await self.__websocket.close()
 
-asyncio.get_event_loop().run_until_complete(hello())
+c = Client()
+asyncio.get_event_loop().run_until_complete(c.hello())

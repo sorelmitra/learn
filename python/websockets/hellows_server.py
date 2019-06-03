@@ -17,23 +17,22 @@ async def get_action(name):
 	return action
 
 async def hello(websocket, path):
+	print(f"< (client connected)")
 	try:
-		name = await websocket.recv()
-		print(f"< {name}")
+		async for name in websocket:
+			print(f"< {name}")
 
-		action = await get_action(name)
-		if action == 'exit':
-			return
+			action = await get_action(name)
+			if action == 'exit':
+				return
 
-		greeting = f"Hello {name}!"
+			greeting = f"Hello {name}!"
 
-		await websocket.send(greeting)
-		print(f"> {greeting}")
+			await websocket.send(greeting)
+			print(f"> {greeting}")
+		print(f"< (client closed connection)")
 	except websockets.exceptions.ConnectionClosed as e:
-		if e.code == WebSocketCloseCodes.CLOSE_NORMAL:
-			print(f"< (client closed connection)")
-		else:
-			print(f"< (client connection died with code {e.code}")
+		print(f"< (client connection closed with code {e.code}")
 
 async def run():
 	global server
