@@ -5,6 +5,9 @@
 import asyncio
 import websockets
 
+class WebSocketCloseCodes:
+	CLOSE_NORMAL = 1000
+
 async def get_action(name):
 	global loop
 	action = 'respond'
@@ -14,17 +17,23 @@ async def get_action(name):
 	return action
 
 async def hello(websocket, path):
-	name = await websocket.recv()
-	print(f"< {name}")
+	try:
+		name = await websocket.recv()
+		print(f"< {name}")
 
-	action = await get_action(name)
-	if action == 'exit':
-		return
+		action = await get_action(name)
+		if action == 'exit':
+			return
 
-	greeting = f"Hello {name}!"
+		greeting = f"Hello {name}!"
 
-	await websocket.send(greeting)
-	print(f"> {greeting}")
+		await websocket.send(greeting)
+		print(f"> {greeting}")
+	except websockets.exceptions.ConnectionClosed as e:
+		if e.code == WebSocketCloseCodes.CLOSE_NORMAL:
+			print(f"< (client closed connection)")
+		else:
+			print(f"< (client connection died with code {e.code}")
 
 async def run():
 	global server
