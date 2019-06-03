@@ -6,6 +6,8 @@ import os
 import asyncio
 import websockets
 
+import constants
+
 class Client:
 
 	def __init__(self, *args, **kwargs):
@@ -19,8 +21,12 @@ class Client:
 			return True
 
 		if name.lower() == "restart":
-			await self.__websocket.close()
-			self.__websocket = await websockets.connect('ws://localhost:8765')
+			if self.__websocket != None:
+				await self.__websocket.close()
+			try:
+				self.__websocket = await websockets.connect('ws://localhost:8765')
+			except OSError as e:
+				print(f"Could not connect: {e}")
 			return True
 
 		if name.lower() == "kill":
@@ -30,18 +36,25 @@ class Client:
 		return False
 
 	async def hello(self):
-		self.__websocket = await websockets.connect('ws://localhost:8765')
+		await self.__do_action("restart")
 		while not self.__stop:
-			name = input("What's your name? ")
+			try:
+				name = input("What's your name? ")
 
-			if await self.__do_action(name):
-				continue
+				if await self.__do_action(name):
+					continue
 
-			await self.__websocket.send(name)
-			print(f"> {name}")
+				await self.__websocket.send(name)
+				print(f"> {name}")
 
-			greeting = await self.__websocket.recv()
-			print(f"< {greeting}")
+				greeting = await self.__websocket.recv()
+				print(f"< {greeting}")
+			except websockets.exceptions.ConnectionClosed as e:
+				if e.code == constants.WebSocketCloseCodes.CLOSE_NORMAL:
+					print(f"< (server closed)")
+					self.__stop = True
+				else:
+					print(f"< (server connection closed with code {e.code})")
 	
 		print(f"Graceful exit")
 		await self.__websocket.close()
