@@ -7,27 +7,39 @@ import asyncio
 import websockets
 
 
-async def is_action(websocket, name):
+async def do_action(websocket, name):
+	action = name.lower()
+	if name.lower() == "stop":
+		return action
+
 	if name.lower() == "close":
 		await websocket.close()
-		return True
+		return action
 
 	if name.lower() == "kill":
 		await os._exit(0)
-		return True
+		return action
+	
+	return ''
 
 async def hello():
-	async with websockets.connect(
-			'ws://localhost:8765') as websocket:
-		name = input("What's your name? ")
+	stop = False
+	while not stop:
+		async with websockets.connect(
+				'ws://localhost:8765') as websocket:
+			name = input("What's your name? ")
 
-		if await is_action(websocket, name):
-			return
+			action = await do_action(websocket, name)
+			if action == 'stop':
+				stop = True
+				continue
+			elif len(action) > 0:
+				continue
 
-		await websocket.send(name)
-		print(f"> {name}")
+			await websocket.send(name)
+			print(f"> {name}")
 
-		greeting = await websocket.recv()
-		print(f"< {greeting}")
+			greeting = await websocket.recv()
+			print(f"< {greeting}")
 
 asyncio.get_event_loop().run_until_complete(hello())
