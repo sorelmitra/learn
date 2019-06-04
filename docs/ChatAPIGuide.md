@@ -194,20 +194,21 @@ The client is supposed to perform the action, then send the data specified.
 
 ### Step 1
 
-- **Action**: `WebSocket Client Connect`
-- **Response**: N/A
+- **Client Action**: `WebSocket Client Connect`
+- **Client Data**: N/A
+- **Server Response**: Establishes connection
 
 ### Step 2
 
-- **Action**: `WebSocket Message to Server`
-- **Data**:
+- **Client Action**: `WebSocket Message to Server`
+- **Client Data**:
 	```json
 	{
         "name": <name of client that registers>,
         "command": "register"
 	}
 	```
-- **Response**:
+- **Server Response**:
     - *Success*:
         ```json
         {
@@ -233,40 +234,64 @@ The client is supposed to perform the action, then send the data specified.
 
 ## Read All Notification Registrations
 
-- **Action**: `WebSocket Message to Server`
-- **Data**:
+- **Client Action**: `WebSocket Message to Server`
+- **Client Data**:
 	```json
 	{
         "name": <name of client>,
         "command": "show-all"
 	}
 	```
-- **Response**:
+- **Server Response**:
     - *Success*:
         ```json
         {
             "success": true,
-            "notification-registration": {
-                "id": <newly allocated registration id>,
-                "name ": <name of client that registers>
-            },
-            "reason": "registration succeeded"
+            "notification-registrations": [
+                ...,
+                {
+                    "id": <registration id N>,
+                    "name ": <name of registered client N>
+                },
+                ...
+            ],
+            "reason": "registrations listed"
         }
         ```
     - *Failure*:
         ```json
         {
-            "success": false,
-            "notification-registration": {
-                "id": null,
-                "name ": <name of client that registers>
-            },
+            "success": true,
+            "notification-registrations": [
+                {
+                    "id": <registration id>,
+                    "name ": <name of registered client>
+                },
+                ...
+            ],
             "reason": "failure reason"
         }
         ```
 
 ## Delete Notification Registration
 
-- **Action**: `WebSocket Client Disconnect`
-- **Response**: N/A
+- **Client Action**: `WebSocket Client Disconnect`
+- **Client Data**: N/A
+- **Server Response**: Disconnects client
 
+## Get Post Notification
+
+- **Client Action**: N/A
+- **Client Data**: N/A
+- **Server Response**:
+    When a message is posted, server will send the following notification:
+    ```json
+    {
+        "success": true,
+        "post": {
+            "id": <post id>,
+            "body": "message text"
+        },
+        "reason": "message posted notification"
+    }
+    ```

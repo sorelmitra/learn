@@ -7,10 +7,12 @@ Scenario: Delete All Posts
 
 Scenario: Post Message and Notify
 	Given Chat API Host "http://localhost:8201"
-	#When "POST" "register_posts.json" to "/"
+	When WebSocket Connect to Server "http://localhost:8202"
+	When WebSocket Send "register_for_notifications.json"
+	Then WebSocket Get response like "notification-registration.*Chat API Tests.*id.*: (\d+).*success.*true"
 	When "POST" "message_1.json" to "/posts/v1"
 	Then Status is "200" and response contains "body.*Message 1.*id.*: (\d+).*success.*true"
-	#Then 
+	Then WebSocket Get response like "body.*Message 1.*id.*: (\d+).*success.*true"
 
 Scenario: Get Post by ID
 	Given Chat API Host "http://localhost:8201"
