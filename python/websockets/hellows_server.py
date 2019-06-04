@@ -14,6 +14,9 @@ class HelloServer:
 		self.__server = None
 		self.__stop = False
 
+	def log(self, websocket, *args):
+		print(f"[{websocket.remote_address}]", *args)
+
 	def __do_action(self, name):
 		if name.lower() == 'stop server':
 			self.__server.close()
@@ -22,11 +25,11 @@ class HelloServer:
 		return False
 
 	async def hello(self, websocket, path):
-		print(f"< (client connected)")
+		self.log(websocket, f"< (client connected)")
 		try:
 			while not self.__stop:
 				name = await websocket.recv()
-				print(f"< {name}")
+				self.log(websocket, f"< {name}")
 
 				if self.__do_action(name):
 					continue
@@ -34,16 +37,16 @@ class HelloServer:
 				greeting = f"Hello {name}!"
 
 				await websocket.send(greeting)
-				print(f"> {greeting}")
+				self.log(websocket, f"> {greeting}")
 			if self.__stop:
-				print(f"Told to exit")
+				self.log(websocket, f"Told to exit")
 				return
-			print(f"< (client closed connection)")
+			self.log(websocket, f"< (client closed connection)")
 		except websockets.exceptions.ConnectionClosed as e:
 			if e.code == constants.WebSocketCloseCodes.CLOSE_NORMAL:
-				print(f"< (client disconnected)")
+				self.log(websocket, f"< (client disconnected)")
 			else:
-				print(f"< (client connection closed with code {e.code})")
+				self.log(websocket, f"< (client connection closed with code {e.code})")
 
 	async def run(self):
 		self.__server = await websockets.serve(self.hello, 'localhost', 8765)
