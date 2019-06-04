@@ -75,7 +75,7 @@ class ViewRestPosts(View):
 			return errorResponse(e)
 		response = {
 			'success': True,
-			'posts': {},
+			'posts': [],
 			'reason': 'all messages deleted'
 		}
 		return HttpResponse(json.dumps(response))

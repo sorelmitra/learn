@@ -14,7 +14,7 @@
     "createsuperuser": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py createsuperuser",
     "makemigrations": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py makemigrations chatapi",
     "migrate": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py migrate",
-    "start-dev-local": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py runserver",
+    "start-dev-local": "DJANGO_SETTINGS_MODULE=chatapisite.settings_dev_local source env/bin/activate && python manage.py runserver 8201",
     "test": "behave"
   }
 }

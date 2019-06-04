@@ -69,6 +69,11 @@
 			"type": "npm",
 			"script": "docs",
 			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "postgres",
+			"problemMatcher": []
 		}
 	]
 }
