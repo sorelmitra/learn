@@ -74,6 +74,12 @@
 			"type": "npm",
 			"script": "postgres",
 			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "restart-dev-local",
+			"path": "src/chatapi/",
+			"problemMatcher": []
 		}
 	]
 }
