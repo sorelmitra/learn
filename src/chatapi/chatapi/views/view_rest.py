@@ -4,18 +4,8 @@ from django.views import View
 from django.http import HttpResponse
 from django.http import HttpRequest
 
-from .models import *
-
-def default(request):
-	return HttpResponse("Oops, you tried a wrong path!")
-
-def errorResponse(e):
-	response = {
-		'success': False,
-		'post': {},
-		'reason': f'{e}'
-	}
-	return HttpResponse(json.dumps(response))
+from .view_common import *
+from ..models import *
 
 class ViewRestPosts(View):
 	def get(self, request, *args, **kwargs):

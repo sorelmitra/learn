@@ -24,6 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 INSTALLED_APPS = [
     'chatapi.apps.ChatApiConfig',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +63,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chatapisite.wsgi.application'
-
+ASGI_APPLICATION = 'chatapisite.routing.application'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

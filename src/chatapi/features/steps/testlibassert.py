@@ -63,7 +63,9 @@ def assertAsStrContains(a, reStr, itemName="item"):
 def expandGroups(s):
 	global groups
 	try:
-		return s.replace('$1', groups[0])
+		for i in range(0, len(groups)):
+			s = s.replace(f'${i+1}', groups[i])
+		return s
 	except Exception as e:
 		print(f"Not replaced in <{s}> based on <{groups}>: {e}")
 		return s

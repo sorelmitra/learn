@@ -59,7 +59,7 @@ curl \
     --data '{
         "body": "Hi there!" 
     }' \
-    http://localhost:8000/posts/v1/
+    http://localhost:8201/posts/v1/
 ```
 
 ## Read All Posts
@@ -105,7 +105,7 @@ curl \
     --header "Content-Type: application/json" \
     --request GET \
     --data '{}' \
-    http://localhost:8000/posts/v1/
+    http://localhost:8201/posts/v1/
 ```
 
 ## Delete All Posts
@@ -141,7 +141,7 @@ curl \
     --header "Content-Type: application/json" \
     --request DELETE \
     --data '{}' \
-    http://localhost:8000/posts/v1/
+    http://localhost:8201/posts/v1/
 ```
 
 ## Read Post with ID
@@ -180,14 +180,14 @@ curl \
     --header "Content-Type: application/json" \
     --request GET \
     --data '{}' \
-    http://localhost:8000/posts/v1/1/
+    http://localhost:8201/posts/v1/1/
 ```
 
 # WebSockets API for Posts Notifications v1
 
 ## Overview
 
-All requests are sent on port `8202`.
+All requests are sent on port `8201`.
 The client is supposed to perform the action, then send the data specified.
 
 ## Register for Posts Notification
@@ -195,12 +195,14 @@ The client is supposed to perform the action, then send the data specified.
 ### Step 1
 
 - **Client Action**: `WebSocket Client Connect`
+- **Path**: `/notifications/v1`
 - **Client Data**: N/A
 - **Server Response**: Establishes connection
 
 ### Step 2
 
 - **Client Action**: `WebSocket Message to Server`
+- **Path**: N/A
 - **Client Data**:
 	```json
 	{
@@ -235,6 +237,7 @@ The client is supposed to perform the action, then send the data specified.
 ## Read All Notification Registrations
 
 - **Client Action**: `WebSocket Message to Server`
+- **Path**: N/A
 - **Client Data**:
 	```json
 	{
@@ -276,6 +279,7 @@ The client is supposed to perform the action, then send the data specified.
 ## Delete Notification Registration
 
 - **Client Action**: `WebSocket Client Disconnect`
+- **Path**: N/A
 - **Client Data**: N/A
 - **Server Response**: Disconnects client
 
