@@ -264,14 +264,8 @@ The client is supposed to perform the action, then send the data specified.
     - *Failure*:
         ```json
         {
-            "success": true,
-            "notification-registrations": [
-                {
-                    "id": <registration id>,
-                    "name ": <name of registered client>
-                },
-                ...
-            ],
+            "success": false,
+            "notification-registrations": [],
             "reason": "failure reason"
         }
         ```
@@ -281,7 +275,7 @@ The client is supposed to perform the action, then send the data specified.
 - **Client Action**: `WebSocket Client Disconnect`
 - **Path**: N/A
 - **Client Data**: N/A
-- **Server Response**: Disconnects client
+- **Server Response**: Disconnects and deregisters client
 
 ## Get Post Notification
 

@@ -16,4 +16,5 @@ def step_impl(context, jsonFilePath):
 @then(u'WebSocket Get response like "{reStr}"')
 def step_impl(context, reStr):
     data = websocketRecv()
-    assertAsStrContains(sortedJson(data), reStr, "content")
+    sortedData = sortedJson(json.loads(data))
+    assertAsStrContains(sortedData, reStr, "content")
