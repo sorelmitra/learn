@@ -7,6 +7,7 @@ class NotificationsConsumer(JsonWebsocketConsumer):
 		super().__init__(*args, **kwargs)
 		self.client = None
 		self.register = getPostNotificationsRegister()
+		self.commandFactory = PostNotifCommandsFactory(self.register, self)
 
 	def connect(self):
 		# Called on connection.
@@ -19,8 +20,8 @@ class NotificationsConsumer(JsonWebsocketConsumer):
 	def receive_json(self, content):
 		# Called with json-decoded content when a message is received
 		print(f'< {content}')
-		result = self.register.registerClient(self, content)
-		print(f'Client {self.client} registration status: {result["success"]}')
+		command = self.commandFactory.create(content)
+		result = command.execute()
 		self.send_json(result)
 
 	def send_json(self, content):
