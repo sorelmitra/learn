@@ -11,6 +11,10 @@ class LogService {
 
 	configuredLevel = logLevels.debug;
 
+	error(context, message) {
+		this.log(logLevels.err, context, message);
+	}
+
 	debug(context, message) {
 		this.log(logLevels.debug, context, message);
 	}

@@ -1,13 +1,22 @@
 import logService from './log-service';
 import config from './config';
+import postNotifService from './postnotif-service';
 
 class ChatService {
+
+	getPostsUrl() {
+		return config.posts.host + config.posts.path;
+	}
+
+	getNotificationsUrl() {
+		return config.notifications.host + config.notifications.path;
+	}
 
 	async post(message) {
 		var data = {
 			body: message
 		};
-		const resp = await this.restJsonCall('POST', config.chat.path.posts, data);
+		const resp = await this.restJsonCall('POST', this.getPostsUrl(), data);
 		return new Promise(function(resolve, reject) {
 			if (resp.success) {
 				if (resp.post.body == data.body) {
@@ -24,10 +33,14 @@ class ChatService {
 		});
 	}
 
-	async restJsonCall(restMethod, path, data) {
-		chatPostUrl = "" + config.chat.host + path;
-		logService.debug(this, `Launching ${restMethod} to <${chatPostUrl}>: <${data.body}>`);
-		const response = await fetch(chatPostUrl, {
+	addPostNotificationListener(listener) {
+		postNotifService.addListener(listener);
+		postNotifService.register(this.getNotificationsUrl());
+	}
+
+	async restJsonCall(restMethod, url, data) {
+		logService.debug(this, `Launching ${restMethod} to <${url}>: <${data.body}>`);
+		const response = await fetch(url, {
 			method: restMethod,
 			mode: 'cors',
 			cache: 'no-cache',

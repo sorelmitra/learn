@@ -1,8 +1,12 @@
 {
 	"chat": {
-		"host": "http://localhost:8000",
-		"path": {
-			"posts": "/posts/v1/"
+		"posts": {
+			"host": "http://localhost:8000",
+			"path": "/posts/v1/"
+		},
+		"notifications": {
+			"host": "ws://localhost:8201",
+			"path": "/notifications/v1/"
 		}
 	}
 }

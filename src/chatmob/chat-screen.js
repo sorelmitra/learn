@@ -44,6 +44,10 @@ export default class ChatScreen extends React.Component {
 			'keyboardDidHide',
 			this.keyboardDidHide.bind(this),
 		);
+
+		this.incomingMessageListener = chatService.addPostNotificationListener(
+			this.messageIn.bind(this)
+		)
 	}
 
 	keyboardWillShow(e) {
@@ -109,6 +113,10 @@ export default class ChatScreen extends React.Component {
 				messagePostingStatus: "(error!)",
 			});
 		});
+	}
+
+	messageIn(message) {
+		this.addMessage(message, "incomingMessage");
 	}
 
 	showLastMessage(options = {flash: true}) {
