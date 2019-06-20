@@ -11,7 +11,8 @@ class PostNotifService {
 	register(url) {
 		let ws = new WebSocket(url);
 		ws.onopen = () => {
-			ws.send(this.buildRegistrationMessage());
+			data = this.buildRegistrationMessage();
+			ws.send(data);
 			logService.debug(this, `> ${data}`);
 		};
 

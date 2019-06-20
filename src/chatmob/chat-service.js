@@ -5,11 +5,11 @@ import postNotifService from './postnotif-service';
 class ChatService {
 
 	getPostsUrl() {
-		return config.posts.host + config.posts.path;
+		return config.chat.posts.host + config.chat.posts.path;
 	}
 
 	getNotificationsUrl() {
-		return config.notifications.host + config.notifications.path;
+		return config.chat.notifications.host + config.chat.notifications.path;
 	}
 
 	async post(message) {

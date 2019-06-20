@@ -8,10 +8,10 @@ Scenario: Post: Delete All
 Scenario: Post and Notify: New Message
 	Given Chat API Host "http://localhost:8201"
 
-	When WebSocket "1" Connect to Server "ws://localhost:8201/notifications/v1"
+	When WebSocket "1" Connect to Server "ws://localhost:8201/notifications/v1/"
 	When WebSocket "1" Send "notify_register_1.json"
 	Then WebSocket "1" Get response like "notification-registration.*id.*: (\d+).*chatapi-systest.*success.*true"
-	When WebSocket "2" Connect to Server "ws://localhost:8201/notifications/v1"
+	When WebSocket "2" Connect to Server "ws://localhost:8201/notifications/v1/"
 	When WebSocket "2" Send "notify_register_2.json"
 	Then WebSocket "2" Get response like "notification-registration.*id.*: (\d+).*chatapi-systest.*success.*true"
 
@@ -37,12 +37,12 @@ Scenario: Post: Delete All
 	Then Status is "200" and response contains "reason.*all messages deleted.*success.*true"
 
 Scenario: Notify: Incomplete Registration
-	When WebSocket "1" Connect to Server "ws://localhost:8201/notifications/v1"
+	When WebSocket "1" Connect to Server "ws://localhost:8201/notifications/v1/"
 	When Sleep "3" seconds
 	When WebSocket "1" Send "notify_register_1.json"
 	Then WebSocket "1" Get response like "chatapi-systest.*could not find entry.*success.*false"
 
 Scenario: Notify: Bad Command
-	When WebSocket "1" Connect to Server "ws://localhost:8201/notifications/v1"
+	When WebSocket "1" Connect to Server "ws://localhost:8201/notifications/v1/"
 	When WebSocket "1" Send "notify_bad_command.json"
 	Then WebSocket "1" Get response like "chatapi-systest.*command not understood.*success.*false"
