@@ -13,9 +13,9 @@ This is a learning project. While I learn some new [technologies](#tools) I also
 This platform will have 5 components:
 
 * **SampleBot Service**. This is a Web Service that implements a simple bot. Functions TBD.
-* **SampleBot Admin**. This is a web app where chat bot owners can create accounts and configure SampleBot, including: connection to one of the supported communication channels, intent recognition and responses
-* **ChatBot API**. This is a chat bot RESTful API that serves as an interface for talking to various bots (for now only SampleBot). It allows sending a message to a bot and getting the bot response. It registers as an observer for message posting to the **Chat API**
-* **Chat API**. This is a chat RESTful API that allows posting messages and getting notifications when messages are posted
+* **SampleBot Admin**. This is a web app where chat bot owners can create accounts and configure SampleBot dialogs
+* **ChatBot API**. This is a chat bot API that serves as an interface between **Chat API** and various bots (for now only SampleBot). It acts both as a client and as posts observer for the **Chat API**. When a message is posted to **Chat API**, the ChatBot API takes it and forwards it to the **bot**. When the **bot** responds, the ChatBot API posts the bot response back to **Chat API**
+* **Chat API**. This is a chat API that allows posting messages and getting notifications when messages are posted
 * **Chat Mobile**. This is a mobile app where the visitors can write messages and read messages posted by other chat members
 
 Additionally, this platform will conform to the following constraints (initially it is enough if we at least *design* for it):
@@ -57,8 +57,8 @@ This project demonstrates software development with the following tools and tech
 - **Components**:
 	* **SampleBot Service**: [Node.js](https://nodejs.org) with [Express JS](https://expressjs.com/), REST, and [Botlang](https://botlang.org)
 	* **SampleBot Admin**: [React JS](https://reactjs.org/)
-	* **ChatBot API**: Node.js, REST
-	* **Chat API**: Python with [Django](https://www.djangoproject.com/) and [Thorn](https://pypi.org/project/thorn/)
+	* **ChatBot API**: Node.js, WebSockets
+	* **Chat API**: Python with [Django](https://www.djangoproject.com/), REST, WebSockets
 	* **Chat Mobile**. [React Native](https://facebook.github.io/react-native/)
 
 # Documentation
