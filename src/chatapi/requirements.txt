@@ -1,4 +1,4 @@
-Django==2.2
+Django==2.2.2
 djangorestframework==3.9.4
 psycopg2==2.8.2
 channels==2.2.0
