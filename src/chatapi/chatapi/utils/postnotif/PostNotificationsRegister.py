@@ -72,3 +72,8 @@ class PostNotificationsRegister:
 		if consumer in self.consumers:
 			del self.consumers[consumer]
 
+	def notifyAll(self, content):
+		for consumer in self.consumers:
+			consumer.send_json(content)
+		return len(self.consumers)
+

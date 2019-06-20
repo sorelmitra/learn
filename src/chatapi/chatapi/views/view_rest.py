@@ -6,8 +6,14 @@ from django.http import HttpRequest
 
 from .view_common import *
 from ..models import *
+from ..utils.postnotif import *
 
 class ViewRestPosts(View):
+
+	def __init__(self, **kwargs):
+		self.register = getPostNotificationsRegister()
+		self.commandFactory = PostNotifCommandsFactory(self.register, self)
+
 	def get(self, request, *args, **kwargs):
 		unicodeBody = request.body.decode('utf-8')
 		print(f"Body is: {unicodeBody}")
@@ -44,15 +50,25 @@ class ViewRestPosts(View):
 			post.save()
 		except Exception as e:
 			return errorResponse(e)
+		respPost = {
+			'id': post.id,
+			'body': post.text
+		}
 		response = {
 			'success': True,
-			'post': {
-				'id': post.id,
-				'body': post.text
-			},
+			'post': respPost,
 			'reason': 'message posted successfully'
 		}
+		self.notifyPost(respPost)
 		return HttpResponse(json.dumps(response))
+	
+	def notifyPost(self, post):
+		content = {
+			'command': 'notify-all',
+			'post': post
+		}
+		command = self.commandFactory.create(content)
+		command.execute()
 
 	def delete(self, request, *args, **kwargs):
 		unicodeBody = request.body.decode('utf-8')

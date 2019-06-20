@@ -9,5 +9,7 @@ class PostNotifCommandsFactory:
 		commandString = content['command']
 		if commandString == "register":
 			return CommandRegister(self.register, self.consumer, content)
+		elif commandString == "notify-all":
+			return CommandNotifyAll(self.register, self.consumer, content)
 		else:
 			return CommandNotUnderstood(self.register, self.consumer, content)

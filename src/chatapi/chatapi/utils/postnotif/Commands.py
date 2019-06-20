@@ -24,3 +24,14 @@ class CommandRegister(CommandBase):
 		print(f'Client {self.consumer.client} registration status: {result["success"]}')
 		return result
 
+class CommandNotifyAll(CommandBase):
+	def execute(self):
+		post = self.content['post']
+		result = {
+			'success': True,
+			'post': post,
+			'reason': f'message posted notification'
+		}
+		count = self.register.notifyAll(result)
+		print(f'Notified {count} consumers on post {post}')
+		return result

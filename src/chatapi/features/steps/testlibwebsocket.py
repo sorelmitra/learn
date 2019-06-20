@@ -1,20 +1,22 @@
 from chatapi.utils.websocket import *
 
-def websocketConnect(server):
-	global client
-	client = WebSocketClient(url=server)
-	asyncio.get_event_loop().run_until_complete(client.connect())
+clients = {}
 
-def websocketSend(data):
-	global client
-	asyncio.get_event_loop().run_until_complete(client.send(data))
+def websocketConnect(socketName, server):
+	global clients
+	clients[socketName] = WebSocketClient(url=server)
+	asyncio.get_event_loop().run_until_complete(clients[socketName].connect())
 
-async def recvWithTimeout(timeout):
+def websocketSend(socketName, data):
+	global clients
+	asyncio.get_event_loop().run_until_complete(clients[socketName].send(data))
+
+async def recvWithTimeout(socketName, timeout):
 	try:
-		return await asyncio.wait_for(client.recv(), timeout=3)
+		return await asyncio.wait_for(clients[socketName].recv(), timeout=3)
 	except asyncio.TimeoutError:
 		return None
 
-def websocketRecv():
-	global client
-	return asyncio.get_event_loop().run_until_complete(recvWithTimeout(3))
+def websocketRecv(socketName):
+	global clients
+	return asyncio.get_event_loop().run_until_complete(recvWithTimeout(socketName, 3))
