@@ -45,12 +45,20 @@ class ViewRestPosts(View):
 		print(f"Data is: {data}")
 		print(f"Args are: {args}")
 		print(f"Keyword args are: {kwargs}")
+
+		name = 'unknown'
+		try:
+			name = data['name']
+		except KeyError as e:
+			return errorResponse("Missing client name, post refused. Please add a 'name' field")
+
 		post = Post(text=data['body'])
 		try:
 			post.save()
 		except Exception as e:
 			return errorResponse(e)
 		respPost = {
+			'name': name,
 			'id': post.id,
 			'body': post.text
 		}

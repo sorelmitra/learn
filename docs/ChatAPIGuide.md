@@ -21,11 +21,13 @@ Resource/Method | POST <br/>Create | GET <br/>Read | PUT <br/>Update | DELETE <b
 - **Request Type**: `POST`
 - **Path**: `/posts/v1/`
 - **Data**:
-	```json
-	{
-		"body": "text to be posted"
-	}
-	```
+    ```json
+    {
+        "name": <name of client>,
+        "body": "text to be posted"
+    }
+    ```
+    The name is used to avoid echoing own posts by clients. It is sent back to the clients. 
 - **Response**:
     - *Success*:
         ```json
@@ -67,9 +69,9 @@ curl \
 - **Request Type**: `GET`
 - **Path**: `/posts/v1/`
 - **Data**:
-	```json
-	{}
-	```
+    ```json
+    {}
+    ```
 - **Response**:
     - *Success*:
         ```json
@@ -113,9 +115,9 @@ curl \
 - **Request Type**: `DELETE`
 - **Path**: `/posts/v1/`
 - **Data**:
-	```json
-	{}
-	```
+    ```json
+    {}
+    ```
 - **Response**:
     - *Success*:
         ```json
@@ -149,9 +151,9 @@ curl \
 - **Request Type**: `GET`
 - **Path**: `/posts/v1/<id>/`
 - **Data**:
-	```json
-	{}
-	```
+    ```json
+    {}
+    ```
 - **Response**:
     - *Success*:
         ```json
@@ -204,12 +206,12 @@ The client is supposed to perform the action, then send the data specified.
 - **Client Action**: `WebSocket Message to Server`
 - **Path**: N/A
 - **Client Data**:
-	```json
-	{
+    ```json
+    {
         "name": <name of client that registers>,
         "command": "register"
-	}
-	```
+    }
+    ```
 - **Server Response**:
     - *Success*:
         ```json
@@ -239,12 +241,12 @@ The client is supposed to perform the action, then send the data specified.
 - **Client Action**: `WebSocket Message to Server`
 - **Path**: N/A
 - **Client Data**:
-	```json
-	{
+    ```json
+    {
         "name": <name of client>,
         "command": "show-all"
-	}
-	```
+    }
+    ```
 - **Server Response**:
     - *Success*:
         ```json
@@ -254,7 +256,7 @@ The client is supposed to perform the action, then send the data specified.
                 ...,
                 {
                     "id": <registration id N>,
-                    "name ": <name of registered client N>
+                    "name": <name of registered client N>
                 },
                 ...
             ],

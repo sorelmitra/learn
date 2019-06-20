@@ -1,9 +1,10 @@
 import logService from './log-service';
+import config from './config';
 
 class PostNotifService {
 
 	constructor() {
-		this.postNotifRegistreeName = 'BotAgg Chat Mobile';
+		this.chatName = config.chat.name;
 		this.listener = null;
 		this.registered = false;
 	}
@@ -47,8 +48,8 @@ class PostNotifService {
 		}
 
 		let reg = o["notification-registration"];
-		if (reg.name != this.postNotifRegistreeName) {
-			logService.error(this, `Error: Received out-of-band registration response for name '${reg.name}', our name is '${this.postNotifRegistreeName}'`)
+		if (reg.name != this.chatName) {
+			logService.error(this, `Error: Received out-of-band registration response for name '${reg.name}', our name is '${this.chatName}'`)
 			return;
 		}
 		
@@ -62,10 +63,14 @@ class PostNotifService {
 			logService.debug(this, `No Listener configured`);
 			return;
 		}
-		message = this.getMessage(data);
-		if (message != null) {
-			this.listener(message);
+		post = this.getMessage(data);
+		if (post == null) {
+			return;
 		}
+		if (this.chatName == post.name) {
+			return
+		}
+		this.listener(post.body);
 	}
 	
 	getMessage(data) {
@@ -74,12 +79,12 @@ class PostNotifService {
 			logService.error(this, `Post notification error: ${o.reason}`);
 			return null;
 		}
-		return o.post.body;
+		return o.post;
 	}
 
 	buildRegistrationMessage() {
 		let o = {
-			name: this.postNotifRegistreeName,
+			name: this.chatName,
 			command: 'register'
 		}
 		return JSON.stringify(o);

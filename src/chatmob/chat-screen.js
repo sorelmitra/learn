@@ -98,9 +98,10 @@ export default class ChatScreen extends React.Component {
 	}
 
 	onTextInput(event) {
-		this.addMessage(event.nativeEvent.text, "outgoingMessage");
+		let message = event.nativeEvent.text;
+		this.addMessage(message, "outgoingMessage");
 		let self = this;
-		chatService.post(event.nativeEvent.text)
+		chatService.post(message)
 		.then(function(resp) {
 			console.log(resp);
 			self.setState({
@@ -108,7 +109,7 @@ export default class ChatScreen extends React.Component {
 			});
 		})
 		.catch(function(error) {
-			console.log(error);
+			console.log(`Server refused posting message <${message}> with response: ${error}`);
 			self.setState({
 				messagePostingStatus: "(error!)",
 			});

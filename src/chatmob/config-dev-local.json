@@ -1,5 +1,6 @@
 {
 	"chat": {
+		"name": "botagg-chatmob",
 		"posts": {
 			"host": "http://localhost:8201",
 			"path": "/posts/v1/"

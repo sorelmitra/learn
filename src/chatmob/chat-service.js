@@ -14,6 +14,7 @@ class ChatService {
 
 	async post(message) {
 		var data = {
+			name: config.chat.name,
 			body: message
 		};
 		const resp = await this.restJsonCall('POST', this.getPostsUrl(), data);
