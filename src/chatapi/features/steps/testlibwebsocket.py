@@ -1,4 +1,4 @@
-from chatapi.lib.websocket import *
+from chatapi.utils.websocket import *
 
 def websocketConnect(server):
 	global client

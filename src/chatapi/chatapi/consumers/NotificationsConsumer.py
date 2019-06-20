@@ -1,6 +1,6 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 
-from ..lib.postnotif import *
+from ..utils.postnotif import *
 
 class NotificationsConsumer(JsonWebsocketConsumer):
 	def __init__(self, *args, **kwargs):
