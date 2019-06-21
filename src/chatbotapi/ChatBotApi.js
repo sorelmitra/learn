@@ -1,10 +1,11 @@
 var logService = require('./../chatmob/utils/log-service');
 var PostNotifBotApiService = require('./postnotif-botapi-service').PostNotifBotApiService;
+var botConnectorFactory = require('./bot-connector-factory').botConnectorFactory;
 
 class ChatBotApi {
 
 	constructor() {
-		//this.botConnector = botConnectorFactory.get(config.bots[config.bot]);
+		this.botConnector = botConnectorFactory.get(process.env.BOT_CONNECTOR_INSTANCE);
 		this.notifService = new PostNotifBotApiService(process.env.CHAT_NAME);
 		this.notifService.addListener(this.onIncomingMessage.bind(this));		
 	}
@@ -18,8 +19,7 @@ class ChatBotApi {
 	}
 
 	sendToConfiguredBot(post) {
-		//this.botConnector.send(post);
-		logService.debug(this, `Will be sending post ${post.id} = ${post.body} to bot soon`);
+		this.botConnector.send(post);
 	}
 
 }
