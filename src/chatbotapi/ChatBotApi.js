@@ -1,4 +1,3 @@
-var config = require('./../chatmob/config/config').config;
 var logService = require('./../chatmob/utils/log-service');
 var PostNotifBotApiService = require('./postnotif-botapi-service').PostNotifBotApiService;
 
@@ -6,36 +5,21 @@ class ChatBotApi {
 
 	constructor() {
 		//this.botConnector = botConnectorFactory.get(config.bots[config.bot]);
-		this.notifService = new PostNotifBotApiService(config.chat.name);
-		this.notifService.addListener(this.onIncomingMessage);		
-	}
-
-	getPostsUrl() {
-		return config.chat.posts.host + config.chat.posts.path;
-	}
-
-	getNotificationsUrl() {
-		return config.chat.notifications.host + config.chat.notifications.path;
+		this.notifService = new PostNotifBotApiService(process.env.CHAT_NAME);
+		this.notifService.addListener(this.onIncomingMessage.bind(this));		
 	}
 
 	run() {
-		this.notifService.register(this.getNotificationsUrl())
+		this.notifService.register(process.env.CHAT_NOTIFICATIONS_URL)
 	}
 
-	onIncomingMessage(data) {
-		logService.debug(`< ${data}`)
-		let o = JSON.parse(data);
-		let post = o['post']
-		if (post == undefined) {
-			logService.warn(`Incoming message has no 'post' field, discarding`);
-			return;
-		}
-		sendToConfiguredBot(post);
+	onIncomingMessage(post) {
+		this.sendToConfiguredBot(post);
 	}
 
 	sendToConfiguredBot(post) {
 		//this.botConnector.send(post);
-		logService.debug(`Will be sending to bot soon`);
+		logService.debug(this, `Will be sending post ${post.id} = ${post.body} to bot soon`);
 	}
 
 }

@@ -1,7 +1,6 @@
 var logService = require('./../chatmob/utils/log-service');
 var ChatApiNotif = require('./../chatmob/utils/ChatApiNotif').ChatApiNotif;
 var WebSocketClient = require('websocket').client;
-var notif = new ChatApiNotif("hi");
 
 class PostNotifBotApiService {
 

@@ -39,12 +39,6 @@
 		},
 		{
 			"type": "npm",
-			"script": "start-dev-local",
-			"path": "src/chatapi/",
-			"problemMatcher": []
-		},
-		{
-			"type": "npm",
 			"script": "createsuperuser",
 			"path": "src/chatapi/",
 			"problemMatcher": []
@@ -64,14 +58,6 @@
 			"script": "restart-dev-local",
 			"path": "src/chatapi/",
 			"problemMatcher": []
-		},
-		{
-			"type": "npm",
-			"script": "start-dev-local",
-			"path": "src/chatbotapi/",
-			"problemMatcher": [
-				"$eslint-compact"
-			]
 		}
 	]
 }
