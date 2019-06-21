@@ -1,11 +1,11 @@
 import logService from './utils/log-service';
 import config from './config';
-var notif = require('./../chatmob/utils/ChatApiNotif');
+var ChatApiNotif = require('./../chatmob/utils/ChatApiNotif').ChatApiNotif;
 
 class PostNotifService {
 
 	constructor() {
-		this.notif = new notif.ChatApiNotif(config.chat.name);
+		this.notif = new ChatApiNotif(config.chat.name);
 		this.registered = false;
 	}
 
