@@ -1,23 +1,15 @@
 import logService from './utils/log-service';
-var config = require('./config/config').config;
+import Config from 'react-native-config';
 import postNotifService from './postnotif-service';
 
 class ChatService {
 
-	getPostsUrl() {
-		return config.chat.posts.host + config.chat.posts.path;
-	}
-
-	getNotificationsUrl() {
-		return config.chat.notifications.host + config.chat.notifications.path;
-	}
-
 	async post(message) {
 		var data = {
-			name: config.chat.name,
+			name: Config.CHAT_NAME,
 			body: message
 		};
-		const resp = await this.restJsonCall('POST', this.getPostsUrl(), data);
+		const resp = await this.restJsonCall('POST', Config.CHAT_POSTS_URL, data);
 		return new Promise(function(resolve, reject) {
 			if (resp.success) {
 				if (resp.post.body == data.body) {
@@ -36,7 +28,7 @@ class ChatService {
 
 	addPostNotificationListener(listener) {
 		postNotifService.addListener(listener);
-		postNotifService.register(this.getNotificationsUrl());
+		postNotifService.register(Config.CHAT_NOTIFICATIONS_URL);
 	}
 
 	async restJsonCall(restMethod, url, data) {

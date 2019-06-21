@@ -1,15 +1,14 @@
 {
   "scripts": {
     "start": "react-native start --reset-cache",
-    "start-dev-local": "REACT_APP_BOTAGG_MOB_ENV=dev-local BOTAGG_CHAT_NAME=botagg-chatmob npm start",
-    "start-dev-cloud": "REACT_APP_BOTAGG_MOB_ENV=dev-cloud npm start",
     "android": "react-native run-android",
-    "ios": "react-native run-ios --simulator='iPhone 5s'",
+    "ios": "ENVFILE=.env.dev.local react-native run-ios --simulator='iPhone 5s'",
     "test": "detox test --configuration ios.sim"
   },
   "dependencies": {
     "react": "16.8.6",
-    "react-native": "0.59.5"
+    "react-native": "0.59.5",
+    "react-native-config": "^0.11.7"
   },
   "devDependencies": {
     "appium": "1.8.1",

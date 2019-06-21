@@ -1,11 +1,11 @@
 import logService from './utils/log-service';
-var config = require('./config/config').config;
+import Config from 'react-native-config';
 var ChatApiNotif = require('./../chatmob/utils/ChatApiNotif').ChatApiNotif;
 
 class PostNotifService {
 
 	constructor() {
-		this.notif = new ChatApiNotif(config.chat.name);
+		this.notif = new ChatApiNotif(Config.CHAT_NAME);
 		this.registered = false;
 	}
 
