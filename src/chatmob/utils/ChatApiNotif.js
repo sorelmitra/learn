@@ -37,7 +37,7 @@ exports.ChatApiNotif = function ChatApiNotif(name) {
 		if (this.chatName == post.name) {
 			return
 		}
-		this.listener(post.body);
+		this.listener(post);
 	}
 	
 	this.getPost = function getPost(data) {

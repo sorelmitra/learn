@@ -1,8 +1,0 @@
-{
-	"chat": {
-		"host": "https://botagg-239511.appspot.com",
-		"path": {
-			"posts": "/posts/v1/"
-		}
-	}
-}

@@ -116,8 +116,8 @@ export default class ChatScreen extends React.Component {
 		});
 	}
 
-	messageIn(message) {
-		this.addMessage(message, "incomingMessage");
+	messageIn(post) {
+		this.addMessage(post.body, "incomingMessage");
 	}
 
 	showLastMessage(options = {flash: true}) {
