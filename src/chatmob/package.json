@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "react-native start --reset-cache",
-    "start-dev-local": "REACT_APP_BOTAGG_MOB_ENV=dev-local npm start",
+    "start-dev-local": "REACT_APP_BOTAGG_MOB_ENV=dev-local BOTAGG_CHAT_NAME=botagg-chatmob npm start",
     "start-dev-cloud": "REACT_APP_BOTAGG_MOB_ENV=dev-cloud npm start",
     "android": "react-native run-android",
     "ios": "react-native run-ios --simulator='iPhone 5s'",
