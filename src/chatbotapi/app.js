@@ -1,4 +1,4 @@
-var notif = require('./../chatmob/utils/ChatApiNotif');
+var ChatBotApi = require('./ChatBotApi').ChatBotApi;
 
-var n = new notif.ChatApiNotif("hi");
-n.receiveRegistrationResponse("{\"reason\": \"fake\"}")
+var api = new ChatBotApi();
+api.run()

@@ -4,7 +4,7 @@
   "description": "Interface between chatapi and bots",
   "main": "app.js",
   "scripts": {
-    "start-dev-local": "node app.js",
+    "start-dev-local": "REACT_APP_BOTAGG_MOB_ENV=dev-local node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sorel Mitra",
