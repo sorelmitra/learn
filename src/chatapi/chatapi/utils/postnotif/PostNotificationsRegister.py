@@ -46,6 +46,16 @@ class PostNotificationsRegister:
 		t.start()
 
 	def registerClient(self, consumer, input):
+		clientName = None
+		try:
+			clientName = input['name']
+		except KeyError:
+			return {
+				'success': False,
+				'notification-registration': {},
+				'reason': "Cannot register unnamed client. Please add a 'name' field"
+			}
+
 		if consumer in self.consumers:
 			entry = self.consumers[consumer]
 			entry.registered = True
@@ -53,7 +63,7 @@ class PostNotificationsRegister:
 				'success': True,
 				'notification-registration': {
 					'id': entry.id,
-					'name': input['name']
+					'name': clientName
 				},
 				'reason': 'registration succeeded'
 			}
@@ -62,7 +72,7 @@ class PostNotificationsRegister:
 				'success': False,
 				'notification-registration': {
 					'id': None,
-					'name': input['name']
+					'name': clientName
 				},
 				'reason': f'registration failed: could not find entry for client {input["name"]}'
 			}
