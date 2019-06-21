@@ -13,6 +13,10 @@ exports.error = function error(context, message) {
 	this.log(exports.logLevels.err, context, message);
 }
 
+exports.warn = function warn(context, message) {
+	this.log(exports.logLevels.warn, context, message);
+}
+
 exports.debug = function debug(context, message) {
 	this.log(exports.logLevels.debug, context, message);
 }
