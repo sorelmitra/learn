@@ -1,5 +1,5 @@
 import logService from './utils/log-service';
-import config from './config';
+var config = require('./config/config').config;
 import postNotifService from './postnotif-service';
 
 class ChatService {

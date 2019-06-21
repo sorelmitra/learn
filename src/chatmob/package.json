@@ -4,7 +4,7 @@
     "start-dev-local": "REACT_APP_BOTAGG_MOB_ENV=dev-local npm start",
     "start-dev-cloud": "REACT_APP_BOTAGG_MOB_ENV=dev-cloud npm start",
     "android": "react-native run-android",
-    "ios": "REACT_APP_BOTAGG_MOB_ENV=DEV react-native run-ios --simulator='iPhone 5s'",
+    "ios": "react-native run-ios --simulator='iPhone 5s'",
     "test": "detox test --configuration ios.sim"
   },
   "dependencies": {

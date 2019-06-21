@@ -1,5 +1,5 @@
 import logService from './utils/log-service';
-import config from './config';
+var config = require('./config/config').config;
 var ChatApiNotif = require('./../chatmob/utils/ChatApiNotif').ChatApiNotif;
 
 class PostNotifService {
@@ -12,7 +12,7 @@ class PostNotifService {
 	register(url) {
 		let ws = new WebSocket(url);
 		ws.onopen = () => {
-			data = this.notif.buildRegistrationMessage();
+			let data = this.notif.buildRegistrationMessage();
 			ws.send(data);
 			logService.debug(this, `> ${data}`);
 		};
