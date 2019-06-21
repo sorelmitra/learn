@@ -1,0 +1,15 @@
+{
+  "name": "chatbotapi",
+  "version": "1.0.0",
+  "description": "Interface between chatapi and bots",
+  "main": "app.js",
+  "scripts": {
+    "start-dev-local": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sorel Mitra",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "websocket": "^1.0.28"
+  }
+}

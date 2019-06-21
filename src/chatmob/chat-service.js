@@ -1,4 +1,4 @@
-import logService from './log-service';
+import logService from './utils/log-service';
 import config from './config';
 import postNotifService from './postnotif-service';
 
