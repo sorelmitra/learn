@@ -1,4 +1,4 @@
-import logService from './log-service';
+var logService = require('./log-service');
 
 class ChatService {
 
