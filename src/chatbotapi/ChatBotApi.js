@@ -1,4 +1,5 @@
 var logService = require('./../chatmob/utils/log-service');
+const fetch = require("node-fetch");
 var ChatService = require('./../chatmob/utils/ChatService').ChatService;
 var PostNotifBotApiService = require('./postnotif-botapi-service').PostNotifBotApiService;
 var botConnectorFactory = require('./bot-connector-factory').botConnectorFactory;
@@ -12,7 +13,7 @@ class ChatBotApi {
 		this.notifService = new PostNotifBotApiService(process.env.CHAT_NAME);
 		this.notifService.addListener(this.onVisitorMessage.bind(this));
 
-		this.chatService = new ChatService(process.env.CHAT_NAME, process.env.CHAT_POSTS_URL);
+		this.chatService = new ChatService(fetch, process.env.CHAT_NAME, process.env.CHAT_POSTS_URL);
 	}
 
 	run() {
@@ -30,8 +31,17 @@ class ChatBotApi {
 		this.botConnector.send(post);
 	}
 
-	onBotMessage(message) {
-		this.chatService.post(message);
+	onBotMessage(data) {
+		let message = data.body;
+		let self = this;
+		let s = JSON.stringify(data);
+		this.chatService.post(message)
+		.then(function(resp) {
+			logService.debug(self, `> ${s}`);
+		})
+		.catch(function(error) {
+			logService.error(self, `Could not send ${s}: ${error}`);
+		});
 	}
 
 }
