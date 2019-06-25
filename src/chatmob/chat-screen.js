@@ -23,7 +23,7 @@ export default class ChatScreen extends React.Component {
 			messageStatusStyle: styles.messageStatusVisible,
 		}
 
-		this.chatService = new ChatService(Config.CHAT_NAME, Config.CHAT_POSTS_URL);
+		this.chatService = new ChatService(fetch, Config.CHAT_NAME, Config.CHAT_POSTS_URL);
 		this.expandedPicHeight = 150;
 		this.minimizedPicHeight = 80;
 		this.keyboardHeight = new Animated.Value(0);

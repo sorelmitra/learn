@@ -2,9 +2,10 @@ var logService = require('./log-service');
 
 class ChatService {
 
-	constructor(chatName, chatPostsUrl) {
+	constructor(fetchCb, chatName, chatPostsUrl) {
 		this.chatName = chatName;
 		this.chatPostsUrl = chatPostsUrl;
+		this.fetchCb = fetchCb;
 	}
 
 	async post(message) {
@@ -31,7 +32,7 @@ class ChatService {
 
 	async restJsonCall(restMethod, url, data) {
 		logService.debug(this, `Launching ${restMethod} to <${url}>: <${data.body}>`);
-		const response = await fetch(url, {
+		const response = await this.fetchCb(url, {
 			method: restMethod,
 			mode: 'cors',
 			cache: 'no-cache',
