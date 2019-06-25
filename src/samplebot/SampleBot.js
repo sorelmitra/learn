@@ -1,0 +1,11 @@
+
+class SampleBot {
+
+	constructor() {
+
+	}
+
+	run() {
+
+	}
+}

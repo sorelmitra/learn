@@ -55,7 +55,7 @@ This project demonstrates software development with the following tools and tech
 - **Architecture**: Microservices with Docker and Kubernetes for On Premise, Google Free-Tier technologies for Cloud (Docker is [not supported](https://cloud.google.com/cloud-build/docs/quickstart-docker) in Google Free Tier)
 - **Cloud Hosting**: Google Cloud
 - **Components**:
-	* **SampleBot Service**: [Node.js](https://nodejs.org) with [Express JS](https://expressjs.com/), REST, and [Botlang](https://botlang.org)
+	* **SampleBot Service**: [Node.js](https://nodejs.org) with [Express JS](https://expressjs.com/), [Botlang](https://botlang.org), REST, WebSockets
 	* **SampleBot Admin**: [React JS](https://reactjs.org/)
 	* **ChatBot API**: Node.js, WebSockets
 	* **Chat API**: Python with [Django](https://www.djangoproject.com/), REST, WebSockets
