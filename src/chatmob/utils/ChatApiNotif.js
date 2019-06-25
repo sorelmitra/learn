@@ -6,6 +6,7 @@ exports.ChatApiNotif = function ChatApiNotif(name) {
 
 	this.addListener = function addListener(listener) {
 		this.listener = listener;
+		return listener;
 	}
 
 	this.receiveRegistrationResponse = function receiveRegistrationResponse(data) {

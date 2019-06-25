@@ -37,7 +37,7 @@ class PostNotifService {
 	}
 
 	addListener(listener) {
-		this.notif.addListener(listener);
+		return this.notif.addListener(listener);
 	}
 
 }

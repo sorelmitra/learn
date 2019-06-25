@@ -4,8 +4,10 @@ import {
 	Image, FlatList, TextInput, Keyboard,
 	StyleSheet, Animated
 } from 'react-native';
+import Config from 'react-native-config';
 
-import chatService from './chat-service';
+var ChatService = require('./utils/ChatService').ChatService;
+import postNotifService from './postnotif-service';
 
 export default class ChatScreen extends React.Component {
 
@@ -21,6 +23,7 @@ export default class ChatScreen extends React.Component {
 			messageStatusStyle: styles.messageStatusVisible,
 		}
 
+		this.chatService = new ChatService(Config.CHAT_NAME, Config.CHAT_POSTS_URL);
 		this.expandedPicHeight = 150;
 		this.minimizedPicHeight = 80;
 		this.keyboardHeight = new Animated.Value(0);
@@ -45,7 +48,8 @@ export default class ChatScreen extends React.Component {
 			this.keyboardDidHide.bind(this),
 		);
 
-		this.incomingMessageListener = chatService.addPostNotificationListener(
+		postNotifService.register(Config.CHAT_NOTIFICATIONS_URL);
+		this.incomingMessageListener = postNotifService.addListener(
 			this.messageIn.bind(this)
 		)
 	}
@@ -101,7 +105,7 @@ export default class ChatScreen extends React.Component {
 		let message = event.nativeEvent.text;
 		this.addMessage(message, "outgoingMessage");
 		let self = this;
-		chatService.post(message)
+		this.chatService.post(message)
 		.then(function(resp) {
 			console.log(resp);
 			self.setState({

@@ -1,15 +1,18 @@
-import logService from './utils/log-service';
-import Config from 'react-native-config';
-import postNotifService from './postnotif-service';
+import logService from './log-service';
 
 class ChatService {
 
+	constructor(chatName, chatPostsUrl) {
+		this.chatName = chatName;
+		this.chatPostsUrl = chatPostsUrl;
+	}
+
 	async post(message) {
 		var data = {
-			name: Config.CHAT_NAME,
+			name: this.chatName,
 			body: message
 		};
-		const resp = await this.restJsonCall('POST', Config.CHAT_POSTS_URL, data);
+		const resp = await this.restJsonCall('POST', this.chatPostsUrl, data);
 		return new Promise(function(resolve, reject) {
 			if (resp.success) {
 				if (resp.post.body == data.body) {
@@ -24,11 +27,6 @@ class ChatService {
 				throw resp.reason;
 			}
 		});
-	}
-
-	addPostNotificationListener(listener) {
-		postNotifService.addListener(listener);
-		postNotifService.register(Config.CHAT_NOTIFICATIONS_URL);
 	}
 
 	async restJsonCall(restMethod, url, data) {
@@ -49,4 +47,4 @@ class ChatService {
 	}
 }
 
-export default chatService = new ChatService();
+exports.ChatService = ChatService;
