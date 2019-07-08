@@ -41,7 +41,6 @@ The client is supposed to perform the action, then send the data specified.
         {
             "success": true,
             "client-registration": {
-                "id": <newly allocated registration id>,
                 "name ": <name of client that registers>
             },
             "reason": "registration succeeded"

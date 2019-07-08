@@ -1,13 +1,18 @@
-
 class SampleBot {
 
 	constructor() {
-
 	}
 
-	run() {
-
+	process(input) {
+		let response = {
+			success: true,
+			botResponse: {
+				body: `SampleBot is on the way: '${input.body}'`
+			},
+			reason: "chat bot response"
+		};
+		return response;
 	}
 }
 
-exports.SampleBot = SampleBot;
+exports.default = SampleBot;

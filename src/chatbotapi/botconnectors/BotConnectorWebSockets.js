@@ -52,7 +52,7 @@ class BotConnectorWebSockets {
 			logService.error(this, `Can't send: no connection`);
 			return;
 		}
-		this.connection.send(post);
+		this.connection.send(JSON.stringify(post));
 		logService.debug(this, `WebSockets Bot Connector < ${JSON.stringify(post)}`);
 	}
 

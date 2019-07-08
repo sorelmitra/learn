@@ -1,20 +1,21 @@
+var logService = require('../../chatmob/utils/log-service');
 
 class BotProtocolSample {
 
 	constructor() {
-
+		this.nameForBot = process.env.NAME_FOR_BOT;
 	}
 
 	buildRegistrationMessage() {
 		let o = {
-			name: process.env.NAME_FOR_BOT,
+			name: this.nameForBot,
 			command: 'register'
 		}
 		return JSON.stringify(o);
 	}
 
 	receiveMessage(data) {
-		response = this.getResponse(data);
+		let response = this.getResponse(data);
 		return response;
 	}
 
@@ -35,12 +36,12 @@ class BotProtocolSample {
 		}
 
 		let reg = o["client-registration"];
-		if (reg.name != this.chatName) {
-			logService.error(this, `Error: Received out-of-band registration response for name '${reg.name}', our name is '${this.chatName}'`)
+		if (reg.name != this.nameForBot) {
+			logService.error(this, `Error: Received out-of-band registration response for name '${reg.name}', our name is '${this.nameForBot}'`)
 			return false;
 		}
 		
-		logService.debug(this, `Registered as a chat bot client with ID ${reg.id}`);
+		logService.debug(this, `Registered as a chat bot client`);
 		return true;
 	}
 

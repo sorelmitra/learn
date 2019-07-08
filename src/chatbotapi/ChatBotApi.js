@@ -28,6 +28,7 @@ class ChatBotApi {
 	}
 
 	sendToConfiguredBot(post) {
+		post.command = "message";
 		this.botConnector.send(post);
 	}
 

@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-var SampleBot = require('./SampleBot').SampleBot;
+var SampleBotServer = require('./SampleBotServer').SampleBotServer;
 
-var bot = new SampleBot();
+var bot = new SampleBotServer();
 bot.run()
