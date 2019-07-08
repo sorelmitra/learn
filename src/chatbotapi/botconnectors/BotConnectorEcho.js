@@ -1,5 +1,5 @@
 var logService = require('../../chatmob/utils/log-service');
-var EchoBot = require('../bots/EchoBot').EchoBot;
+var EchoBot = require('../bots/EchoBot').default;
 
 class BotConnectorEcho {
 

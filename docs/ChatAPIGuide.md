@@ -238,6 +238,8 @@ The client is supposed to perform the action, then send the data specified.
 
 ## Read All Notification Registrations
 
+<span style="color: Gray">*Not Implemented*</span>
+
 - **Client Action**: `WebSocket Message to Server`
 - **Path**: N/A
 - **Client Data**:

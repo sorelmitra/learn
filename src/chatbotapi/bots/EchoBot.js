@@ -27,4 +27,4 @@ class EchoBot {
 	}
 }
 
-exports.EchoBot = EchoBot;
+exports.default = EchoBot;
