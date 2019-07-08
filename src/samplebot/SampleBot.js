@@ -9,3 +9,5 @@ class SampleBot {
 
 	}
 }
+
+exports.SampleBot = SampleBot;
