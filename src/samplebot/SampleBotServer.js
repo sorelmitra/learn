@@ -1,7 +1,8 @@
 var logService = require('../chatmob/utils/log-service');
 var WebSocketServer = require('websocket').server;
 var http = require('http');
-var SampleBot = require('./SampleBot').default;
+var SampleBot = require('./SampleBot').bot;
+var SampleBotEvents = require('./SampleBot').events;
  
 class SampleBotServer {
 
@@ -10,6 +11,10 @@ class SampleBotServer {
 		this.wsServer = null;
 		this.connection = null;
 		this.bot = new SampleBot();
+		let self = this;
+		this.bot.on(SampleBotEvents.REPLY, function(response) {
+			self.send(response);
+		});
 	}
 
 	run() {
@@ -71,8 +76,7 @@ class SampleBotServer {
 		if (o.command == "register") {
 			this.processRegistration(o);
 		} else if (o.command == "message") {
-			let response = this.bot.process(o);
-			this.send(response);
+			this.bot.process(o);
 		} else {
 			logService.error(this, `Unknown command ${o.command}`);
 		}
