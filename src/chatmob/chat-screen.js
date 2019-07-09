@@ -113,17 +113,17 @@ export default class ChatScreen extends React.Component {
 		this.chatService.post(message)
 		.then(function(resp) {
 			console.log(resp);
-			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOut", "styleOutgoingMessage", "(sent)");
+			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOut", "styleOutgoingMessage", `${self.timestamp()} >`);
 		})
 		.catch(function(error) {
 			console.log(`Server refused posting message <${message}> with response: ${error}`);
-			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOut", "styleOutgoingMessage", "(error!)");
+			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOutErr", "styleOutgoingMessage", `${self.timestamp()} !`);
 		});
 		this.onConversationChanged();
 	}
 
 	messageIn(post) {
-		this.addMessage(post.body, "styleMessageRowReverse", "styleMessageBoxIn", "styleMessageStatusIn", "styleIncomingMessage", "(received)");
+		this.addMessage(post.body, "styleMessageRowReverse", "styleMessageBoxIn", "styleMessageStatusIn", "styleIncomingMessage", `< ${this.timestamp()}`);
 	}
 
 	showLastMessage(options = {flash: true}) {
@@ -138,6 +138,16 @@ export default class ChatScreen extends React.Component {
 
 	onConversationChanged(contentWidth, contentHeight) {
 		this.showLastMessage();
+	}
+
+	timestamp() {
+		let d = new Date(Date.now());
+		let month = d.toLocaleString('en-us', { month: 'short' });
+		let date = d.getDate();
+		let h = d.getHours().toString().padStart(2, "0");
+		let m = d.getMinutes().toString().padStart(2, "0");
+		let s = d.getSeconds().toString().padStart(2, "0");
+		return `${month} ${date} ${h}:${m}:${s}`;
 	}
 
 	rowStyle(index) {
@@ -232,13 +242,13 @@ export default class ChatScreen extends React.Component {
 
 const styles = StyleSheet.create({
 	styleMainView: {
-		backgroundColor: '#eee',
+		backgroundColor: '#E0E0E0',
 		flex: 1
 	},
 	styleContainer: {
 		alignItems: 'stretch',
 		justifyContent: 'flex-start',
-		backgroundColor: '#fff',
+		backgroundColor: '#FFFFFF',
 		margin: 5
 	},
 	styleTitle: {
@@ -257,7 +267,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row-reverse'
 	},
 	styleMessageBoxIn: {
-		backgroundColor: '#FFF0E0',
+		backgroundColor: '#E0FFE0',
 		borderWidth: StyleSheet.hairlineWidth,
 		borderRadius: 5,
 		width: 140,
@@ -281,6 +291,11 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-end",
 		fontSize: 10,
 		color: '#303030',
+	},
+	styleMessageStatusOutErr: {
+		alignSelf: "flex-end",
+		fontSize: 12,
+		color: '#FF0000',
 	},
 	styleList: { 
 		margin: 5, 

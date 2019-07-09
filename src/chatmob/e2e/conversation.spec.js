@@ -60,13 +60,12 @@ describe('Conversation', () => {
     await expect(element(by.id(id3))).toBeNotVisible();
   });
 
-  it('should show post sent', async () => {
+  it('should show message status', async () => {
     await device.reloadReactNative();
     lastAddedText = 'Post Me';
     await element(by.id('messageText')).tap();
     await addMessage(lastAddedText);
     await expect(element(by.id('messageStatus-1'))).toBeVisible();
-    await expect(element(by.id('messageStatus-1'))).toHaveText('(sent)');
   });
 
 });
