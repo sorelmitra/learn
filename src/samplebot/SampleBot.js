@@ -7,7 +7,7 @@ const SampleBotEvents = {
 class SampleBot {
 
 	constructor() {
-		this.bot = new Botml('./sample.bot')
+		this.bot = new Botml('./sample.bot');
 		this.bot.start();
 		this.cbs = [];
 		let self = this;

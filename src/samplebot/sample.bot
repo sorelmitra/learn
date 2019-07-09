@@ -1,6 +1,59 @@
 ! BOTML 1
 
-# A basic echo bot that repeats what he's told.
+= introductions
+- Hello
+- Hi
+- Howdy
+- Good morning
+- Good day
+- Good evening
+
+= greetings
+- Nice to meet you
+- I'm glad to talk to you
+- I couldn't be more pleased to see you
+
+= botnames
+- This is the Bot, what do you want from me?
+- I am the Bot at your service!
+- Bot awaiting your instructions!
+
+= subjects
+- discuss weather
+
+> /(?i)(Hello|Hi|Howdy|Good morning|Good day|Good evening).*(I am|I'm|My name is|This is).*?\s+(?<name>\w+)/
+< [introductions], ${name}! [botnames]
+
+> [introductions]
+< [greetings]! [botnames]
+
+> /(?i)(I am|My name is|This is)\s+(?<name>\w+)/
+< [greetings], ${name}! [botnames]
+
+# weather subject
+
+= weathergreetings
+- Oh, so you like
+- Interesting that you want the weather to be
+- It would appear the weather you like is
+
+= wheatherpreferquestions
+- What weather do you prefer
+- How do you like the weather
+- What weather do you like
+- What is your weather preference
+
+> discuss weather
+< I can talk about weather preferences and climate.
+
+> How( is|'s) the weather
+< I don't know how's the weather. I'm a poor Bot unconnnected to a weather service. I can talk about weather preferences.
+
+> [wheatherpreferquestions]
+< Whoever programmed me prefers a not-too-hot weather. [wheatherpreferquestions]?
+
+> /I.*(like|prefer)\s+(?<weatherpref>\w+).*weather/
+< [weathergreetings] ${weatherpref}!
 
 > *
-< $
+< Sorry, I don't know "$". Try "[subjects]"
