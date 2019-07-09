@@ -18,10 +18,7 @@ export default class ChatScreen extends React.Component {
 			input: "",
 			data: [],
 			index: 1,
-			rowStyles: [],
-			messageBoxStyles: [],
-			messageStatusStyles: [],
-			messageTypes: [],
+			styles: [],
 			messagePostingStatuses: [],
 		}
 
@@ -90,7 +87,7 @@ export default class ChatScreen extends React.Component {
 		//this._conversationView.scrollToEnd({animated: false});
 	}
 
-	addMessage(message, rowStyle, messageBoxStyle, messageStatusStyle, messageType, status) {
+	addMessage(message, status, style) {
 		var o = {
 			text: message,
 			key: this.state.index.toString()
@@ -99,10 +96,7 @@ export default class ChatScreen extends React.Component {
 			input: "",
 			data: [o, ...this.state.data],
 			index: this.state.index + 1,
-			rowStyles: [rowStyle, ...this.state.rowStyles],
-			messageBoxStyles: [messageBoxStyle, ...this.state.messageBoxStyles],
-			messageStatusStyles: [messageStatusStyle, ...this.state.messageStatusStyles],
-			messageTypes: [messageType, ...this.state.messageTypes],
+			styles: [style, ...this.state.styles],
 			messagePostingStatuses: [status, ...this.state.messagePostingStatuses],
 		});
 	}
@@ -113,17 +107,35 @@ export default class ChatScreen extends React.Component {
 		this.chatService.post(message)
 		.then(function(resp) {
 			console.log(resp);
-			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOut", "styleOutgoingMessage", `${self.timestamp()} >`);
+			self.addMessage(message, `${self.timestamp()} >`,
+				{
+					row: "styleMessageRow",
+					messageBox: "styleMessageBoxOut",
+					messageText: "styleOutgoingMessage",
+					messageStatus: "styleMessageStatusOut",
+				});
 		})
 		.catch(function(error) {
 			console.log(`Server refused posting message <${message}> with response: ${error}`);
-			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOutErr", "styleOutgoingMessage", `${self.timestamp()} !`);
+			self.addMessage(message, `${self.timestamp()} !`,
+				{
+					row: "styleMessageRow",
+					messageBox: "styleMessageBoxOut",
+					messageText: "styleOutgoingMessage",
+					messageStatus: "styleMessageStatusOutErr",
+				});
 		});
 		this.onConversationChanged();
 	}
 
 	messageIn(post) {
-		this.addMessage(post.body, "styleMessageRowReverse", "styleMessageBoxIn", "styleMessageStatusIn", "styleIncomingMessage", `< ${this.timestamp()}`);
+		this.addMessage(post.body, `< ${this.timestamp()}`,
+			{
+				row: "styleMessageRowReverse",
+				messageBox: "styleMessageBoxIn",
+				messageText: "styleIncomingMessage",
+				messageStatus: "styleMessageStatusIn",
+			});
 	}
 
 	showLastMessage(options = {flash: true}) {
@@ -151,19 +163,19 @@ export default class ChatScreen extends React.Component {
 	}
 
 	rowStyle(index) {
-		return styles[this.state.rowStyles[index]];
+		return styles[this.state.styles[index].row];
 	}
 
 	messageBoxStyle(index) {
-		return styles[this.state.messageBoxStyles[index]];
+		return styles[this.state.styles[index].messageBox];
 	}
 
 	textStyle(index) {
-		return styles[this.state.messageTypes[index]];
+		return styles[this.state.styles[index].messageText];
 	}
 
 	messageStatusStyle(index) {
-		return styles[this.state.messageStatusStyles[index]];
+		return styles[this.state.styles[index].messageStatus];
 	}
 
 	messageStatus(index) {
