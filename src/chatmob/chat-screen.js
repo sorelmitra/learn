@@ -19,7 +19,7 @@ export default class ChatScreen extends React.Component {
 			data: [],
 			index: 1,
 			styles: [],
-			messagePostingStatuses: [],
+			messageStatuses: [],
 		}
 
 		this.chatService = new ChatService(fetch, Config.CHAT_NAME, Config.CHAT_POSTS_URL);
@@ -97,7 +97,7 @@ export default class ChatScreen extends React.Component {
 			data: [o, ...this.state.data],
 			index: this.state.index + 1,
 			styles: [style, ...this.state.styles],
-			messagePostingStatuses: [status, ...this.state.messagePostingStatuses],
+			messageStatuses: [status, ...this.state.messageStatuses],
 		});
 	}
 
@@ -179,7 +179,7 @@ export default class ChatScreen extends React.Component {
 	}
 
 	messageStatus(index) {
-		return this.state.messagePostingStatuses[index];
+		return this.state.messageStatuses[index];
 	}
 
 	getMessageStatusTestId(index) {
