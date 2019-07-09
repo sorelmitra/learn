@@ -18,9 +18,10 @@ export default class ChatScreen extends React.Component {
 			input: "",
 			data: [],
 			index: 1,
+			rowStyles: [],
 			messageTypes: [],
-			messagePostingStatus: "Sending...",
-			messageStatusStyle: styles.messageStatusVisible,
+			messagePostingStatuses: [],
+			messageStatusStyle: styles.styleMessageStatusVisible,
 		}
 
 		this.chatService = new ChatService(fetch, Config.CHAT_NAME, Config.CHAT_POSTS_URL);
@@ -88,7 +89,7 @@ export default class ChatScreen extends React.Component {
 		//this._conversationView.scrollToEnd({animated: false});
 	}
 
-	addMessage(message, messageType) {
+	addMessage(message, rowStyle, messageType, status) {
 		var o = {
 			text: message,
 			key: this.state.index.toString()
@@ -97,31 +98,29 @@ export default class ChatScreen extends React.Component {
 			input: "",
 			data: [o, ...this.state.data],
 			index: this.state.index + 1,
-			messageTypes: [...this.state.messageTypes, messageType],
+			rowStyles: [rowStyle, ...this.state.rowStyles],
+			messageTypes: [messageType, ...this.state.messageTypes],
+			messagePostingStatuses: [status, ...this.state.messagePostingStatuses],
 		});
 	}
 
 	onTextInput(event) {
 		let message = event.nativeEvent.text;
-		this.addMessage(message, "outgoingMessage");
 		let self = this;
 		this.chatService.post(message)
 		.then(function(resp) {
 			console.log(resp);
-			self.setState({
-				messagePostingStatus: "(sent)",
-			});
+			self.addMessage(message, "styleMessageRow", "styleOutgoingMessage", "(sent)");
 		})
 		.catch(function(error) {
 			console.log(`Server refused posting message <${message}> with response: ${error}`);
-			self.setState({
-				messagePostingStatus: "(error!)",
-			});
+			self.addMessage(message, "styleMessageRow", "styleOutgoingMessage", "(error!)");
 		});
+		this.onConversationChanged();
 	}
 
 	messageIn(post) {
-		this.addMessage(post.body, "incomingMessage");
+		this.addMessage(post.body, "styleMessageRowReverse", "styleIncomingMessage", "(received)");
 	}
 
 	showLastMessage(options = {flash: true}) {
@@ -138,9 +137,24 @@ export default class ChatScreen extends React.Component {
 		this.showLastMessage();
 	}
 
+	rowStyle(index) {
+		return styles[this.state.rowStyles[index]];
+	}
+
 	textStyle(index) {
-		style = styles[this.state.messageTypes[index]];
-		return style;
+		return styles[this.state.messageTypes[index]];
+	}
+
+	messageStatus(index) {
+		return this.state.messagePostingStatuses[index];
+	}
+
+	getMessageStatusTestId(index) {
+		return `messageStatus-${index}`;
+	}
+
+	getMessageTestId(index) {
+		return `message-${index}`;
 	}
 
 	render() {
@@ -149,30 +163,31 @@ export default class ChatScreen extends React.Component {
 		}
 		return (
 			<View
-				style={styles.mainView}
+				style={styles.styleMainView}
 				ref={(c) => this._mainView = c}
 			>
 				<Animated.Image source={pic} style={{ flex: 0, width: '100%', height: this.picHeight }} />
-				<View><Text style={[styles.title, {flex: 0}]}>Conversation</Text></View>
+				<View><Text style={[styles.styleTitle, {flex: 0}]}>Conversation</Text></View>
 				<Animated.View style={{flex: 1, paddingBottom: this.keyboardHeight}}>
 					<View 
-						style={[styles.container, {flex: 1}]} 
+						style={[styles.styleContainer, {flex: 1}]} 
 					>
 						<FlatList
 							testID="conversationList"
 							ref={(c) => this._conversationView = c}
 							data={this.state.data}
-							style={styles.list}
+							style={styles.styleList}
 							inverted={true}
-							onContentSizeChange={(contentWidth, contentHeight) => this.onConversationChanged(contentWidth, contentHeight)}
 							renderItem={({ item, index }) =>
-								<View style={styles.messageRow}>
+								<View style={this.rowStyle(index)}>
+									<View style="flex-direction:column">
 									<View
-										style={styles.message}
+										style={styles.styleMessage}
 										accessibilityLabel={item.text}
 									>
 										<Text
 											style={this.textStyle(index)}
+											testID={this.getMessageTestId(index)}
 										>
 											{item.text}
 										</Text>
@@ -181,21 +196,22 @@ export default class ChatScreen extends React.Component {
 										style={this.state.messageStatusStyle}
 									>
 										<Text 
-											style={styles.messageStatusText}
-											testID="messageStatus"
-											>{this.state.messagePostingStatus}</Text>
+											style={styles.styleMessageStatusText}
+											testID={this.getMessageStatusTestId(index)}
+											>{this.messageStatus(index)}</Text>
+									</View>
 									</View>
 								</View>
 							}
 						/>
 					</View>
-					<View style={[styles.container, {flex: 0}]}>
+					<View style={[styles.styleContainer, {flex: 0}]}>
 						<TextInput
 							testID="messageText"
 							accessibilityLabel="message input field"
 							ref={(c) => this._textInput = c}
 							value={this.state.input}
-							style={styles.input}
+							style={styles.styleInput}
 							blurOnSubmit={false}
 							placeholder="Type your message"
 							onChangeText={(text) => this.setState({ input: text })}
@@ -210,17 +226,17 @@ export default class ChatScreen extends React.Component {
 
 
 const styles = StyleSheet.create({
-	mainView: {
+	styleMainView: {
 		backgroundColor: '#eee',
 		flex: 1
 	},
-	container: {
+	styleContainer: {
 		alignItems: 'stretch',
 		justifyContent: 'flex-start',
 		backgroundColor: '#fff',
 		margin: 5
 	},
-	title: {
+	styleTitle: {
 		height: 16,
 		color: 'black',
 		fontSize: 14,
@@ -229,40 +245,36 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		margin: 5
 	},
-	messageRow: {
+	styleMessageRow: {
 		flexDirection: 'row'
 	},
-	message: {
-		height: 30,
+	styleMessageRowReverse: {
+		flexDirection: 'row-reverse'
+	},
+	styleMessage: {
 		justifyContent: 'center'
 	},
-	messageStatusText: {
+	styleMessageStatusText: {
 		fontSize: 10,
 		color: 'gray',
-		margin: 5
 	},
-	messageStatusVisible: {
+	styleMessageStatusVisible: {
 	},
-	subtext: {
-		height: 10,
-		color: 'gray',
-		fontSize: 9
-	},
-	list: { 
+	styleList: { 
 		margin: 5, 
 		alignSelf: 'stretch' 
 	},
-	input: {
+	styleInput: {
 		height: 24,
 		borderWidth: StyleSheet.hairlineWidth,
 		borderRadius: 5,
 		padding: 3
 	},
-	outgoingMessage: {
+	styleOutgoingMessage: {
 		color: 'green',
 		fontSize: 14
 	},
-	incomingMessage: {
+	styleIncomingMessage: {
 		color: 'red',
 		fontSize: 14,
 		textAlign: 'right'
