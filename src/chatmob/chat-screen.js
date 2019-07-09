@@ -19,9 +19,10 @@ export default class ChatScreen extends React.Component {
 			data: [],
 			index: 1,
 			rowStyles: [],
+			messageBoxStyles: [],
+			messageStatusStyles: [],
 			messageTypes: [],
 			messagePostingStatuses: [],
-			messageStatusStyle: styles.styleMessageStatusVisible,
 		}
 
 		this.chatService = new ChatService(fetch, Config.CHAT_NAME, Config.CHAT_POSTS_URL);
@@ -89,7 +90,7 @@ export default class ChatScreen extends React.Component {
 		//this._conversationView.scrollToEnd({animated: false});
 	}
 
-	addMessage(message, rowStyle, messageType, status) {
+	addMessage(message, rowStyle, messageBoxStyle, messageStatusStyle, messageType, status) {
 		var o = {
 			text: message,
 			key: this.state.index.toString()
@@ -99,6 +100,8 @@ export default class ChatScreen extends React.Component {
 			data: [o, ...this.state.data],
 			index: this.state.index + 1,
 			rowStyles: [rowStyle, ...this.state.rowStyles],
+			messageBoxStyles: [messageBoxStyle, ...this.state.messageBoxStyles],
+			messageStatusStyles: [messageStatusStyle, ...this.state.messageStatusStyles],
 			messageTypes: [messageType, ...this.state.messageTypes],
 			messagePostingStatuses: [status, ...this.state.messagePostingStatuses],
 		});
@@ -110,17 +113,17 @@ export default class ChatScreen extends React.Component {
 		this.chatService.post(message)
 		.then(function(resp) {
 			console.log(resp);
-			self.addMessage(message, "styleMessageRow", "styleOutgoingMessage", "(sent)");
+			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOut", "styleOutgoingMessage", "(sent)");
 		})
 		.catch(function(error) {
 			console.log(`Server refused posting message <${message}> with response: ${error}`);
-			self.addMessage(message, "styleMessageRow", "styleOutgoingMessage", "(error!)");
+			self.addMessage(message, "styleMessageRow", "styleMessageBoxOut", "styleMessageStatusOut", "styleOutgoingMessage", "(error!)");
 		});
 		this.onConversationChanged();
 	}
 
 	messageIn(post) {
-		this.addMessage(post.body, "styleMessageRowReverse", "styleIncomingMessage", "(received)");
+		this.addMessage(post.body, "styleMessageRowReverse", "styleMessageBoxIn", "styleMessageStatusIn", "styleIncomingMessage", "(received)");
 	}
 
 	showLastMessage(options = {flash: true}) {
@@ -141,8 +144,16 @@ export default class ChatScreen extends React.Component {
 		return styles[this.state.rowStyles[index]];
 	}
 
+	messageBoxStyle(index) {
+		return styles[this.state.messageBoxStyles[index]];
+	}
+
 	textStyle(index) {
 		return styles[this.state.messageTypes[index]];
+	}
+
+	messageStatusStyle(index) {
+		return styles[this.state.messageStatusStyles[index]];
 	}
 
 	messageStatus(index) {
@@ -180,26 +191,20 @@ export default class ChatScreen extends React.Component {
 							inverted={true}
 							renderItem={({ item, index }) =>
 								<View style={this.rowStyle(index)}>
-									<View style="flex-direction:column">
-									<View
-										style={styles.styleMessage}
-										accessibilityLabel={item.text}
-									>
+									<View style={this.messageBoxStyle(index)}>
+										<Text 
+											style={this.messageStatusStyle(index)}
+											testID={this.getMessageStatusTestId(index)}
+										>
+											{this.messageStatus(index)}
+										</Text>
 										<Text
+											accessibilityLabel={item.text}
 											style={this.textStyle(index)}
 											testID={this.getMessageTestId(index)}
 										>
 											{item.text}
 										</Text>
-									</View>
-									<View 
-										style={this.state.messageStatusStyle}
-									>
-										<Text 
-											style={styles.styleMessageStatusText}
-											testID={this.getMessageStatusTestId(index)}
-											>{this.messageStatus(index)}</Text>
-									</View>
 									</View>
 								</View>
 							}
@@ -251,14 +256,31 @@ const styles = StyleSheet.create({
 	styleMessageRowReverse: {
 		flexDirection: 'row-reverse'
 	},
-	styleMessage: {
-		justifyContent: 'center'
+	styleMessageBoxIn: {
+		backgroundColor: '#FFF0E0',
+		borderWidth: StyleSheet.hairlineWidth,
+		borderRadius: 5,
+		width: 140,
+		flexDirection: "column",
+		alignItems: "flex-end"
 	},
-	styleMessageStatusText: {
+	styleMessageBoxOut: {
+		backgroundColor: '#FFF0FF',
+		borderWidth: StyleSheet.hairlineWidth,
+		borderRadius: 5,
+		width: 140,
+		flexDirection: "column",
+		alignItems: "flex-start"
+	},
+	styleMessageStatusIn: {
+		alignSelf: "flex-start",
 		fontSize: 10,
-		color: 'gray',
+		color: '#303030',
 	},
-	styleMessageStatusVisible: {
+	styleMessageStatusOut: {
+		alignSelf: "flex-end",
+		fontSize: 10,
+		color: '#303030',
 	},
 	styleList: { 
 		margin: 5, 

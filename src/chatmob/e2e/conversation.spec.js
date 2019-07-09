@@ -36,11 +36,11 @@ describe('Conversation', () => {
   });
 
   it('should keep scroll position when dismissing keyboard', async () => {
-    await element(by.id('conversationList')).scroll(155, 'up');
+    await element(by.id('conversationList')).scroll(170, 'up');
     let max = 2 * maxMessages;
     id1 = `message-${getTestIdNr(max, 5)}`;
-    id2 = `message-${getTestIdNr(max, 8)}`;
-    id3 = `message-${getTestIdNr(max, 9)}`;
+    id2 = `message-${getTestIdNr(max, 7)}`;
+    id3 = `message-${getTestIdNr(max, 8)}`;
     await expect(element(by.id(id1))).toBeVisible();
     await expect(element(by.id(id2))).toBeVisible();
     await expect(element(by.id(id3))).toBeNotVisible();
@@ -53,8 +53,8 @@ describe('Conversation', () => {
     await element(by.id('messageText')).tap();
     let max = 2 * maxMessages;
     id1 = `message-${getTestIdNr(max, 5)}`;
-    id2 = `message-${getTestIdNr(max, 8)}`;
-    id3 = `message-${getTestIdNr(max, 9)}`;
+    id2 = `message-${getTestIdNr(max, 7)}`;
+    id3 = `message-${getTestIdNr(max, 8)}`;
     await expect(element(by.id(id1))).toBeVisible();
     await expect(element(by.id(id2))).toBeVisible();
     await expect(element(by.id(id3))).toBeNotVisible();
