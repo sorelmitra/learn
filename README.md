@@ -2,13 +2,12 @@
 
 # Overview
 
-This is a learning project. While I learn some new [technologies](#tools) I also build a demo chatbot app with mobile frontend and web admin app, as a proof that I understood something from these technologies :)
+This is a demonstrative project that aims to build a ChatBot Aggregator app with mobile front-end and web admin app, as a way to show how I assure product quality while developing with new technologies.
 
 
 # Goals
 
-- Learn to develop and test using the [technologies](#tools) specified below
-- Build a demo app that offers a mobile chat platform where visitors can discuss with a chat bot and a web app where chat bot owners can administer their bots
+Build a demo app that offers a mobile chat platform where visitors can discuss with a chat bot and a web app where chat bot owners can administer their bots
 
 This platform will have 5 components:
 
