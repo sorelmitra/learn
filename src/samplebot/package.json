@@ -4,13 +4,14 @@
   "description": "A sample chat bot",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sorel Mitra",
   "license": "GPL-3.0",
   "dependencies": {
-    "botlang": "^0.8.0",
-    "websocket": "^1.0.28",
-    "dotenv": "^8.0.0"
+    "botml": "^2.2.6",
+    "dotenv": "^8.0.0",
+    "websocket": "^1.0.28"
   }
 }

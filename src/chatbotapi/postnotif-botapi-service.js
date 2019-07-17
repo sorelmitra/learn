@@ -40,7 +40,7 @@ class PostNotifBotApiService {
 			logService.error(this, `Connection error: ${e}`);
 		});
 
-		client.connect(url)
+		client.connect(url);
 	}
 
 	addListener(listener) {

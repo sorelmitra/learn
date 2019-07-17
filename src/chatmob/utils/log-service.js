@@ -22,7 +22,7 @@ exports.debug = function debug(context, message) {
 }
 
 exports.log = function log(desiredLevel, context, message) {
-	message = "[" + context.constructor.name.toString() + "] " + message;
+	message = `[${(new Date()).toISOString()}] [${context.constructor.name.toString()}] ${message}`;
 	if (desiredLevel > this.configuredLevel) return;
 
 	console.log(message);
