@@ -192,7 +192,7 @@ export default class ChatScreen extends React.Component {
 
 	render() {
 		let pic = {
-			uri: 'https://cdn.pixabay.com/photo/2019/01/16/20/52/chatbot-3936760_960_720.jpg'
+			uri: 'resources/chatmob.png'
 		}
 		return (
 			<View
