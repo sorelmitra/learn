@@ -7,15 +7,15 @@ This is a demonstrative project that aims to build a ChatBot Aggregator app with
 
 # Goals
 
-Build a demo app that offers a mobile chat platform where visitors can discuss with a chat bot and a web app where chat bot owners can administer their bots
+Build a demo app that offers a mobile chat platform where visitors can discuss with a chat bot and a web app where chat bot owners can administer their bots.
 
 This platform will have 5 components:
 
+* **Chat API**. This is an API that allows posting messages and getting notifications when messages are posted
+* **Chat Mobile**. This is a mobile app where the visitors can write messages and read messages posted by other chat members, using **Chat API**
+* **ChatBot API**. This is a service that serves as an interface between **Chat API** and various bots (for now only SampleBot). It registers with **Chat API** to get posts notifications. When a message is posted to **Chat API**, the ChatBot API takes it and forwards it to the **bot**. When the **bot** responds, the ChatBot API posts the bot response back to **Chat API**
 * **SampleBot Service**. This is a Web Service that implements a simple bot. Functions TBD.
 * **SampleBot Admin**. This is a web app where chat bot owners can create accounts and configure SampleBot dialogs
-* **ChatBot API**. This is a chat bot API that serves as an interface between **Chat API** and various bots (for now only SampleBot). It acts both as a client and as posts observer for the **Chat API**. When a message is posted to **Chat API**, the ChatBot API takes it and forwards it to the **bot**. When the **bot** responds, the ChatBot API posts the bot response back to **Chat API**
-* **Chat API**. This is a chat API that allows posting messages and getting notifications when messages are posted
-* **Chat Mobile**. This is a mobile app where the visitors can write messages and read messages posted by other chat members
 
 Additionally, this platform will conform to the following constraints (initially it is enough if we at least *design* for it):
 
@@ -24,8 +24,10 @@ Additionally, this platform will conform to the following constraints (initially
 * **Flexible Deploy**. The system can be deployed on premise as well as in a cloud environment
 * **Cloud-Vendor Independence**. The cloud deploying can be done on any cloud vendor with minimal additional development
 * **New Bots**. The platform should support adding new bots, whether via internal development or external
-* **New Caller Channels**. The platform should support adding new channels for the entities that come to talk to the bots (named "Caller" here)
+* **New Visitor Channels**. The platform should support adding new channels for the entities that come to talk to the bots
 * **Open to Contact Centers**. The platform should support future additions of Contact Centers of any kind
+
+See [Solution & Architecture](https://github.com/sorelmitra/botagg/blob/master/docs/SolutionArchitecture.md) for more details.
 
 # Team, Tools, and Process
 
