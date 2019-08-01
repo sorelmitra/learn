@@ -191,15 +191,12 @@ export default class ChatScreen extends React.Component {
 	}
 
 	render() {
-		let pic = {
-			uri: 'resources/chatmob.png'
-		}
 		return (
 			<View
 				style={styles.styleMainView}
 				ref={(c) => this._mainView = c}
 			>
-				<Animated.Image source={pic} style={{ flex: 0, width: '100%', height: this.picHeight }} />
+				<Animated.Image source={require('./resources/botagg.png')} style={{ flex: 0, width: '100%', height: this.picHeight }} />
 				<View><Text style={[styles.styleTitle, {flex: 0}]}>Conversation</Text></View>
 				<Animated.View style={{flex: 1, paddingBottom: this.keyboardHeight}}>
 					<View 
