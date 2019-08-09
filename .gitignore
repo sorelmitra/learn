@@ -20,3 +20,6 @@ src/chatapi/db.sqlite3
 
 # Build
 **/build
+
+# Editors
+**/.vscode

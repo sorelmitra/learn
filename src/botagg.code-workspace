@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "chatapi"
+		},
+		{
+			"path": "chatmob"
+		},
+		{
+			"path": "chatbotapi"
+		},
+		{
+			"path": "samplebot"
+		}
+	],
+	"settings": {}
+}
