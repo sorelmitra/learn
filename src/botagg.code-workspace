@@ -11,6 +11,12 @@
 		},
 		{
 			"path": "samplebot"
+		},
+		{
+			"path": "postgres"
+		},
+		{
+			"path": "docker"
 		}
 	],
 	"settings": {}

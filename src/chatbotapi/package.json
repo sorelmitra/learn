@@ -4,7 +4,7 @@
   "description": "Interface between chatapi and bots",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.js"
   },
   "author": "Sorel Mitra",
   "license": "GPL-3.0",

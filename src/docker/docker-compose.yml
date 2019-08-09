@@ -9,7 +9,7 @@ networks:
         - subnet: 10.2.1.0/24
 
 volumes:
-  postgres10-data:
+  postgres-data:
     external: true
 
 services:
@@ -22,8 +22,9 @@ services:
     ports:
       - "5203:5432"
     volumes:
-      - postgres10-data:/var/lib/postgresql/data
-      - ./src/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
-      - ./src/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - postgres-data:/var/lib/postgresql/data
+      - ../postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ../postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
     environment:
       - POSTGRES_PASSWORD=postgres
+

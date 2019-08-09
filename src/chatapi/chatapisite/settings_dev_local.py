@@ -18,7 +18,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'chatapi',
         'USER': 'postgres',
-        'HOST': '192.168.99.100',
+        'HOST': '192.168.99.103',
         'PORT': '5203'
     },
 }
