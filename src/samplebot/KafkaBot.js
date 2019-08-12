@@ -1,25 +1,32 @@
+var logService = require('./../chatmob/utils/log-service');
 const Kafka = require('node-rdkafka');
 
-exports.KafkaBot = function KafkaBot() {
-	this.run = function run() {
+class KafkaBot {
+	run() {
 		this.consumer = Kafka.KafkaConsumer({
 			'group.id': `${process.env.KAFKA_GROUP_ID}`,
 			'metadata.broker.list': `${process.env.KAFKA_HOST}:${process.env.KAFKA_PORT}`
 		});
 
-		this.consumer.connect();
+		logService.debug(this, `Connecting...`);
+		let resp = this.consumer.connect();
+		logService.debug(this, `Connection status:`, resp);
 		this.process();
 	}
 
-	this.process = function process() {
+	process() {
+		let self = this;
 		this.consumer
 		.on('ready', function() {
-			this.consumer.subscribe([`${process.env.KAFKA_TOPIC}`]);
-			this.consumer.consume();
+			logService.debug(self, `Kafka connection ready`);
+			self.consumer.subscribe([`${process.env.KAFKA_TOPIC}`]);
+			logService.debug(self, `Subscribed to topic, consuming...`);
+			self.consumer.consume();
 		})
 		.on('data', function(data) {
-			console.log(data.value.toString());
+			logService.debug(self, data.value.toString());
 		});
 	}
-	return this;
 }
+
+exports.KafkaBot = KafkaBot;
