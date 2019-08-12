@@ -252,6 +252,8 @@ Start the service:
 
 ### One-time Setup
 
+#### Install Kafka
+
 Install [Kafka](https://kafka.apache.org) on your PC and add it's `bin/` directory to your `PATH`.
 
 CD to the Kafka config source:
@@ -263,7 +265,7 @@ Create the `zookeeper.properties` file with the following content:
 	# the directory where the snapshot is stored.
 	dataDir=/tmp/zookeeper
 	# the port at which the clients will connect
-	clientPort=2181
+	clientPort=2282
 	# disable the per-ip limit on the number of connections since this is a non-production config
 	maxClientCnxns=0
 
@@ -283,13 +285,13 @@ Create the `server.properties` file with the following content:
 	#   FORMAT:
 	#     listeners = listener_name://host_name:port
 	#   EXAMPLE:
-	#     listeners = PLAINTEXT://your.host.name:9092
-	listeners=PLAINTEXT://127.0.0.1:9092
+	#     listeners = PLAINTEXT://your.host.name:9193
+	listeners=PLAINTEXT://127.0.0.1:9193
 
 	# Hostname and port the broker will advertise to producers and consumers. If not set, 
 	# it uses the value for "listeners" if configured.  Otherwise, it will use the value
 	# returned from java.net.InetAddress.getCanonicalHostName().
-	#advertised.listeners=PLAINTEXT://your.host.name:9092
+	#advertised.listeners=PLAINTEXT://your.host.name:9193
 
 	# Maps listener names to security protocols, the default is for them to be the same. See the config documentation for more details
 	#listener.security.protocol.map=PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
@@ -376,7 +378,7 @@ Create the `server.properties` file with the following content:
 	# server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002".
 	# You can also append an optional chroot string to the urls to specify the
 	# root directory for all kafka znodes.
-	zookeeper.connect=localhost:2181
+	zookeeper.connect=localhost:2282
 
 	# Timeout in ms for connecting to zookeeper
 	zookeeper.connection.timeout.ms=6000
@@ -391,7 +393,7 @@ Create the `server.properties` file with the following content:
 	# However, in production environments the default value of 3 seconds is more suitable as this will help to avoid unnecessary, and potentially expensive, rebalances during application startup.
 	group.initial.rebalance.delay.ms=0
 
-### Start Kafka
+#### Start Kafka
 
 Open a new terminal and type:
 
@@ -403,6 +405,21 @@ Open a second terminal and type:
 	cd src/kafka
 	kafka-server-start.sh server.properties
 
+#### Create Kafka Topics
+
+Create the following Kafka topics:
+
+* For visitor messages:
+
+		kafka-topics.sh --zookeeper localhost:2282 --create --topic botcon-visitor-messages --replication-factor 1 --partitions 1
+
+Check the topics that you have:
+
+	kafka-topics.sh --zookeeper localhost:2282 --list
+
+It should look like this:
+
+	botcon-visitor-messages
 
 ### Configuration
 

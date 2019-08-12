@@ -20,6 +20,9 @@
 		},
 		{
 			"path": "/Users/sorel/1data/github/sorelmitra/botagg/docs"
+		},
+		{
+			"path": "kafka"
 		}
 	],
 	"settings": {}
