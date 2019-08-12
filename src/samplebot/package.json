@@ -11,6 +11,7 @@
   "dependencies": {
     "botml": "^2.2.6",
     "dotenv": "^8.0.0",
+    "node-rdkafka": "^2.7.1-2",
     "websocket": "^1.0.28"
   }
 }
