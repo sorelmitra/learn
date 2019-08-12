@@ -55,14 +55,7 @@ Resource/Method | POST <br/>Create | GET <br/>Read | PUT <br/>Update | DELETE <b
 Example Request:
 
 ```bash
-curl \
-    --header "Content-Type: application/json" \
-    --request POST \
-    --data '{
-        "name": "testname",
-        "body": "Hi there!" 
-    }' \
-    http://localhost:8201/posts/v1/
+curl --header "Content-Type: application/json" --request POST --data '{ "name": "testname", "body": "Hi there!" }' http://localhost:8201/posts/v1/
 ```
 
 ## Read All Posts
@@ -104,11 +97,7 @@ curl \
 Example Request:
 
 ```bash
-curl \
-    --header "Content-Type: application/json" \
-    --request GET \
-    --data '{}' \
-    http://localhost:8201/posts/v1/
+curl --header "Content-Type: application/json" --request GET --data '{}' http://localhost:8201/posts/v1/
 ```
 
 ## Delete All Posts
@@ -140,11 +129,7 @@ curl \
 Example Request:
 
 ```bash
-curl \
-    --header "Content-Type: application/json" \
-    --request DELETE \
-    --data '{}' \
-    http://localhost:8201/posts/v1/
+curl --header "Content-Type: application/json" --request DELETE --data '{}' http://localhost:8201/posts/v1/
 ```
 
 ## Read Post with ID
@@ -179,11 +164,7 @@ curl \
 Example Request:
 
 ```bash
-curl \
-    --header "Content-Type: application/json" \
-    --request GET \
-    --data '{}' \
-    http://localhost:8201/posts/v1/1/
+curl --header "Content-Type: application/json" --request GET --data '{}' http://localhost:8201/posts/v1/1/
 ```
 
 # WebSockets API for Posts Notifications v1
