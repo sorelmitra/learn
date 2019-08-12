@@ -4,6 +4,10 @@ const SampleBotEvents = {
 	REPLY: 'reply'
 }
 
+const BotmlEvents = {
+	REPLY: 'reply'
+}
+
 class SampleBot {
 
 	constructor() {
@@ -11,7 +15,7 @@ class SampleBot {
 		this.bot.start();
 		this.cbs = [];
 		let self = this;
-		this.bot.on(SampleBotEvents.REPLY, function(botResponse) {
+		this.bot.on(BotmlEvents.REPLY, function(botResponse) {
 			let response = {
 				success: true,
 				botResponse: {
@@ -23,7 +27,7 @@ class SampleBot {
 		});
 	}
 
-	process(input, cb) {
+	process(input) {
 		this.bot.send(input.body);
 	}
 
