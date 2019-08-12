@@ -2,7 +2,7 @@
   "scripts": {
     "start": "react-native start --reset-cache",
     "android": "react-native run-android",
-    "ios": "ENVFILE=.env.dev.local react-native run-ios --simulator='iPhone 5s'",
+    "ios": "react-native run-ios --simulator='iPhone 5s'",
     "test": "detox test --configuration ios.sim"
   },
   "dependencies": {

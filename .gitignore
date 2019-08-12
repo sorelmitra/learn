@@ -20,3 +20,10 @@ src/chatapi/db.sqlite3
 
 # Build
 **/build
+
+# Configuration
+src/chatmob/.env
+src/chatbotapi/.env
+src/samplebot/.env
+src/chatapi/chatapisite/settings.py
+

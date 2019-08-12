@@ -89,8 +89,14 @@ Create an isolated Python environment, and install dependencies:
 	virtualenv env
 	npm run env-install
 
+Create the `postgres-cert` docker image:
+
+	cd src/postgres
+	make
+
 Start the local Postgres with Certificates:
 
+	cd src/docker
 	docker-compose up -d
 
 Check that Postgres is up and running:
@@ -101,9 +107,45 @@ Create the database in the local Postgres:
 
 	create database chatapi;
 
+CD back to the Chat API source directory:
+
+	cd src/chatapi
+
 Create a super user for your Django app
 
 	npm run createsuperuser
+
+## Configuration
+
+Create a file `chatapisite/settings.py` with the following content:
+
+	from .settings_common import *
+
+	# SECURITY WARNING: keep the secret key used in production secret!
+	SECRET_KEY = '<YOUR.SECRET.KEY.USED.IN.DJANGO>'
+
+	# SECURITY WARNING: don't run with debug turned on in production!
+	DEBUG = <True|False>
+
+	ALLOWED_HOSTS = [
+		'<some host>',
+		'<some other host>'
+	]
+
+	# Database
+	# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+	# Use whatever database you need and have a driver for. Below we have a sample for postgres
+
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.postgresql',
+			'NAME': 'chatapi',
+			'USER': '<Postgres User>',
+			'HOST': '<Postgres Host>',
+			'PORT': '<Postgres Port>'
+		},
+	}
+
 
 ### Start Chat API On a Local PC
 
@@ -158,6 +200,14 @@ Install the dependencies:
 
 	npm install
 
+### Configuration
+
+Create a `.env` file with the following content:
+
+	CHAT_NAME=botagg-chatmob
+	CHAT_POSTS_URL=http://localhost:8201/posts/v1/
+	CHAT_NOTIFICATIONS_URL=ws://localhost:8201/notifications/v1/
+
 ### Start React Native Server
 
 To start it set-up to connect to the Chat API running on the Local PC:
@@ -179,6 +229,55 @@ Run:
 Run the automated tests:
 
 	npm run test
+
+## Start the Sample Bot
+
+### Configuration
+
+CD to the source directory
+
+	cd src/samplebot
+
+Create a file `.env` with the following content:
+
+	PORT=8202
+
+### Start
+
+Start the service:
+
+	npm start
+
+## Start the ChatBot API
+
+### Configuration
+
+CD to the source directory
+
+	cd src/chatbotapi
+
+Create a file `.env` with the following content:
+
+	CHAT_NAME=botagg-chatbot-api
+	CHAT_POSTS_URL=http://localhost:8201/posts/v1/
+	CHAT_NOTIFICATIONS_URL=ws://localhost:8201/notifications/v1/
+
+	BOT_CONNECTOR_INSTANCE=SAMPLE
+	NAME_FOR_BOT=botagg
+
+	BOT_CONNECTOR_DUMMY_TYPE=javascript-class
+	BOT_CONNECTOR_DUMMY_PROTOCOL_HANDLER=none
+	BOT_CONNECTOR_DUMMY_URI=file://./botconnectors/BotConnectorEcho
+
+	BOT_CONNECTOR_SAMPLE_TYPE=websockets
+	BOT_CONNECTOR_SAMPLE_PROTOCOL_HANDLER=file://./botprotocols/BotProtocolSample
+	BOT_CONNECTOR_SAMPLE_URI=ws://localhost:8202/samplebot/v1/
+
+### Start
+
+Start the service:
+
+	npm start
 
 # Development
 

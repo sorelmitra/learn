@@ -59,6 +59,7 @@ curl \
     --header "Content-Type: application/json" \
     --request POST \
     --data '{
+        "name": "testname",
         "body": "Hi there!" 
     }' \
     http://localhost:8201/posts/v1/
