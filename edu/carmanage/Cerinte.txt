@@ -1,0 +1,13 @@
+ACME este o companie auto ce se ocupă cu vânzarea și de mașini precum și de oferirea de servicii de reparații și întreținere. Compania dorește implementarea unor module pentru gestiunea procesului de reparații și întreținere a mașinilor deținute de clienții săi.
+
+1.În momentul recepționării unei noi mașini care necesită reparații sau verificare, diferiți specialiști (tinichigiu, electrician, mecanic, etc) din service vor inspecta mașina pentru evaluare, completând o listă de reparații care necesită a fi realizate și se stabilește un cost inițial de reparații.
+
+2.Lista reparațiilor necesare este ulterior trimisă spre echipa de mecanici și electricieni. În funcție de tipul de reparație ce trebuie efectuată, există un responsabil care va realiza comanda primită.
+
+3.Odată lansată comanda, clientul are posibilitatea de a verifica situația în care se află mașina folosind aplicația online a companiei auto. Dacă mașina se află încă în stare de reparații, clientul este informat cu privire la timpul estimat pentru finalizarea reparațiilor. În cazul în care reparațiile au fost efectuate, clientul va primi informații despre fișa finală a reparațiilor precum și când poate să-și preia mașina.
+
+4.Compania deține, de asemenea, și un modul de tunning la nivelul mașinilor deja deținute de clienți, cu posibilitatea alegerii unui pachet de modificări. În funcție de scopul modificărilor, estetice sau la nivel de performanțe, clientului i se oferă cea mai bună opțiune de pachet de tunning. Se folosește un simulator de adăugare de pachete de tunning, listă de simulări pe care clientul le poate consulta și alege ulterior versiunea favorabilă.
+
+Realizarea proiectului presupune implementarea de design pattern-uri din categoria Structurale și Comportamentale. Obligatoriu se implementează: Command, Memento, Chain of Responsability, State, Strategy și Decorator. 
+
+Într-un fișier .txt sau .doc separat (inclus în directorul proiectului) se descrie noul modul adăugat și se explică implementarea fiecărui design pattern folosit.

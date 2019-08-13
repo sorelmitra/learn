@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .DS_Store
 
 **/node_modules
@@ -56,3 +55,15 @@ src/chatmob/.env
 src/chatbotapi/.env
 src/samplebot/.env
 src/chatapi/chatapisite/settings.py
+
+# Edu
+*~
+.DS_Store
+**/*.suo
+**/Debug
+**/ipch
+**/*.sdf
+**/*.opensdf
+**/*.VC.opendb
+**/*.vcxproj.user
+**/*.class

@@ -1,0 +1,33 @@
+De folosit JAVA:
+
+ACME Inc este o companie auto ce proiectează și construiește diferite modele de mașini: berlină, coupé, break și van. Pentru a eficientiza procesul de vânzare companie dorește implementarea unei soluții informatice la nivelul dealer-ilor auto. Scopul aplicației este de a gestiona comenzile de mașini noi și de a le salva într-un fișier text.
+
+1. Fiecare comandă nouă pornește cu alegerea modelului de bază. Acesta conține elemente comune tuturor autoturismelor din aceeași gamă (la alegere 2-3 atribute).  Pentru a-i permite clientului alegerea corectă a modelului acesta este proiectat în aplicație printr-un model 3D. După ce este proiectat prototipul pentru fiecare model, acesta este copiat pentru crearea unui număr mai mare de mașini din același model. Astfel se evită pierderea de timp cu reproiectarea aceluiași model pentru fiecare mașină construită. Procesul ar fi unul costisitor dacă s-ar implementa și aplicația ar genera timpi mari de așteptare. Să se implementeze modulul care să asigure procesul de generare a modelelor de bază pentru obiectele din familia de mașini.
+
+2. Fiecare mașină comandată are o serie de șasiu unică. Aceasta este definită (și nu mai poate fi modificată) în momentul în care este finalizată comanda. Pentru a gestiona eficient generarea acestor valori, aplicația care gestionează procesul de producție va permite crearea unui singur generator, unic la nivelul tuturor modulelor.
+
+3. Pentru a permite configurarea fiecărei mașini vândute, clientul are posibilitatea de a alege combinații diferite dintre cele 12 opțiuni suplimentare pe care le poate comanda. Aplicația trebuie să permită crearea flexibilă a modelului comandat.
+
+Implementarea se realizează prin implementarea de design patterns din categoria celor Creationale. În cadrul proiectului trebuie să respectați principiile de Clean Code (conventii de nume pentru variabile si metode, SOLID, KISS, YAGNI). Într-un fișier .txt sau .doc separat (inclus in directorul proiectului) descrieți principiile de Clean Code respectate si indicati ce design patterns ati utilizat pentru fiecare din cerinte.
+
+
+
+Ok deci atributele comune tuturor masinilor ar fi:
+
+areABS
+areStergatorSpate
+areAirbagPasager
+
+Atribute optionale ar fi:
+
+areFaruriXenon
+areSenzorPloaie
+areScauneSport
+areScaunePiele
+areAerConditionat
+areEleron
+areScaunCopil
+areJentiAliaj
+areVopseaMetalizata
+
+Cam astea zic eu ca sunt suficiente
