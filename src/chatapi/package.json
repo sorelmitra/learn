@@ -14,8 +14,8 @@
     "env-install": "source env/bin/activate && pip install -r requirements.txt",
     "makemigrations": "source env/bin/activate && python manage.py makemigrations chatapi",
     "migrate": "source env/bin/activate && python manage.py migrate",
-    "start": "source env/bin/activate && python manage.py runserver 8201",
-    "fullstart": "npm run env-install && npm run makemigrations && npm run migrate && npm start",
+    "runserver": "source env/bin/activate && python manage.py runserver 8201",
+    "start": "npm run env-install && npm run makemigrations && npm run migrate && npm run runserver",
     "test": "behave"
   }
 }

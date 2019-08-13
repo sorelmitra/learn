@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-var KafkaBot = require('./KafkaBot').KafkaBot;
+var SampleBotServer = require('./SampleBotServer').SampleBotServer;
 
-var bot = new KafkaBot();
+var bot = new SampleBotServer();
 bot.run()
