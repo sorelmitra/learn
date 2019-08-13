@@ -1,0 +1,47 @@
+{
+  "scripts": {
+    "start": "react-native start --reset-cache",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios --simulator='iPhone 5s'",
+    "test": "detox test --configuration ios.sim"
+  },
+  "dependencies": {
+    "react": "16.8.6",
+    "react-native": "0.59.5",
+    "react-native-config": "^0.11.7"
+  },
+  "devDependencies": {
+    "appium": "1.8.1",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "chai": "4.1.2",
+    "chai-as-promised": "^6.0.0",
+    "cucumber": "4.2.1",
+    "detox": "^12.8.0",
+    "jest": "^24.8.0",
+    "jest-react-native": "^18.0.0",
+    "metro": "^0.54.0",
+    "metro-core": "^0.54.0",
+    "metro-react-native-babel-preset": "^0.54.1",
+    "protractor": "^5.4.1",
+    "protractor-cucumber-framework": "^3.1.2",
+    "react-native-testing-library": "^1.7.0",
+    "react-test-renderer": "^16.8.6",
+    "wd": "1.10.1",
+    "wdio-appium-service": "0.2.3",
+    "wdio-cucumber-framework": "2.2.0",
+    "wdio-spec-reporter": "0.1.4",
+    "webdriverio": "^4.13.1"
+  },
+  "detox": {
+    "test-runner": "jest",
+    "configurations": {
+      "ios.sim": {
+        "binaryPath": "ios/build/chatmob/Build/Products/Debug-iphonesimulator/chatmob.app",
+        "type": "ios.simulator",
+        "name": "iPhone 5s"
+      }
+    },
+    "specs": ""
+  },
+  "private": true
+}

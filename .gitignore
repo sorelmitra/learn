@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 
 **/node_modules
@@ -25,3 +26,33 @@ dot/*.svg
 
 **/.bpmn
 **/*.log
+
+# Botagg
+# Security
+src/postgres/ssl
+*.jks
+*.p12
+*.key
+
+# OS
+.DS_Store
+
+# JavaScript
+**/node_modules/**/*
+npm-debug.*
+appium.log
+
+# Python
+__pycache__
+env/
+src/chatapi/static
+src/chatapi/db.sqlite3
+
+# Build
+**/build
+
+# Configuration
+src/chatmob/.env
+src/chatbotapi/.env
+src/samplebot/.env
+src/chatapi/chatapisite/settings.py

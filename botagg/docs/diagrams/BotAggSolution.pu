@@ -1,0 +1,17 @@
+@startuml BotAggSolution
+
+!include ./style.pu
+
+package "Chat API <img:images/OnPremise.png{scale=.50}>" as packageChat {
+	FA_SERVER(serviceChatApi,"Chat API")
+	FA_DATABASE(dbChatApi,"Chat DB")
+}
+
+FA_MOBILE_PHONE(appChatMobile,"Chat Mobile App")
+OFF_COMMUNICATIONS(caller,"Caller")
+
+caller --[#Maroon]> appChatMobile: Caller Message
+appChatMobile --[#Maroon]> serviceChatApi: Caller Message
+serviceChatApi -[#Maroon]> dbChatApi: Caller Message
+
+@enduml

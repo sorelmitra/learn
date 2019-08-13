@@ -1,0 +1,1 @@
+from .NotificationsConsumer import *

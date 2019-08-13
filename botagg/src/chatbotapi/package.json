@@ -1,0 +1,16 @@
+{
+  "name": "chatbotapi",
+  "version": "1.0.0",
+  "description": "Interface between chatapi and bots",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Sorel Mitra",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "websocket": "^1.0.28",
+    "dotenv": "^8.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "chatapi",
+  "version": "1.0.0",
+  "description": "Chat REST API",
+  "main": "main.py",
+  "devDependencies": {
+    "chromedriver": "^2.46.0",
+    "concurrently": "^4.1.0",
+    "cucumber": "^5.1.0",
+    "selenium-webdriver": "^4.0.0-alpha.1"
+  },
+  "scripts": {
+    "createsuperuser": "source env/bin/activate && python manage.py createsuperuser",
+    "env-install": "source env/bin/activate && pip install -r requirements.txt",
+    "makemigrations": "source env/bin/activate && python manage.py makemigrations chatapi",
+    "migrate": "source env/bin/activate && python manage.py migrate",
+    "runserver": "source env/bin/activate && python manage.py runserver 8201",
+    "start": "npm run env-install && npm run makemigrations && npm run migrate && npm run runserver",
+    "test": "behave"
+  }
+}

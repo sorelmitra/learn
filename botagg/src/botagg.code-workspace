@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "chatapi"
+		},
+		{
+			"path": "chatmob"
+		},
+		{
+			"path": "chatbotapi"
+		},
+		{
+			"path": "samplebot"
+		},
+		{
+			"path": "postgres"
+		},
+		{
+			"path": "docker"
+		},
+		{
+			"path": "/Users/sorel/1data/github/sorelmitra/botagg/docs"
+		}
+	],
+	"settings": {}
+}

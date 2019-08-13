@@ -1,0 +1,17 @@
+{
+  "name": "samplebot",
+  "version": "1.0.0",
+  "description": "A sample chat bot",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Sorel Mitra",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "botml": "^2.2.6",
+    "dotenv": "^8.0.0",
+    "node-rdkafka": "^2.7.1-2",
+    "websocket": "^1.0.28"
+  }
+}

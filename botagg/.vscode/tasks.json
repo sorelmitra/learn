@@ -1,0 +1,63 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558 
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "src/chatmob/",
+			"problemMatcher": [
+				"$eslint-compact"
+			]
+		},
+		{
+			"type": "npm",
+			"script": "ios",
+			"path": "src/chatmob/",
+			"problemMatcher": [
+				"$eslint-compact"
+			]
+		},
+		{
+			"type": "npm",
+			"script": "env-install",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "makemigrations",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "migrate",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "createsuperuser",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "docs",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "postgres",
+			"problemMatcher": []
+		},
+		{
+			"type": "npm",
+			"script": "restart-dev-local",
+			"path": "src/chatapi/",
+			"problemMatcher": []
+		}
+	]
+}
