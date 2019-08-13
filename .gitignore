@@ -28,7 +28,7 @@ dot/*.svg
 
 # Botagg
 # Security
-src/postgres/ssl
+botagg/src/postgres/ssl
 *.jks
 *.p12
 *.key
@@ -44,17 +44,17 @@ appium.log
 # Python
 __pycache__
 env/
-src/chatapi/static
-src/chatapi/db.sqlite3
+botagg/src/chatapi/static
+botagg/src/chatapi/db.sqlite3
 
 # Build
 **/build
 
 # Configuration
-src/chatmob/.env
-src/chatbotapi/.env
-src/samplebot/.env
-src/chatapi/chatapisite/settings.py
+botagg/src/chatmob/.env
+botagg/src/chatbotapi/.env
+botagg/src/samplebot/.env
+botagg/src/chatapi/chatapisite/settings.py
 
 # Edu
 *~
