@@ -1,0 +1,41 @@
+ROOT_PATH=../../../..
+EXPLODED_DEPLOY_SUBDIR=ccfrmwk/
+
+include ${ROOT_PATH}/makefile.config
+include ${HOME}/Documents/makefile.anchor
+
+RSYNC_OPT+= --exclude='*~' --exclude=build --exclude=tags
+
+all: unit ctags deploy_incremental
+
+.PHONY: build clean
+
+build clean deploy_exploded deploy_war deploy_clean check_deployed test_paths_exploded test_paths_war:
+	${CD} ${ROOT_PATH} && make $@
+
+deploy_incremental:
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "touch ${DEPLOY_PATH}/${SKIP_DEPLOY_FILE}"
+	${RSYNC} ${RSYNC_OPT} * ${DEPLOY_VM_USER}@${DEPLOY_VM_IP}:${DEPLOY_PATH}/${EXPLODED_PACKAGE_DEPLOY_DIR}/${EXPLODED_DEPLOY_SUBDIR}
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "rm -v ${DEPLOY_PATH}/${SKIP_DEPLOY_FILE}"
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "touch ${DEPLOY_PATH}/${DO_DEPLOY_FILE}"
+	${CD} ${ROOT_PATH} && make check_deployed
+
+lint:
+	@/Volumes/Data/1data/tehnic/scripts/runjsl.sh
+
+unit:
+	@cd build && node node_modules/karma/bin/karma run
+
+ctags_incr:
+	@/Volumes/Data/1data/tehnic/scripts/runctags_js.sh -d ${PWD} -t Build/ctags > ctags_incr.log 2>&1 || echo "WARNING: ctags script returned error"
+
+ctags:
+	@echo "Rebuilding CTags file and preparing for incremental update..."
+	@rm -f tags TAGS
+	@rm -rf Build/ctags
+	@ctags ${PWD} >${HOME}/Documents/ctags.log 2>&1
+	@/Volumes/Data/1data/tehnic/scripts/runctags_js.sh -d ${PWD} -t Build/ctags -u || echo "WARNING: ctags script returned error"
+
+test_paths_incremental:
+	@echo ${RSYNC} ${RSYNC_OPT} * ${DEPLOY_VM_USER}@${DEPLOY_VM_IP}:${DEPLOY_PATH}/${EXPLODED_PACKAGE_DEPLOY_DIR}/${EXPLODED_DEPLOY_SUBDIR}
+

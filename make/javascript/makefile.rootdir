@@ -1,0 +1,37 @@
+include makefile.config
+include ${HOME}/Documents/makefile.anchor
+
+all: deploy_exploded
+
+deploy_war: build
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "touch ${DEPLOY_PATH}/${SKIP_DEPLOY_FILE}"
+	${SCP} ${PACKAGE} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP}:${DEPLOY_PATH}/${PACKAGE_DEPLOY_NAME}
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "rm -v ${DEPLOY_PATH}/${SKIP_DEPLOY_FILE}"
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "touch ${DEPLOY_PATH}/${DO_DEPLOY_FILE}"
+	./check_deployed.sh
+
+deploy_exploded: build
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "touch ${DEPLOY_PATH}/${SKIP_DEPLOY_FILE}"
+	${RSYNC} ${RSYNC_OPT} ${EXPLODED_PACKAGE}/* ${DEPLOY_VM_USER}@${DEPLOY_VM_IP}:${DEPLOY_PATH}/${EXPLODED_PACKAGE_DEPLOY_DIR}/
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "rm -v ${DEPLOY_PATH}/${SKIP_DEPLOY_FILE}"
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "touch ${DEPLOY_PATH}/${DO_DEPLOY_FILE}"
+	./check_deployed.sh
+
+deploy_clean:
+	${SSH} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP} "rm -rfv ${DEPLOY_PATH}/${EXPLODED_PACKAGE_DEPLOY_DIR}*"
+
+build:
+	${MAVEN} package
+
+clean:
+	${MAVEN} clean
+
+check_deployed:
+	./check_deployed.sh
+
+test_paths_war:
+	echo ${SCP} ${PACKAGE} ${DEPLOY_VM_USER}@${DEPLOY_VM_IP}:${DEPLOY_PATH}/${PACKAGE_DEPLOY_NAME}
+
+test_paths_exploded:
+	echo ${RSYNC} ${RSYNC_OPT} ${EXPLODED_PACKAGE}/* ${DEPLOY_VM_USER}@${DEPLOY_VM_IP}:${DEPLOY_PATH}/${EXPLODED_PACKAGE_DEPLOY_DIR}/
+

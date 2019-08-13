@@ -1,0 +1,28 @@
+MAVEN=mvn
+CD=cd
+SCP=scp
+SSH=ssh
+TOUCH=touch
+RSYNC=rsync
+RSYNC_OPT=-rLztih
+
+SED=sed
+SED_OPTIONS=-Ee
+SED_JS_STACKFRAME='s/([^\(]*)\(([^:]*):([^:]*):([^\)]*)\)/\2:\3:\4 (\1)/'
+SED_JS_IGNORE1='s/(.*Loading config *)(.*$$)/\2:1:1 \1/'
+
+APP_NAME=clientWebApp
+APP_DEPLOY_NAME=${APP_NAME}${EXTRA_DEPLOY_SUFFIX}
+PACKAGE=target/${APP_NAME}.war
+PACKAGE_DEPLOY_NAME=${APP_DEPLOY_NAME}.war
+DEPLOY_PATH=/opt/Avaya/jboss-as/7.1.1/standalone/deployments
+EXPLODED_PACKAGE=target/${APP_NAME}
+EXPLODED_PACKAGE_DEPLOY_DIR=${APP_DEPLOY_NAME}.war
+DEPLOYED_FILE=${APP_DEPLOY_NAME}.war.deployed
+DO_DEPLOY_FILE=${APP_DEPLOY_NAME}.war.dodeploy
+SKIP_DEPLOY_FILE=${APP_DEPLOY_NAME}.war.skipdeploy
+
+# Sample ${HOME}/Documents/makefile.anchor:
+# DEPLOY_VM_USER=avaya
+# DEPLOY_VM_IP=135.20.253.104
+# EXTRA_DEPLOY_SUFFIX=<user name> # if you have a suffix to add to your WAR so not to conflict with other users

@@ -1,0 +1,9 @@
+The makefiles shown here are for a case where you have a web app that has a complex src directory structure, and you're working in some subdirectory of the main src directory. This subdirectory is called 'srcdir' here.
+
+You need to:
+- copy the makefile.srcdir into your srcdir, and remove the ".srcdir" extension
+- copy the makefile.*.rootdir into your main src directory (which would be a parent of srcdir), and remove the ".rootdir" extension
+- update the paths in makefile.srcdir to point to your main src directory
+- rename if needed and copy the makefile.anchor to your home Documents directory
+- update if needed makefile.config and the rest of the makefiles with respect to your particular setup
+
