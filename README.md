@@ -1,5 +1,9 @@
 # botagg
 
+# Discontinued
+
+I discontinued this project because I can't keep-up with it along with my other assignments...
+
 # Overview
 
 This is a demonstrative project that aims to build a ChatBot Aggregator app with mobile front-end and web admin app, as a way to show how I assure product quality while developing with new technologies.
