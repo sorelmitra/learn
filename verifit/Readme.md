@@ -25,9 +25,9 @@ I need to set up a frame that would help me with automatic system testing of the
 	b. REST API
 	c. WebSockets API
 2. Mobile
-	a. Ideally, cross-platform
-	b. iOS
-	c. Android
+	a. iOS
+	b. Android
+	(Ideally, cross-platform.)
 
 ## Setting Up the Framework(s)
 
