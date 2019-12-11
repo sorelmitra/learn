@@ -10,7 +10,7 @@
     "makemigrations": "source env/bin/activate && python manage.py makemigrations web",
     "migrate": "source env/bin/activate && python manage.py migrate",
     "createsuperuser": "source env/bin/activate && python manage.py createsuperuser",
-    "copy-images": "rm -rf ./static/images && mkdir -p ./static/images && (cp ../img/* ./static/images/ || true)",
+    "copy-images": "rm -rf ./web/static/images && mkdir -p ./web/static/images && (cp ../img/* ./web/static/images/ || true)",
     "runserver": "source env/bin/activate && python manage.py runserver 8305",
     "setup": "npm run env-create && npm run env-install && npm run makemigrations && npm run migrate && npm run createsuperuser",
     "start": "npm run env-install && npm run makemigrations && npm run migrate && npm run copy-images && npm run runserver",
