@@ -35,6 +35,12 @@ I need to set up a frame that would help me with automatic system testing of the
 3. Micro-services
 	(via REST or WebSockets API)
 
+## Types of Data
+
+Most easily the frameworks can support plain text data. I believe I want to stick to plain text and call GNU diff tool to show me differences when comparing output (same as I did years ago for the automation framework developed for the "Tailored Software Development Process" project).
+
+If the apps I want to test do move around binary data, I'd probably better write a JSON adapter inside the app and expose it via REST or WebSockets (for reasons similar to what I put in the Non-Goals section).
+
 ## Setting Up the Framework(s)
 
 The framework(s) I find need to be easily set-up in a new, time-constrained project.
