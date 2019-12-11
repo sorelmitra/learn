@@ -1,0 +1,8 @@
+DEBUG=True
+ALLOWED_HOST="*"
+SECRET_KEY=p^3q2_@zf2$lo$ud$sy8&6je)^$84f_jg&5_r-nem*-zq)q*kd
+DATABASE_NAME="notepic"
+DATABASE_USER="postgres"
+DATABASE_PASSWORD="postgres"
+DATABASE_HOST="192.168.99.103"
+DATABASE_PORT="5203"

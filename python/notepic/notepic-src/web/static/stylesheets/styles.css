@@ -1,0 +1,89 @@
+* {
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 18px;
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-size: 1em;
+	line-height: 1.6;
+	font-weight: 300;
+	background-color: lightgoldenrodyellow;
+	color: darkgreen;
+}
+
+body, input, .button, .submit-button-home {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell, Oxygen, "Oxygen-Sans", "Open Sans", "Helvetica Neue", Tahoma, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: darkmagenta;
+	margin: 0.5em 0 1em;
+	line-height: 1.2;
+}
+
+h1 {
+	font-size: 30px;
+	padding-bottom: 10px;
+}
+
+@media (min-width: 769px) {
+	h1 {
+		font-size: 44px;
+	}
+}
+
+h2 {
+	font-size: 26px;
+}
+
+@media (min-width: 769px) {
+	h2 {
+		font-size: 38px;
+	}
+}
+
+h3 {
+	font-size: 22px;
+}
+
+@media (min-width: 769px) {
+	h3 {
+		font-size: 28px;
+	}
+}
+
+h4 {
+	font-size: 18px;
+	opacity: .8;
+}
+
+@media (min-width: 769px) {
+	h4 {
+		font-size: 22px;
+	}
+}
+
+p, ul, ol {
+	margin: 0 0 1.75em;
+}
+
+li {
+	margin-bottom: 0.25em;
+}
+
+a, a:visited {
+	color: green;
+}
+
+a:hover {
+	color: pink;
+}

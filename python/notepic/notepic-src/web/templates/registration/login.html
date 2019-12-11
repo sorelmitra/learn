@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Welcome Back!</h1>
+    <p>Please login to continue.</p>
+    <form method="post" _lpchecked="1">
+
+  {% csrf_token %}
+  {{ form.as_p }}
+        <label for="remember">Remember me:</label>
+        <input name="remember" type="checkbox">
+        <input type="submit" value="Login">
+    </form>
+    <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+
+{% endblock %}

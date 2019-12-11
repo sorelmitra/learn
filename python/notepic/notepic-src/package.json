@@ -1,0 +1,19 @@
+{
+  "name": "notepic",
+  "version": "1.0.0",
+  "description": "Notes with Pictures Demo App",
+  "main": "manage.py",
+  "scripts": {
+    "env-create": "virtualenv env",
+    "env-install": "source env/bin/activate && pip install -r requirements.txt",
+    "dotenv-copy": "cp ../docs/sample_env.txt ./.env",
+    "makemigrations": "source env/bin/activate && python manage.py makemigrations web",
+    "migrate": "source env/bin/activate && python manage.py migrate",
+    "createsuperuser": "source env/bin/activate && python manage.py createsuperuser",
+    "copy-images": "rm -rf ./static/images && mkdir -p ./static/images && (cp ../img/* ./static/images/ || true)",
+    "runserver": "source env/bin/activate && python manage.py runserver 8305",
+    "setup": "npm run env-create && npm run env-install && npm run makemigrations && npm run migrate && npm run createsuperuser",
+    "start": "npm run env-install && npm run makemigrations && npm run migrate && npm run copy-images && npm run runserver",
+    "test": "behave"
+  }
+}
