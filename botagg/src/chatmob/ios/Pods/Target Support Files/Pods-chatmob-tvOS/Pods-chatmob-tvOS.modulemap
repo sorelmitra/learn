@@ -1,0 +1,6 @@
+framework module Pods_chatmob_tvOS {
+  umbrella header "Pods-chatmob-tvOS-umbrella.h"
+
+  export *
+  module * { export * }
+}

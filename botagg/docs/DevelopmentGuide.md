@@ -219,6 +219,14 @@ Test it in the same way as locally, but use http://botagg-239511.appspot.com/cha
 
 ## Start Chat Mobile App
 
+### Broken!
+
+2019-12-12: The app is broken after I've upgraded to Mac OS Catalina and Xcode 11. I tried updating to React 0.61.5 but I can't build.
+
+I don't have enough time to try and fix it but probably I'd better copy my source code elsewhere and start over with a new React Latest Version project.
+
+Thoughts: It's not nice to find this project after 6 months and discover I can't run it anymore. The pace with React Native might be too fast for my limited time. I believe that had I had an Xcode Objective-C or Swift project I wouldn't have had it broken in just 6 months.
+
 ### Prepare to Run
 
 CD to the Chat Mobile source directory:
@@ -245,17 +253,29 @@ CHAT_NOTIFICATIONS_URL=ws://localhost:8201/notifications/v1/
 
 ### Start React Native Server
 
-To start it set-up to connect to the Chat API running on the Local PC:
+To start it and connect to the Chat API specified in `.env`:
 
 ```bash
-npm start-dev-local
+npm start
 ```
 
-To start it set-up to connect to the Chat API running in the Cloud:
+If you get this error `Loading dependency graph...Failed to construct transformer: Error: Option 'mapper' isn't supported by the Node crawler`, do this:
 
-```bash
-npm start-dev-cloud
-```
+1. Install `patch-package`
+
+		npm install --global patch-package
+
+2. Make sure you have `jest-haste` at least `24.8.0`
+
+3. CD `src/chatmob`
+
+4. Run this:
+
+		npx patch-package
+
+	It will automatically find `./patches/jest-haste-map+24.8.0.patch` and apply it.
+
+5. Run again `npm start`. The error is gone.
 
 ### Start the iOS App in the Simulator
 
