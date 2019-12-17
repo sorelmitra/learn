@@ -94,7 +94,9 @@ Supports: Mobile: iOS, Android, any kind of app.
 
 http://appium.io/
 
-https://github.com/appium-boneyard/sample-code/tree/master/sample-code/examples/python
+https://github.com/appium/appium/tree/master/sample-code
+
+I've installed their TestApp into iOS Simulator iPhone 8.
 
 TBD
 
