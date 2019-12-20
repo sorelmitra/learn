@@ -88,6 +88,78 @@ The reason for this is that there are multiple, very different types of messagin
 
 # Analysis
 
+## WebSockets
+
+Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
+
+### Websocat
+
+https://github.com/vi/websocat
+
+The tool works nicely with `ws` or `wss`. It can only read input and print to output. It can only send on Enter.
+
+How do I send JSON with it? How do I send multiline text? How do I receive only?
+
+TBD
+
+## REST
+
+### Idea: Use cURL and Drive Tests via a Directory Structure
+
+A directory with tests could look like this:
+
+	- tests
+		- tool.sh
+		- jsonplaceholder
+			- tool.sh
+			- jsonplaceholder-post-1
+				- tool-params.txt
+				- jsonplaceholder-post-1-output-expected.json
+				- jsonplaceholder-post-1-input.json
+				- [created during test] jsonplaceholder-post-1-output.json
+			- jsonplaceholder-post-2
+				- jsonplaceholder-post-2-output-expected.json
+				- jsonplaceholder-post-2-input.json
+				- [created during test] jsonplaceholder-post-2-output.json
+		- other-api
+			- other-api-test-1
+				- tool.sh
+				- other-api-test-1-output-expected.json
+				- other-api-test-1-input.json
+				- [created during test] other-api-test-1-output.json
+		- stuff
+			- stuff-test-1
+				- stuff-test-1-output-expected.json
+				- stuff-test-1-input.json
+				- [created during test] stuff-test-1-output.json
+
+Where:
+
+- `...-input.json` is the file to input to the tools
+- `...-output-expected.json` is the expected output
+- `...-output.json` is the output got during running.
+- `tool.sh` is the program to run. If there's no such file in the current directory, look up in the hierarchy and stop at the first one found. For example in the above hierarchy, `stuff` uses `tests/tool.sh`; all `jsonplaceholder` tests use their own `tool.sh`, but `jsonplaceholder-post-1` adds some parameters to it, etc.
+- `tool-params.txt` are extra params to the tool needed by that particular test. If there's no such file in the current directory just use `tool.sh`
+
+The tool would be written so that it does the job to actually execute the test. For example, for a REST API, it could be a call to cURL. For a command line tool, it would be a call to the tool itself. For a Web UI, it would be a call to Python with a script such as EXAMPLE 1 of [this tutorial](https://www.guru99.com/selenium-python.html).
+
+The problem: how do you solve the "running context" problem? I.e. if you need some context to be active at your test. For example, a Web UI test case might require some other UI actions, which means the browser must be kept open during the entire suite. What I'm proposing above means instantiating the browser for each test. If I am to keep it open, I must have some sort of a Python script waiting for commands.
+Although, it could be that the only thing you need is login, which could be done by the `tool.sh` from the parent directory, i.e. the step only provides the actual actions, while the parent `tool.sh` starts the browser and logins, and executes the step actions afterwards.
+
+### Idea: Use cURL and Drive Tests with Pytest and a Directory Structure
+
+The idea with directory structure is good, but requires me to write and maintain my own test runner. This means both a lot of work and would not be easy to explain why I chose this path.
+
+According to [their page](https://docs.pytest.org/en/latest/getting-started.html), Pytest uses [standard test discovery practices](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery). These practices seem to suit my needs.
+
+The idea would be that I use the same directory structure, but instead of `tool.sh` I'd have `test_blah.py`. This is my entry point and it really helps to have it in Python rather than Bash, as it's rather easy to write cross-platform code in Python.
+
+For this, I would only write a Python library that executes a command with input (either parameters or file), reads its output (either from stdin or file), and compares it to an expected output.
+
+See an implementation on this in `test_jsonplaceholder_post_1.py` and `verifit.py` - the latter must be in a directory that's included in `PYTHONPATH`.
+
+TBD
+
 ## Appium
 
 Supports: Mobile: iOS, Android, any kind of app.
@@ -115,12 +187,6 @@ https://www.katalon.com/
 https://www.altexsoft.com/blog/engineering/the-good-and-the-bad-of-katalon-studio-automation-testing-tool/
 
 https://testguild.com/katalon-studio/
-
-TBD
-
-## (Something for WebSockets)
-
-Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
 
 TBD
 
