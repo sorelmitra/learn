@@ -2,6 +2,8 @@
 
 Trying to learn about Kubernetes.
 
+A Kube playground: https://labs.play-with-k8s.com/
+
 # Resources
 
 [1] A series of [1a-e], explaining Kubernetes Concepts
