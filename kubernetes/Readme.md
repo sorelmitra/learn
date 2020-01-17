@@ -18,11 +18,21 @@ Trying to learn about Kubernetes.
 
 [2] http://kubernetesbyexample.com - a good companion to [1]
 
+[3] https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
+
+[4] https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
+
 # Lecture Notes
 
 ## Kubernetes by Example [2]
 
 This is oriented towards demonstrating Kubernetes concepts with examples. It also explains a bit those concepts, but it's most value comes from the examples. It is a good companion to [1].
+
+## Kubernetes Documentation
+
+*API Server*: The API server is the gateway to the Kubernetes cluster. It is the central touch point that is accessed by all users, automation, and components in the Kubernetes cluster. The API server implements a RESTful API over HTTP, performs all API operations, and is responsible for storing API objects into a persistent storage backend. [3]
+
+*Kubelet*: The kubelet is the primary “node agent” that runs on each node. It can register the node with the apiserver. [4]
 
 ## Kubernetes Concepts Series [1]
 
@@ -37,3 +47,10 @@ The need for understanding the concepts: I like the second paragraph, that state
 *Pod Bundles One App*: The intended use case of a pod is bundle together a container that does a main task with other helper containers, needed either to assist the main container (e.g. a proxy or an initializer), either to assist the maintainer (e.g. logging, data change watchers, etc.).
 
 *Pod is Ephemeral*: A pod will not be rescheduled to a new node once it dies. If we want to keep a pod alive, we need _replica sets_.
+
+*Label*: A key-value piece of information that has a user-defined meaning and can be attached to most of Kubernetes objects, including pods and nodes. Labels can be used within _selectors_ to select objects that share a common meaning. Examples of meanings: dev/production, ownership, release.
+
+*Selector*: A mechanism for selecting objects based on labels. A key and one or more values of labels can be specified.
+
+*Selector is the Core Grouping Primitive*: Using label selectors a client or user can identify and subsequently manage a group of objects. This is the core grouping primitive of Kubernetes and used in many places. One example of its use is working with _replica sets_.
+
