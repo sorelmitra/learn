@@ -2,7 +2,7 @@
 
 Trying to learn about Kubernetes.
 
-A Kube playground: https://labs.play-with-k8s.com/
+A Kube playground: https://labs.play-with-k8s.com/. Not that useful, as it's not safe to use real passwords with it, so you can't download any image from a private repo.
 
 # Resources
 
@@ -23,6 +23,10 @@ A Kube playground: https://labs.play-with-k8s.com/
 [3] https://www.oreilly.com/library/view/managing-kubernetes/9781492033905/ch04.html
 
 [4] https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
+
+[5] https://kubernetes.io/blog/2016/04/using-deployment-objects-with/
+
+[6] https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 
 # Lecture Notes
 
@@ -56,3 +60,60 @@ The need for understanding the concepts: I like the second paragraph, that state
 
 *Selector is the Core Grouping Primitive*: Using label selectors a client or user can identify and subsequently manage a group of objects. This is the core grouping primitive of Kubernetes and used in many places. One example of its use is working with _replica sets_.
 
+*Replica Set*: A selection of pods, each of which being guaranteed the given number of replicas. The selection is made using _selectors_. If not using a replica set, a pod is not rescheduled if its node dies.
+
+### Deployments [1b]
+
+*Imperative vs Declarative Deployment*: The _imperative_ way is to deploy things manually, then adding other configurations (such as replica controllers) on top of them. The _declarative_ way is to create a declarative definition of how things should be deployed and configured, then execute that definition in order to deploy and manage the things. The _imperative_ way is good for learning and trying things out. The _declarative_ way is the way to go once things have settled.
+
+*Deployment*: A declarative object used to automate deploying and rolling updates of applications. It allows easy scaling horizontally, easy progressive updates without service outage (by adding more replicas temporarily), rolling back updates in case of error. [5]
+
+### Services [1c]
+
+*Service*: An abstraction which defines a logical set of Pods and a policy by which to access them. The set of Pods targeted by a Service is usually determined by a selector. A _service_ is a REST object that can be deployed and managed.
+
+*Service without Selector*: A _service_ used to abstract backends that are not part of Kubernetes.
+
+*Service Discovery*: Query the _API server_, use a _service proxy_, _ExternalName_.
+
+*Service Proxy*: Virtual IP for services, implemented by `kube-proxy`.
+
+*Service ExternalName*: Type of service that maps to a DNS name rather than Pods.
+
+### ConfigMaps and Secrets [1d]
+
+*ConfigMap*: Configuration data, that stores key-value pairs. A value can be a string, a config file, or a blob. Used to decouple configuration from containers.
+
+*Secret*: Configuration data similar to _ConfigMap_ but designed for small amounts of secret data, such as passwords, keys, etc. Kubernetes treats secrets different from _ConfigMap_'s: they are stored in a tmpfs and only on nodes that have pods that use them. However, they are passed to and from _API server_ in plain text, so a TLS connection is needed between _API server_ and _kubelet_ / user.
+
+## Configure Liveness, Readiness and Startup Probes [6]
+
+TBD
+
+## Configure Secrets for Pull from Private Repository
+
+The error `Error: ErrImagePull` from `kubectl describe pod`  may mean that you're trying to pull from a private repository.
+
+In this case you need to create the secret, assuming that you've already logged in locally with `docker login`:
+
+	kubectl create secret generic dockerhubcred --from-file=.dockerconfigjson=/Users/sorel/.docker/config.json --type=kubernetes.io/dockerconfigjson
+
+This may not work if the local docker uses a credential manager from the OS.
+In this case, create it with explicit credentials:
+
+	kubectl create secret docker-registry dockerhubcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+
+While doing this, make sure nobody's watching over your shoulder and once finished remove the command from your shell history.
+
+Then refer it in your pod:
+
+	apiVersion: v1
+	kind: Pod
+	metadata:
+	name: microservice
+	spec:
+	containers:
+	- name: microservice
+		image: sorelmitra/microservice:latest
+	imagePullSecrets:
+	- name: dockerhubcred

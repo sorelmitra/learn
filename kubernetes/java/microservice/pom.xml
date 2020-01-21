@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sorelmitra</groupId>
+    <artifactId>microservice</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <docker.push.username>sorelmitra</docker.push.username>
+        <docker.image.name>${docker.push.username}/microservice</docker.image.name>
+        <docker.file.dir>${project.build.directory}/docker-tmp</docker.file.dir>
+    </properties>
+
+    <build>
+        <plugins>
+
+            <!-- Configuration for "maven-resources-plugin" -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <!-- Maven Resources - Execution "prepare-dockerfile" -->
+                    <execution>
+                        <id>prepare-dockerfile</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <!-- Apply Maven properties expansion
+                                        to the Dockerfile -->
+                                    <directory>src/main/docker</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${docker.file.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Configuration for "dockerfile-maven-plugin" -->
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.33.0</version>
+                <configuration>
+                    <verbose>true</verbose>
+                    <!-- creates an docker-image based on the Dockerfile -->
+                    <images>
+                        <image>
+                            <!-- define the image name and version -->
+                            <!-- %l: If the project version ends with -SNAPSHOT
+                                then this placeholder is latest, otherwise its the full version -->
+                            <name>${docker.image.name}:%l</name>
+                            <alias>${docker.image.name}</alias>
+                            <build>
+                                <cleanup>try</cleanup>
+                                <dockerFile>Dockerfile</dockerFile>
+                                <!-- we need to use this directory as we
+                                    have the Dockerfile being filtered and copied there by the maven-resources-plugin
+                                    plugin -->
+                                <contextDir>${docker.file.dir}</contextDir>
+
+                                <!-- copies local jar into the docker-plugin
+                                    "build-maven" directory -->
+                                <!-- path: ${project.basedir}/target/docker/xxx-image/build/maven/ -->
+                                <assembly>
+                                    <inline>
+                                        <id>copy-generated-jar-file</id>
+                                        <files>
+                                            <file>
+                                                <source>
+                                                    ${project.build.directory}/${project.artifactId}-${project.version}.jar
+                                                </source>
+                                                <outputDirectory>./</outputDirectory>
+                                                <destName>
+                                                    ${project.artifactId}-${project.version}.jar
+                                                </destName>
+                                            </file>
+                                        </files>
+                                    </inline>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                    <!-- define the file to save the built image -->
+                    <saveFile>${project.build.directory}/${docker.image.name}-docker-image.tar.gz</saveFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-image</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>push-image</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
