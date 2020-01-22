@@ -90,7 +90,7 @@ The need for understanding the concepts: I like the second paragraph, that state
 
 TBD
 
-## Configure Secrets for Pull from Private Repository
+## How to Configure Secrets for Pull from Private Repository
 
 The error `Error: ErrImagePull` from `kubectl describe pod`  may mean that you're trying to pull from a private repository.
 
@@ -117,3 +117,14 @@ Then refer it in your pod:
 		image: sorelmitra/microservice:latest
 	imagePullSecrets:
 	- name: dockerhubcred
+
+## Considerations for Kubernetes Probes
+
+### Liveness Probes
+
+The purpose of a liveness probe is to tell Kube that the pod is alive. How to determine if a pod is alive from inside it depends a lot on what that pod is doing and how. Below are a few items to consider when designing liveness probes in your pod:
+
+- *All threads are alive*: If a thread crashes in Java, it does not necessarily crash the entire program. Your pod is probably not alive, or at least not sane if one of its thread crashed.
+
+- *All external dependencies are alive*: This includes any dependency outside your program, such as a message queue, a store of any kind (i.e. DB, data grid). If such a dependency is not alive, the program will most certainly not function properly. It will be a design decision whether to report this as the program is not alive: for example we might want to restart a pod after it has tried to access its dead external dependency for N times, in the hope that this might mitigate a bug in that area of the code.
+
