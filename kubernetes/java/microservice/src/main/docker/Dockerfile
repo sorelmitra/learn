@@ -7,7 +7,7 @@ ADD maven/${project.artifactId}-${project.version}.jar ${project.artifactId}.jar
 
 ENV JAVA_OPTS=""
 
-EXPOSE 9001
+EXPOSE 8080
 
 ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom \
     -Dfile.encoding=UTF-8 \
