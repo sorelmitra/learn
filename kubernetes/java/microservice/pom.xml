@@ -8,6 +8,13 @@
     <artifactId>microservice</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.6.RELEASE</version>
+        <relativePath />
+    </parent>
+
     <properties>
         <java.version>11</java.version>
         <docker.push.username>sorelmitra</docker.push.username>
@@ -16,6 +23,12 @@
     </properties>
 
     <dependencies>
+	
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
         <!-- Dependency: Logging -->
         <dependency>
@@ -28,56 +41,20 @@
     <build>
         <plugins>
 
-            <!-- Maven Compiler plugin: Set Java version -->
+            <!-- Spring Boot plugin -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>${java.version}</release>
-                </configuration>
-            </plugin>
-
-            <!-- Maven Assembly plugin: Make JAR with dependencies -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>com.sorelmitra.microservice.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
 
-            <!-- Maven JAR plugin: Build an executable JAR -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>com.sorelmitra.microservice.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <!-- Configuration for "maven-resources-plugin" -->
+            <!-- Maven resources plugin: Dockerfile" -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>
@@ -104,7 +81,7 @@
                 </executions>
             </plugin>
 
-            <!-- Configuration for "dockerfile-maven-plugin" -->
+            <!-- Docker maven plugin" -->
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
@@ -136,11 +113,11 @@
                                         <files>
                                             <file>
                                                 <source>
-                                                    ${project.build.directory}/${project.artifactId}-${project.version}-jar-with-dependencies.jar
+                                                    ${project.build.directory}/${project.artifactId}-${project.version}.jar
                                                 </source>
                                                 <outputDirectory>./</outputDirectory>
                                                 <destName>
-                                                    ${project.artifactId}-${project.version}-jar-with-dependencies.jar
+                                                    ${project.artifactId}-${project.version}.jar
                                                 </destName>
                                             </file>
                                         </files>
