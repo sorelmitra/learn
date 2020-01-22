@@ -3,7 +3,7 @@ FROM openjdk:11-jre-slim
 LABEL vendor="Sorel Mitra"
 LABEL maintainer="Sorel Mitra"
 
-ADD maven/${project.artifactId}-${project.version}.jar ${project.artifactId}.jar
+ADD maven/${project.artifactId}-${project.version}-jar-with-dependencies.jar ${project.artifactId}.jar
 
 ENV JAVA_OPTS=""
 
