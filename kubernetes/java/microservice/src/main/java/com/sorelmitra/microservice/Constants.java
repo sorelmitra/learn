@@ -2,6 +2,7 @@ package com.sorelmitra.microservice;
 
 public class Constants {
     public static final String ALIVE = "MicroService is alive!";
+    public static final String DEAD = "MicroService is not quite alive...";
     static final String WORK_HORSE_1 = "Work Horse 1";
     public static final String WORK_HORSE_2 = "Work Horse 2";
     static final long SLEEP_TIME_MS_1 = 5000;

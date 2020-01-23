@@ -49,4 +49,10 @@ public class WorkHorse implements Runnable {
         ticks = 0;
         return true;
     }
+
+    public boolean isAlive() {
+        if (t.isAlive()) return true;
+        LOG.warn("{} is dead!", name);
+        return false;
+    }
 }

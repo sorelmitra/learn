@@ -1,10 +1,12 @@
 package com.sorelmitra.microservice;
 
-import org.springframework.context.annotation.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class MicroService {
@@ -22,5 +24,15 @@ public class MicroService {
 
     private void addWorkHorse(WorkHorse workHorse) {
         workHorses.add(workHorse);
+    }
+
+    public boolean areAllThreadsAlive() {
+        AtomicBoolean alive = new AtomicBoolean(true);
+        workHorses.forEach(workHorse -> {
+            if (!workHorse.isAlive()) {
+                alive.set(false);
+            }
+        });
+        return alive.get();
     }
 }
