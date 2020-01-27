@@ -4,6 +4,8 @@ Trying to learn about Kubernetes.
 
 A Kube playground: https://labs.play-with-k8s.com/. Not that useful, as it's not safe to use real passwords with it, so you can't download any image from a private repo.
 
+
+
 # Resources
 
 [1] A series of [1a-e], explaining Kubernetes Concepts
@@ -27,6 +29,12 @@ A Kube playground: https://labs.play-with-k8s.com/. Not that useful, as it's not
 [5] https://kubernetes.io/blog/2016/04/using-deployment-objects-with/
 
 [6] https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+
+[7] https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+
+[8] https://managedkube.com/kubernetes/k8sbot/troubleshooting/imagepullbackoff/2019/02/23/imagepullbackoff.html
+
+
 
 # Lecture Notes
 
@@ -88,9 +96,19 @@ The need for understanding the concepts: I like the second paragraph, that state
 
 ## Configure Liveness, Readiness and Startup Probes [6]
 
-TBD
+*Probe*: A mechanism by which the _kubelet_ determines certain states of a Container.
 
-## How to Configure Secrets for Pull from Private Repository
+*Liveness Probe*:  _Probe_ used to determine when to restart a Container. Useful to catch a deadlock or a dead thread, where an application is running, but unable to make progress.
+
+*Readiness Probe*: _Probe_ used to determine when a Container is ready to start accepting traffic. A Pod is considered ready when all of its Containers are ready. When a Pod is not ready, it is removed from _Service_ load balancers.
+
+*Startup Probe*: _Probe_ used to determine when a Container application has started. It disables _liveness_ and _readiness_ probes until it succeeds, giving a chance to slow starting containers to be up and running when the other probes start.
+
+
+
+# Technical Info
+
+## How to Configure Secrets for Pull from Private Repository [7, 8]
 
 The error `Error: ErrImagePull` from `kubectl describe pod`  may mean that you're trying to pull from a private repository.
 
@@ -102,6 +120,8 @@ This may not work if the local docker uses a credential manager from the OS.
 In this case, create it with explicit credentials:
 
 	kubectl create secret docker-registry dockerhubcred --docker-server=<your-registry-server> --docker-username=<your-name> --docker-password=<your-pword> --docker-email=<your-email>
+
+(<your-registry-server> would be https://index.docker.io/v1/ for DockerHub.)
 
 While doing this, make sure nobody's watching over your shoulder and once finished remove the command from your shell history.
 
@@ -118,13 +138,23 @@ Then refer it in your pod:
 	imagePullSecrets:
 	- name: dockerhubcred
 
+## How to Attach to a Running Container
+
+Assuming you have bash:
+
+	kubectl exec -it POD-NAME -c CONTAINER-NAME bash
+
+It's similar to `docker exec -it CONTAINER-NAME WHAT_EVER_LOCAL_COMMAND`.
+
 ## Considerations for Kubernetes Probes
 
 ### Liveness Probes
 
-The purpose of a liveness probe is to tell Kube that the pod is alive. How to determine if a pod is alive from inside it depends a lot on what that pod is doing and how. Below are a few items to consider when designing liveness probes in your pod:
+The purpose of a liveness probe is to tell Kube that the container is alive. How to determine if a container is alive from inside it depends a lot on what that container is doing and how. Below are a few items to consider when designing liveness probes in your container:
 
-- *All threads are alive*: If a thread crashes in Java, it does not necessarily crash the entire program. Your pod is probably not alive, or at least not sane if one of its thread crashed.
+- *Healthy threads*: This means:
+	- *All threads are alive*: If a thread crashes in Java, it does not necessarily crash the entire program. Your container is probably not alive, or at least not sane if one of its thread crashed.
+	- *No deadlocks in threads*: If some threads are deadlocked, the container is not alive.
 
-- *All external dependencies are alive*: This includes any dependency outside your program, such as a message queue, a store of any kind (i.e. DB, data grid). If such a dependency is not alive, the program will most certainly not function properly. It will be a design decision whether to report this as the program is not alive: for example we might want to restart a pod after it has tried to access its dead external dependency for N times, in the hope that this might mitigate a bug in that area of the code.
+- *All external dependencies are alive*: This includes any dependency outside your program, such as a message queue, a store of any kind (i.e. DB, data grid). If such a dependency is not alive, the program will most certainly not function properly. It will be a design decision whether to report this as the program not being alive: for example we might want to restart a pod after it has tried to access its dead external dependency for N times, in the hope that this might mitigate a bug in that area of the code.
 
