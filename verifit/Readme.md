@@ -24,22 +24,15 @@ Also, on small projects or where you're time constrained, having an automatic sy
 
 I need to set up a frame that would help me with automatic system testing of the following project types:
 
-1. Web
-	a. UI
-	b. REST API
-	c. WebSockets API
-2. Mobile
-	a. iOS
-	b. Android
-	(Ideally, cross-platform.)
-3. Micro-services
-	(via REST or WebSockets API)
+1. REST API
+2. WebSockets API
+3. Micro-services (via REST or WebSockets API)
+4. Web UI
+5. Mobile UI, both iOS and Android, ideally cross-platform
 
 ## Types of Data
 
-Most easily the frameworks can support plain text data. I believe I want to stick to plain text and call GNU diff tool to show me differences when comparing output (same as I did years ago for the automation framework developed for the "Tailored Software Development Process" project).
-
-If the apps I want to test do move around binary data, I'd probably better write a JSON adapter inside the app and expose it via REST or WebSockets (for reasons similar to what I put in the Non-Goals section).
+The frame will support only plain text data. See also non-goals below.
 
 ## Setting Up the Framework(s)
 
@@ -49,6 +42,7 @@ Setting up the framework for that particular project needs to be somewhere along
 
 - Adding contents from an existing package.json to the project's package.json and running `npm install`
 - Adding to a python's requirements.txt from an existing requirements.txt and running `pip install`
+- Creating a directory structure for the tests
 
 ## Framework Language
 
@@ -60,7 +54,7 @@ Ideally I want all my testing for the required project types to be in a single l
 
 ## No Database Verification
 
-I am specifically not proposing that the frameworks support database verification, i.e. you do an action in the tested app and then check in the database the results of that action.
+I am specifically proposing that the frameworks do NOT support database verification, i.e. you do an action in the tested app and then check in the database the results of that action.
 
 One reason is there are many database engines, each with its quirks and API specifics. Another reason - even if you just consider a single DB engine, there is still a lot of work to connect to the DB and do the verification. The project "Messaging Router" has taught me that.
 
@@ -68,7 +62,7 @@ Instead, I am proposing that the DB is internal to the app I'm testing, and inst
 
 ## No Database Changing
 
-Similarly to the previous item, I am not proposing that the frameworks support changing the database of an app to alter the latter's behavior for testing purposes.
+Similarly to the previous item, I am proposing that the frameworks do NOT support changing the database of an app to alter the latter's behavior for testing purposes.
 
 The reasons are similar - mostly complexity of writing such testing code.
 
@@ -76,138 +70,106 @@ Instead, I maintain that the DB is internal to the app I'm testing, and if I nee
 
 ## No Message Queues Sending or Reading
 
-Similarly to the DB non goals, I do not want to verify message queues directly.
+Similarly to the DB non goals, I do NOT want the frameworks to verify message queues directly.
 
-Micro-services do use message queues as a means of communications and I might need to use this some day. What I currently think I need is a way to verify that a micros-service processes a message I send to it and/or writes an output message I expect.
+Micro-services do use message queues as a means of communications and I might need to use this some day. I think what I really need is a way to verify that a micros-service processes a message I send to it and/or writes an output message I expect.
 
-Based on my previous experience (such as for "Message Router" project), the simplest way to achieve this in both cases is to expose a REST (or maybe WebSockets) API from within the project that allows sending a message and retrieving of an output message of the micro-service.
+Based on my previous experience (such as for "Message Router" project), the simplest way to achieve this in both cases is to expose a REST (or maybe WebSockets) API from within the project (either as a separate tool, either part of the actual app) that allows sending a message and retrieving of an output message of the micro-service.
 
 The reason for this is that there are multiple, very different types of messaging queues (e.g. RabbitMQ, AWS SQS, Kafka - to name just a few), all with different APIs and not all of them supporting all languages. So on one hand I might not be able to access that particular message queue from my automated testing language of choice. On the other hand, setting up access to the messaging queue from the testing language can mean significant effort, as the "Message Router" has taught me. As opposed to this, the micro-service I need to test already uses the message queue so it should be much simpler to expose a REST API from it to allow automated testing.
 
+## No Binary Data
+
+I want to stick to plain text and a tool to show me differences when comparing output (same as I did years ago for the automation framework developed for the "Tailored Software Development Process" project).
+
+If the apps I want to test do move around binary data, I'd probably better write a JSON adapter inside the app and expose it via REST or WebSockets (for reasons similar to what I put in the Non-Goals section).
 
 
-# Analysis
 
-## REST
+# The Framework
 
-### Idea 1: Use cURL and Drive Tests via a Directory Structure
+## Overview
 
-A directory with tests could look like this:
+The framework uses Python to implement test cases and Pytest to drive discovery and execution of the tests.
 
-	- tests
-		- tool.sh
-		- jsonplaceholder
-			- tool.sh
-			- jsonplaceholder-post-1
-				- tool-params.txt
-				- jsonplaceholder-post-1-expected.json
-				- jsonplaceholder-post-1-input.json
-				- [created during test] jsonplaceholder-post-1-output.json
-			- jsonplaceholder-post-2
-				- jsonplaceholder-post-2-expected.json
-				- jsonplaceholder-post-2-input.json
-				- [created during test] jsonplaceholder-post-2-output.json
-		- other-api
-			- other-api-test-1
-				- tool.sh
-				- other-api-test-1-expected.json
-				- other-api-test-1-input.json
-				- [created during test] other-api-test-1-output.json
-		- stuff
-			- stuff-test-1
-				- stuff-test-1-expected.json
-				- stuff-test-1-input.json
-				- [created during test] stuff-test-1-output.json
+According to [their page](https://docs.pytest.org/en/latest/getting-started.html), Pytest uses [standard test discovery practices](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery).
+For Pytest, test cases are Python file named `test_blah.py`, in an arbitrary directory tree.
 
-Where:
+For this framework, we have a few essential items:
 
-- `...-input.json` is the file to input to the tools
-- `...-expected.json` is the expected output
-- `...-output.json` is the output got during running.
-- `tool.sh` is the program to run. If there's no such file in the current directory, look up in the hierarchy and stop at the first one found. For example in the above hierarchy, `stuff` uses `tests/tool.sh`; all `jsonplaceholder` tests use their own `tool.sh`, but `jsonplaceholder-post-1` adds some parameters to it, etc.
-- `tool-params.txt` are extra params to the tool needed by that particular test. If there's no such file in the current directory just use `tool.sh`
+1. A helper Python module, `verifit.py`, that executes a command with input (either parameters or file), reads its output (either from stdin or file), and offers back the expected and the received output.
+2. A directory structure that allows for grouping test cases with their input and expected output data.
+3. We run the tests by changing directory to the parent folder of the test cases and typing `pytest .`
 
-The tool would be written so that it does the job to actually execute the test. For example, for a REST API, it could be a call to cURL. For a command line tool, it would be a call to the tool itself. For a Web UI, it would be a call to Python with a script such as EXAMPLE 1 of [this tutorial](https://www.guru99.com/selenium-python.html).
+The helper module resides in `src/verifit/verifit.py`.
 
-The problem: how do you solve the "running context" problem? I.e. if you need some context to be active at your test. For example, a Web UI test case might require some other UI actions, which means the browser must be kept open during the entire suite. What I'm proposing above means instantiating the browser for each test. If I am to keep it open, I must have some sort of a Python script waiting for commands.
-Although, it could be that the only thing you need is login, which could be done by the `tool.sh` from the parent directory, i.e. the step only provides the actual actions, while the parent `tool.sh` starts the browser and logins, and executes the step actions afterwards.
+The directory structure can be inspected in `src/test` and has the following key items:
 
-### Idea 2: Use cURL and Drive Tests with Pytest and a Directory Structure
+- A subdirectory for each test suite or sub-suite, or whatever grouping makes sense for the project you're working on. E.g. `test/jsonplaceholder`.
+- In this subdirectory the following items appear:
+	- `test_*.py`: The test case itself. It basically defines a name for the test, a few commands to run, one of which being the actual test command. It then launches the commands and compares the output to the expected one.
+	- `<name>-input.json` is the file to input for the commands in the test case. It will be created manually based on the test requirements.
+	- `<name>-expected.json` is the expected output of the test command.  It will be created manually based on the test requirements. The easiest way is to actually execute the test, verify the result, and once you're sure it's good, copy it with this name.
+	- `<name>-output.json` is the output got during running. Once you verified it's correct, you can overwrite `<name>-expected.json` with it.
+		In the above, `<name>` must correspond to the variable `name` that's defined in `test_*.py`.
+	- Any other file a test case might need. E.g. `websocketin-token.txt`, which contains the token for websocket.in that's used to demo the WebSockets test support.
 
-The idea with directory structure is good, but requires me to write and maintain my own test runner. This means both a lot of work and would not be easy to explain why I chose this path.
+## Binary Data Support
 
-According to [their page](https://docs.pytest.org/en/latest/getting-started.html), Pytest uses [standard test discovery practices](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery). These practices seem to suit my needs.
+Write your own tool to convert that binary data to JSON using libraries from the project you're testing. Call that tool as part of the test command of `test_*.py`.
 
-The idea would be that I use the same directory structure, but instead of `tool.sh` I'd have `test_blah.py`. This is my entry point and it really helps to have it in Python rather than Bash, as it's rather easy to write cross-platform code in Python.
+## REST Support
 
-For this, I would only write a Python library that executes a command with input (either parameters or file), reads its output (either from stdin or file), and compares it to an expected output.
+Have your `test_*.py` run `curl` as their single test command, using `verifit.run_test()`. 
 
-See an implementation on this in `test_jsonplaceholder_post_1.py` and `verifit.py` - the latter must be in a directory that's included in `PYTHONPATH`.
+See example in `test_jsonplaceholder_post_1.py`. The example sends to https://jsonplaceholder.typicode.com/posts, which offers various dummy APIs.
 
-TBD
+## WebSockets Support
 
-## WebSockets
+Have your `test_*.py` run `vitwss` as their background test command, using `verifit.run_triggered_background_test()`.
 
-Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
-
-### Online Test Server
-
-I need an online test server in order to test my "testing framework".
-
-1. https://www.websocket.org/echo.html. Echoes back whatever you send to it.
-2. https://www.websocket.in/docs. Supports multiple users on a channel, sends to all of them. Supports authentication tokens.
-
-### Command Line Tools
-
-#### Websocat
-
-https://github.com/vi/websocat
-
-The tool works nicely with `ws` or `wss`. It can only read input and print to output. It can only send on Enter.
-
-How do I send JSON with it? How do I send multiline text? How do I receive only?
-
-TBD
-
-### Idea 1: Run an Arbitrary Command then Expect WS Output
-
-One idea for the WebSockets framework is that the test would:
-- Run a test command that is similar to what I run for the REST test, only that it is in background. It would connect to the WebSockets server as a client, wait for data for a given timeout, then compare it to the expected output. I would have to probably implement this command myself as I couldn't find something similar to `curl` for WebSockets.
-- Run a second, arbitrary command. The idea of this command is that it would trigger the WebSockets server action that would produce the expected data.
-
-The command would be called, say, `vitwss` ("vit" from "Verify It"), and has two modes:
+The command `src/verifit/vitwss` ("vit" from "Verify It") does the following:
 - Send message to web socket and exit.
 - Wait for message on web socket for given timeout, then write the response and exit.
+To use it, add `src/verifit/` to your PATH.
 
-This is implemented in src/test/websocketin/. The command `vitwss` is in src/verifit/.
+See example in `test_websocketin_1.py`. The example connects to https://www.websocket.in/docs. It supports multiple users on a channel, sends to all of them. Supports authentication tokens.
 
-## Appium
+## Micro-Services Support
 
-Supports: Mobile: iOS, Android, any kind of app.
+This is done via REST or WebSockets support, by creating a tool similar to `vitwss` that adapts whatever the micro-service uses for input/output to either REST or WebSockets.
 
-http://appium.io/
+## Web UI Support
 
-https://github.com/appium/appium/tree/master/sample-code
+The problem: how do you solve the "running context" problem? I.e. if you need some context to be active at your test. For example, a Web UI test case might require some other UI actions, which means the browser must be kept open during the entire suite. What I currently have means instantiating the browser for each test. If I am to keep it open, I must have `verifit.py` support this somehow.
+Although, it could be that the only thing you need is login, which could be done by a common method in `verifit.py`.
 
-I've installed their TestApp into iOS Simulator iPhone 8.
+Options:
+
+- Selenium
+	1. Supports: Web UI
+
+- Appium - http://appium.io/
+	1. Supports: Mobile iOS, Android; also other kind of apps, including desktop and Web UI.
+	2. Sample code: https://github.com/appium/appium/tree/master/sample-code
+	3. I've installed their TestApp into my iOS Simulator iPhone 8.
+
+- Katalon - https://www.katalon.com/
+	1. Supports: Mobile with Appium, Web UI, APIs
+	2. Guide 1: https://www.altexsoft.com/blog/engineering/the-good-and-the-bad-of-katalon-studio-automation-testing-tool/
+	3. Guide 2: https://testguild.com/katalon-studio/
+
+TBD
+
+## Mobile UI Support
 
 TBD
 
-## Selenium
 
-Supports: Web: UI
 
-TBD
+# Other Investigated Options
 
-## Katalon
-
-Supports: Mobile with Appium, Web: UI, API
-
-https://www.katalon.com/
-
-https://www.altexsoft.com/blog/engineering/the-good-and-the-bad-of-katalon-studio-automation-testing-tool/
-
-https://testguild.com/katalon-studio/
-
-TBD
+- WebSockets:
+	1. Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
+	2. Websocat - https://github.com/vi/websocat. The tool works nicely with `ws` or `wss`. But: It can only read input and print to output. It can only send on Enter. How do I send JSON with it? How do I send multiline text? How do I receive only?
 
