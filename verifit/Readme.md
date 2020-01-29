@@ -88,23 +88,9 @@ The reason for this is that there are multiple, very different types of messagin
 
 # Analysis
 
-## WebSockets
-
-Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
-
-### Websocat
-
-https://github.com/vi/websocat
-
-The tool works nicely with `ws` or `wss`. It can only read input and print to output. It can only send on Enter.
-
-How do I send JSON with it? How do I send multiline text? How do I receive only?
-
-TBD
-
 ## REST
 
-### Idea: Use cURL and Drive Tests via a Directory Structure
+### Idea 1: Use cURL and Drive Tests via a Directory Structure
 
 A directory with tests could look like this:
 
@@ -114,29 +100,29 @@ A directory with tests could look like this:
 			- tool.sh
 			- jsonplaceholder-post-1
 				- tool-params.txt
-				- jsonplaceholder-post-1-output-expected.json
+				- jsonplaceholder-post-1-expected.json
 				- jsonplaceholder-post-1-input.json
 				- [created during test] jsonplaceholder-post-1-output.json
 			- jsonplaceholder-post-2
-				- jsonplaceholder-post-2-output-expected.json
+				- jsonplaceholder-post-2-expected.json
 				- jsonplaceholder-post-2-input.json
 				- [created during test] jsonplaceholder-post-2-output.json
 		- other-api
 			- other-api-test-1
 				- tool.sh
-				- other-api-test-1-output-expected.json
+				- other-api-test-1-expected.json
 				- other-api-test-1-input.json
 				- [created during test] other-api-test-1-output.json
 		- stuff
 			- stuff-test-1
-				- stuff-test-1-output-expected.json
+				- stuff-test-1-expected.json
 				- stuff-test-1-input.json
 				- [created during test] stuff-test-1-output.json
 
 Where:
 
 - `...-input.json` is the file to input to the tools
-- `...-output-expected.json` is the expected output
+- `...-expected.json` is the expected output
 - `...-output.json` is the output got during running.
 - `tool.sh` is the program to run. If there's no such file in the current directory, look up in the hierarchy and stop at the first one found. For example in the above hierarchy, `stuff` uses `tests/tool.sh`; all `jsonplaceholder` tests use their own `tool.sh`, but `jsonplaceholder-post-1` adds some parameters to it, etc.
 - `tool-params.txt` are extra params to the tool needed by that particular test. If there's no such file in the current directory just use `tool.sh`
@@ -146,7 +132,7 @@ The tool would be written so that it does the job to actually execute the test. 
 The problem: how do you solve the "running context" problem? I.e. if you need some context to be active at your test. For example, a Web UI test case might require some other UI actions, which means the browser must be kept open during the entire suite. What I'm proposing above means instantiating the browser for each test. If I am to keep it open, I must have some sort of a Python script waiting for commands.
 Although, it could be that the only thing you need is login, which could be done by the `tool.sh` from the parent directory, i.e. the step only provides the actual actions, while the parent `tool.sh` starts the browser and logins, and executes the step actions afterwards.
 
-### Idea: Use cURL and Drive Tests with Pytest and a Directory Structure
+### Idea 2: Use cURL and Drive Tests with Pytest and a Directory Structure
 
 The idea with directory structure is good, but requires me to write and maintain my own test runner. This means both a lot of work and would not be easy to explain why I chose this path.
 
@@ -159,6 +145,41 @@ For this, I would only write a Python library that executes a command with input
 See an implementation on this in `test_jsonplaceholder_post_1.py` and `verifit.py` - the latter must be in a directory that's included in `PYTHONPATH`.
 
 TBD
+
+## WebSockets
+
+Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
+
+### Online Test Server
+
+I need an online test server in order to test my "testing framework".
+
+1. https://www.websocket.org/echo.html. Echoes back whatever you send to it.
+2. https://www.websocket.in/docs. Supports multiple users on a channel, sends to all of them. Supports authentication tokens.
+
+### Command Line Tools
+
+#### Websocat
+
+https://github.com/vi/websocat
+
+The tool works nicely with `ws` or `wss`. It can only read input and print to output. It can only send on Enter.
+
+How do I send JSON with it? How do I send multiline text? How do I receive only?
+
+TBD
+
+### Idea 1: Run an Arbitrary Command then Expect WS Output
+
+One idea for the WebSockets framework is that the test would:
+- Run a test command that is similar to what I run for the REST test, only that it is in background. It would connect to the WebSockets server as a client, wait for data for a given timeout, then compare it to the expected output. I would have to probably implement this command myself as I couldn't find something similar to `curl` for WebSockets.
+- Run a second, arbitrary command. The idea of this command is that it would trigger the WebSockets server action that would produce the expected data.
+
+The command would be called, say, `vitwss` ("vit" from "Verify It"), and has two modes:
+- Send message to web socket and exit.
+- Wait for message on web socket for given timeout, then write the response and exit.
+
+This is implemented in src/test/websocketin/. The command `vitwss` is in src/verifit/.
 
 ## Appium
 

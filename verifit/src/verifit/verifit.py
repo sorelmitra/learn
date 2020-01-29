@@ -19,6 +19,13 @@ def load_file_as_string(filepath):
 def run_command(command):
 	subprocess.run(command)
 
+def start_command(command):
+	child = subprocess.Popen(command)
+	return child
+
+def get_other_filename(filename):
+	return script_path(f"{filename}")
+
 def get_input_filename(name):
 	return script_path(f"{name}.json")
 
@@ -40,3 +47,19 @@ def run_test(command, name):
 	got = load_file_as_string(output_filename)
 	expected = load_file_as_string(expected_output_filename)
 	return (expected, got)
+
+def run_triggered_background_test(background_test_command, trigger_command, name):
+	input_filename = script_path(f"{name}.json")
+	output_filename = script_path(f"{name}-answer.json")
+	expected_output_filename = script_path(f"{name}-expected.json")
+	try:
+		os.unlink(output_filename)
+	except FileNotFoundError:
+		pass
+	background_test = start_command(background_test_command)
+	run_command(trigger_command)
+	background_test.wait()
+	got = load_file_as_string(output_filename)
+	expected = load_file_as_string(expected_output_filename)
+	return (expected, got)
+
