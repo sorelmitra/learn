@@ -91,6 +91,8 @@ If the apps I want to test do move around binary data, I'd probably better write
 
 ## Overview
 
+Overall Status: BETA.
+
 The framework uses Python to implement test cases and Pytest to drive discovery and execution of the tests.
 
 According to [their page](https://docs.pytest.org/en/latest/getting-started.html), Pytest uses [standard test discovery practices](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery).
@@ -117,9 +119,13 @@ The directory structure can be inspected in `src/test` and has the following key
 
 ## Binary Data Support
 
+Status: BETA.
+
 Write your own tool to convert that binary data to JSON using libraries from the project you're testing. Call that tool as part of the test command of `test_*.py`.
 
 ## REST Support
+
+Status: BETA.
 
 Install `curl`. How do you do that depends on your OS.
 
@@ -133,6 +139,8 @@ Note: the example intentionally fails to show you how it looks when it does so.
 Do the same as for REST.
 
 ## WebSockets Support
+
+Status: BETA.
 
 Install `vitwss`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
 It can do one of the following:
@@ -149,6 +157,8 @@ Note: the example intentionally fails to show you how it looks when it does so.
 This is done via REST or WebSockets support, by creating a tool similar to `vitwss` that adapts whatever the micro-service uses for input/output to either REST or WebSockets.
 
 ## Web UI Support
+
+Status: BETA.
 
 Install Selenium: 
 - Selenium library: `pip install selenium`.
@@ -167,14 +177,61 @@ Note: the example intentionally fails to show you how it looks when it does so.
 
 ## Mobile UI Support
 
-Options:
+Status: BETA. There are some quirks, see at the end of this section.
 
-- Appium - http://appium.io/
-	1. Supports: Mobile iOS, Android; also other kind of apps, including desktop and Web UI.
-	2. Sample code: https://github.com/appium/appium/tree/master/sample-code
-	3. I've installed their TestApp into my iOS Simulator iPhone 8.
+Install and Setup:
+1. Install Appium and dependencies:
+	- Get the latest Android Studio. Start the installer. Select "Custom". Check the tick box to have it create a simulator device for you.
+	- Add Android tools to path. Make sure you respect the order in PATH!
+			export ANDROID_HOME=/Users/sorel/Library/Android/sdk
+			export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:${PATH}
+	- Install the latest XCode and open it to do post-installation steps.
+	- Install Carthage: `brew install carthage`
+	- Appium server: `npm install -g appium`.
+	- Appium Python Client: `pip install Appium-Python-Client`
+	- Pytest Sauce Client: `pip install SauceClient`
+2. Start the Android Simulator:
+	- Start ADB server for debugging: `adb start-server`.
+	- List available simulator devices: `emulator -list-avds`.
+	- Start simulator: `emulator @Nexus_5X_API_29_x86 &!`.
+3. Start the iOS Simulator:
+	- Check the simulators you have: `xcrun simctl list`.
+	- Boot your desired simulator: `xcrun simctl boot "iPhone 8"`.
+	- Show your simulator on screen: Run the "Simulator" app on your Mac
+4. Install the test app:
+	- Clone https://github.com/appium/appium.git. CD to it.
+	- In the iOS simulator: `xcrun simctl install "iPhone 8" sample-code/apps/TestApp.app`.
+	- In the Android Simulator: `adb install sample-code/apps/ApiDemos-debug.apk`
 
-TBD
+Start Appium: `appium`.
+
+Have your `test_*.py` do the following:
+- Create a test class.
+- Prepare the driver per platform fixtures. These are the actual test drivers, one for each platform, respectively `driver_android` and `driver_ios`. Before using them in your tests you need to prepare them:
+	1. For Android: Define a class field named `APP_ACTIVITY` in your test class. As it's value put the Android activity you want to launch from your package as per [Appium Capabilities Doc](https://appium.io/docs/en/writing-running-appium/caps/#android-only).
+	2. For iOS: Nothing to do.
+- Add `test_*()` methods to your class.
+- In your `test_*()` methods, use the `driver_android` or `driver_ios` fixtures as your driver, depending if you're in a test for Android or iOS.
+- Add test code in your `test_*()` methods, using Appium Python Client.
+
+Your `test_*.py` files depend on some helper modules:
+- `conftest.py` is automatically discovered by Pytest. Here we have some pytest fixtures: for the driver per platform, for a device logger. This module uses `helpers.py`.
+- `helpers.py` defines basic capabilities for both Android and iOS, some reporting and logging features.
+
+See examples in `test/websocketin/`:
+- For Android: `test_mobiledemo_android`. The example connects to Appium's sample Android `ApiDemos-debug.apk`.
+- For iOS: `test_mobiledemo_ios`. The example connects to Appium's sample iOS `TestApp.app`.
+Note: these examples don't intentionally fail, because I just copied and adapted the official Appium sample code.
+
+Quirks:
+- Android doesn't work well with Java 11 and I didn't bother to ruin my Java setup by trying to activate Java 8 temporarily. At least some of the tools don't work with Java 11: SDK Manager, UI Automator Viewer. The latter is the tool that's supposed to show you element IDs and other stuff used in automation.
+- My Mac's Accessibility Inspector doesn't seem to work well with my "iPhone 8" simulator. So I couldn't see any label or ID on the Appium Test app.
+- So I can't inspect mobile app's elements for automation, neither on Android nor iOS.
+- The Python Client for Appium may not be that well documented.
+Solutions:
+- For Android I need a Java 8 setup until further notice. I need to research how to have Java 8 and 11 working interchangeably on Mac.
+- I need to do some more research on getting the element ID inspection work both on Android and iOS. The alternative is to know what IDs I put in the app I develop. 
+- I need to study how does the official JavaScript Appium API maps to the Python Client.
 
 
 
