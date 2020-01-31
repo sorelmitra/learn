@@ -7,6 +7,7 @@ from sauceclient import SauceClient
 
 ANDROID_BASE_CAPS = {
 	'app': os.path.abspath('/Users/sorel/1data/w/github/other/appium/sample-code/apps/ApiDemos-debug.apk'),
+	'appActivity': '.app.SearchInvoke',
 	'automationName': 'UIAutomator2',
 	'platformName': 'Android',
 	'platformVersion': os.getenv('ANDROID_PLATFORM_VERSION') or '10',

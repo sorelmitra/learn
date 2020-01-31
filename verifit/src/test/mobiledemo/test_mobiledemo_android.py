@@ -1,8 +1,6 @@
 import textwrap
 
 class TestAndroidBasicInteractions():
-	APP_ACTIVITY = '.app.SearchInvoke'
-	
 	PACKAGE = 'io.appium.android.apis'
 	ALERT_DIALOG_ACTIVITY = '.app.AlertDialogSamples'
 

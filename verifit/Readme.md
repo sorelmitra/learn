@@ -206,15 +206,15 @@ Install and Setup:
 Start Appium: `appium`.
 
 Have your `test_*.py` do the following:
+- Prepare the driver per platform fixtures. These are the actual test drivers, one for each platform, respectively `driver_android` and `driver_ios`. Before using them in your tests you need to prepare them. In `helpers.py`, fill in the values as described below. Make sure you hunt those values in the entire file as they appear in multiple places:
+	1. For Android: In `ANDROID_BASE_CAPS`: `app`, `appActivity`, `tags`.
+	2. For iOS: In `IOS_BASE_CAPS`: `app`, `tags`.
 - Create a test class.
-- Prepare the driver per platform fixtures. These are the actual test drivers, one for each platform, respectively `driver_android` and `driver_ios`. Before using them in your tests you need to prepare them:
-	1. For Android: Define a class field named `APP_ACTIVITY` in your test class. As it's value put the Android activity you want to launch from your package as per [Appium Capabilities Doc](https://appium.io/docs/en/writing-running-appium/caps/#android-only).
-	2. For iOS: Nothing to do.
 - Add `test_*()` methods to your class.
 - In your `test_*()` methods, use the `driver_android` or `driver_ios` fixtures as your driver, depending if you're in a test for Android or iOS.
 - Add test code in your `test_*()` methods, using Appium Python Client.
 
-Your `test_*.py` files depend on some helper modules:
+Your `test_*.py` files depend on some helper modules that you need to copy in your test dir:
 - `conftest.py` is automatically discovered by Pytest. Here we have some pytest fixtures: for the driver per platform, for a device logger. This module uses `helpers.py`.
 - `helpers.py` defines basic capabilities for both Android and iOS, some reporting and logging features.
 

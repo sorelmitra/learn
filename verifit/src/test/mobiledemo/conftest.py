@@ -39,7 +39,6 @@ def driver_android(request, device_logger):
 
 	caps = copy.copy(ANDROID_BASE_CAPS)
 	caps['name'] = calling_request
-	caps['appActivity'] = request.module.TestAndroidBasicInteractions.APP_ACTIVITY
 
 	driver = webdriver.Remote(
 		command_executor=EXECUTOR,
