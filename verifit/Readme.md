@@ -120,20 +120,24 @@ Write your own tool to convert that binary data to JSON using libraries from the
 
 ## REST Support
 
+Install `curl`. How do you do that depends on your OS.
+
 Have your `test_*.py` run `curl` as their single test command, using `verifit.run_test()`. 
 
-See example in `test_jsonplaceholder_post_1.py`. The example sends to https://jsonplaceholder.typicode.com/posts, which offers various dummy APIs.
+See example in `test/jsonplaceholder/test_jsonplaceholder_post_1.py`. The example sends to https://jsonplaceholder.typicode.com/posts, which offers various dummy APIs.
+Note: the example intentionally fails to show you how it looks when it does so.
 
 ## WebSockets Support
 
-Have your `test_*.py` run `vitwss` as their background test command, using `verifit.run_triggered_background_test()`.
-
-The command `src/verifit/vitwss` ("vit" from "Verify It") does the following:
+Install `vitwss`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
+It can do one of the following:
 - Send message to web socket and exit.
 - Wait for message on web socket for given timeout, then write the response and exit.
-To use it, add `src/verifit/` to your PATH.
 
-See example in `test_websocketin_1.py`. The example connects to https://www.websocket.in/docs. It supports multiple users on a channel, sends to all of them. Supports authentication tokens.
+Have your `test_*.py` run `vitwss` as their background test command, using `verifit.run_triggered_background_test()`.
+
+See example in `test/websocketin/test_websocketin_1.py`. The example connects to https://www.websocket.in/docs. It supports multiple users on a channel, sends to all of them. Supports authentication tokens.
+Note: the example intentionally fails to show you how it looks when it does so.
 
 ## Micro-Services Support
 
@@ -141,13 +145,24 @@ This is done via REST or WebSockets support, by creating a tool similar to `vitw
 
 ## Web UI Support
 
-The problem: how do you solve the "running context" problem? I.e. if you need some context to be active at your test. For example, a Web UI test case might require some other UI actions, which means the browser must be kept open during the entire suite. What I currently have means instantiating the browser for each test. If I am to keep it open, I must have `verifit.py` support this somehow.
-Although, it could be that the only thing you need is login, which could be done by a common method in `verifit.py`.
+Install Selenium: 
+- Selenium library: `pip install selenium`.
+- WebDriver binaries: download from https://selenium.dev/documentation/en/webdriver/driver_requirements/#quick-reference and place them in PATH.
+
+Have your `test_*.py` run Selenium WebDriver code. Tips:
+- Create a `login.py` with a common login function to call from your tests. Import it with `from login import *` as `pytest` adds your current test directory to `sys.path`.
+- Extract duplicates in variables to make it easier to change them in case the UI changes.
+- Group common functionality into a single test case to minimize the number of browser restarts and logins.
+- As the UI allows it, have the test delete what it creates to avoid the need for a manual cleanup.
+- Don't fall in the trap of implementing complex logic do do a cleanup that the UI does not support - if it doesn't, it's not important and it's pretty easy to clean an entire table or so.
+Note: You can't easily map UI testing on the "run command and check output" paradigm. After writing the sample I mention below, I believe Selenium is easy enough and worth the extra effort to test your Web UI app automatically. It gives you peace of mind when changing things.
+
+See example in `test/localhost8201/test_localhost8201_content.py`. The example connects to `http://localhost:8201`. You need to have some sort of a web app. The example expects the web app to provide a login button, a login form with email and password; after login it expects a couple of links "Add Content" and "Your Content". In the "Add Content" page it expects a form that asks for Url, Title, Description and a submit button. In the "Your Content" page it expects links to the existing contents, each link having the name put in the Title field of the form. Clicking that links takes you to the "Edit Content" page.
+Note: the example intentionally fails to show you how it looks when it does so.
+
+## Mobile UI Support
 
 Options:
-
-- Selenium
-	1. Supports: Web UI
 
 - Appium - http://appium.io/
 	1. Supports: Mobile iOS, Android; also other kind of apps, including desktop and Web UI.
@@ -158,10 +173,6 @@ Options:
 	1. Supports: Mobile with Appium, Web UI, APIs
 	2. Guide 1: https://www.altexsoft.com/blog/engineering/the-good-and-the-bad-of-katalon-studio-automation-testing-tool/
 	3. Guide 2: https://testguild.com/katalon-studio/
-
-TBD
-
-## Mobile UI Support
 
 TBD
 
