@@ -25,10 +25,11 @@ Also, on small projects or where you're time constrained, having an automatic sy
 I need to set up a frame that would help me with automatic system testing of the following project types:
 
 1. REST API
-2. WebSockets API
-3. Micro-services (via REST or WebSockets API)
-4. Web UI
-5. Mobile UI, both iOS and Android, ideally cross-platform
+2. SOAP API
+3. WebSockets API
+4. Micro-services (via one of the supported APIs above)
+5. Web UI
+6. Mobile UI, both iOS and Android, ideally cross-platform
 
 ## Types of Data
 
@@ -127,6 +128,10 @@ Have your `test_*.py` run `curl` as their single test command, using `verifit.ru
 See example in `test/jsonplaceholder/test_jsonplaceholder_post_1.py`. The example sends to https://jsonplaceholder.typicode.com/posts, which offers various dummy APIs.
 Note: the example intentionally fails to show you how it looks when it does so.
 
+## SOAP Support
+
+Do the same as for REST.
+
 ## WebSockets Support
 
 Install `vitwss`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
@@ -169,18 +174,22 @@ Options:
 	2. Sample code: https://github.com/appium/appium/tree/master/sample-code
 	3. I've installed their TestApp into my iOS Simulator iPhone 8.
 
-- Katalon - https://www.katalon.com/
-	1. Supports: Mobile with Appium, Web UI, APIs
-	2. Guide 1: https://www.altexsoft.com/blog/engineering/the-good-and-the-bad-of-katalon-studio-automation-testing-tool/
-	3. Guide 2: https://testguild.com/katalon-studio/
-
 TBD
 
 
 
 # Other Investigated Options
 
-- WebSockets:
-	1. Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537
-	2. Websocat - https://github.com/vi/websocat. The tool works nicely with `ws` or `wss`. But: It can only read input and print to output. It can only send on Enter. How do I send JSON with it? How do I send multiline text? How do I receive only?
+- WebSockets: Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537.
+
+- Websocat - https://github.com/vi/websocat.
+	1. Pros: Supports both `ws` and `wss`.
+	2. Cons: It can only read input and print to output. It can only send on Enter. How do I send JSON with it? How do I send multiline text? How do I receive only?
+	3. Verdict: Not useful for my framework.
+
+- Katalon - https://www.katalon.com/.
+	1. Pros: Supports Mobile with Appium, Web UI, APIs. Nice GUI, they say.
+	2. Cons: No Python support. You have to use their IDE, I can't integrate it easily with my framework. Seems to be aimed at QA departments. What I need for dev testing is much more simplistic and I prefer scripts.
+	3. Verdict: Not useful for my framework.
+	4. Guide 1: https://www.altexsoft.com/blog/engineering/the-good-and-the-bad-of-katalon-studio-automation-testing-tool/. Guide 2: https://testguild.com/katalon-studio/.
 
