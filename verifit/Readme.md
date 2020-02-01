@@ -193,7 +193,7 @@ This is done via REST or WebSockets support, by creating a tool similar to `vitw
 
 Install Selenium: 
 - Selenium library: `pip install selenium`.
-- WebDriver binaries: download from https://selenium.dev/documentation/en/webdriver/driver_requirements/#quick-reference and place them in PATH.
+- WebDriver binaries: download `chromedriver` from https://selenium.dev/documentation/en/webdriver/driver_requirements/#quick-reference and place them in PATH.
 
 ### Test Creation
 
