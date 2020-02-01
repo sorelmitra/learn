@@ -89,9 +89,9 @@ If the apps I want to test do move around binary data, I'd probably better write
 
 # The Framework
 
-## Overview
+## Overall Status: BETA
 
-Overall Status: BETA.
+## Overview
 
 The framework uses Python to implement test cases and Pytest to drive discovery and execution of the tests.
 
@@ -125,14 +125,28 @@ Write your own tool to convert that binary data to JSON using libraries from the
 
 ## REST Support
 
-Status: BETA.
+### Status: BETA
+
+### Installation
 
 Install `curl`. How do you do that depends on your OS.
 
-Have your `test_*.py` run `curl` as their single test command, using `verifit.run_test()`. 
+### Test Creation
+
+Have your `test_*.py` do the following:
+
+- Import `verifit`: `from verifit import *`.
+- Define at least a `test_*()` function. In the function:
+	- Define `name` to the name of the test.
+	- Define `command` to run `curl` with the needed parameters for the service you're testing.
+	- Run the actual test: `expected, got = run_test(command, name)`. 
+	- Assert the result: `assert expected == got`.
+
+### Example
 
 See example in `test/jsonplaceholder/test_jsonplaceholder_post_1.py`. The example sends to https://jsonplaceholder.typicode.com/posts, which offers various dummy APIs.
-Note: the example intentionally fails to show you how it looks when it does so.
+
+**Note**: The example intentionally fails to show you how it looks when it does so.
 
 ## SOAP Support
 
@@ -140,17 +154,32 @@ Do the same as for REST.
 
 ## WebSockets Support
 
-Status: BETA.
+### Status: BETA
+
+### Installation
 
 Install `vitwss`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
 It can do one of the following:
 - Send message to web socket and exit.
 - Wait for message on web socket for given timeout, then write the response and exit.
 
-Have your `test_*.py` run `vitwss` as their background test command, using `verifit.run_triggered_background_test()`.
+### Test Creation
+
+Have your `test_*.py` do the following:
+
+- Import `verifit`: `from verifit import *`.
+- Define at least a `test_*()` function. In the function:
+	- Define `name` to the name of the test.
+	- Define `trigger_command` to run the command that triggers WebSocket output, e.g. `vitwss` for sending data.
+	- Define `background_test_command` to run the command that expects WebSocket output, e.g `vitwss` for receiving data.
+	- Run the actual test: `expected, got = run_triggered_background_test(background_test_command, trigger_command, name)`. 
+	- Assert the result: `assert expected == got`.
+
+### Example
 
 See example in `test/websocketin/test_websocketin_1.py`. The example connects to https://www.websocket.in/docs. It supports multiple users on a channel, sends to all of them. Supports authentication tokens.
-Note: the example intentionally fails to show you how it looks when it does so.
+
+**Note**: The example intentionally fails to show you how it looks when it does so.
 
 ## Micro-Services Support
 
@@ -158,77 +187,129 @@ This is done via REST or WebSockets support, by creating a tool similar to `vitw
 
 ## Web UI Support
 
-Status: BETA.
+### Status: BETA
+
+### Installation
 
 Install Selenium: 
 - Selenium library: `pip install selenium`.
 - WebDriver binaries: download from https://selenium.dev/documentation/en/webdriver/driver_requirements/#quick-reference and place them in PATH.
 
+### Test Creation
+
 Have your `test_*.py` run Selenium WebDriver code. Tips:
+
+- The `verifit` library is not used in this case. 
 - Create a `login.py` with a common login function to call from your tests. Import it with `from login import *` as `pytest` adds your current test directory to `sys.path`.
 - Extract duplicates in variables to make it easier to change them in case the UI changes.
 - Group common functionality into a single test case to minimize the number of browser restarts and logins.
 - As the UI allows it, have the test delete what it creates to avoid the need for a manual cleanup.
 - Don't fall in the trap of implementing complex logic do do a cleanup that the UI does not support - if it doesn't, it's not important and it's pretty easy to clean an entire table or so.
-Note: You can't easily map UI testing on the "run command and check output" paradigm. After writing the sample I mention below, I believe Selenium is easy enough and worth the extra effort to test your Web UI app automatically. It gives you peace of mind when changing things.
 
-See example in `test/localhost8201/test_localhost8201_content.py`. The example connects to `http://localhost:8201`. You need to have some sort of a web app. The example expects the web app to provide a login button, a login form with email and password; after login it expects a couple of links "Add Content" and "Your Content". In the "Add Content" page it expects a form that asks for Url, Title, Description and a submit button. In the "Your Content" page it expects links to the existing contents, each link having the name put in the Title field of the form. Clicking that links takes you to the "Edit Content" page.
-Note: the example intentionally fails to show you how it looks when it does so.
+**Note**: You can't easily map UI testing on the "run command and check output" paradigm. After writing the sample I mention below, I believe Selenium is easy enough and worth the extra effort to test your Web UI app automatically. It gives you peace of mind when changing things.
+
+### Example
+
+See example in `test/localhost8201/test_localhost8201_content.py`.
+- The example connects to `http://localhost:8201`. You need to have some sort of a web app there.
+- The example expects the web app to provide a login button, a login form with email and password; after login it expects a couple of links "Add Content" and "Your Content".
+- In the "Add Content" page it expects a form that asks for Url, Title, Description and a submit button.
+- In the "Your Content" page it expects links to the existing contents, each link having the name put in the Title field of the form. Clicking that links takes you to the "Edit Content" page.
+
+**Note**: The example intentionally fails to show you how it looks when it does so.
 
 ## Mobile UI Support
 
-Status: BETA. There are some quirks, see at the end of this section.
+### Status: BETA
 
-Install and Setup:
-1. Install Appium and dependencies:
-	- Get the latest Android Studio. Start the installer. Select "Custom". Check the tick box to have it create a simulator device for you.
-	- Add Android tools to path. Make sure you respect the order in PATH!
-			export ANDROID_HOME=/Users/sorel/Library/Android/sdk
-			export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:${PATH}
-	- Install the latest XCode and open it to do post-installation steps.
-	- Install Carthage: `brew install carthage`
-	- Appium server: `npm install -g appium`.
-	- Appium Python Client: `pip install Appium-Python-Client`
-	- Pytest Sauce Client: `pip install SauceClient`
-2. Start the Android Simulator:
-	- Start ADB server for debugging: `adb start-server`.
-	- List available simulator devices: `emulator -list-avds`.
-	- Start simulator: `emulator @Nexus_5X_API_29_x86 &!`.
-3. Start the iOS Simulator:
-	- Check the simulators you have: `xcrun simctl list`.
-	- Boot your desired simulator: `xcrun simctl boot "iPhone 8"`.
-	- Show your simulator on screen: Run the "Simulator" app on your Mac
-4. Install the test app:
-	- Clone https://github.com/appium/appium.git. CD to it.
-	- In the iOS simulator: `xcrun simctl install "iPhone 8" sample-code/apps/TestApp.app`.
-	- In the Android Simulator: `adb install sample-code/apps/ApiDemos-debug.apk`
+There are some quirks, see at the end of this section.
 
-Start Appium: `appium`.
+### Installation and Setup
 
-Have your `test_*.py` do the following:
-- Prepare the driver per platform fixtures. These are the actual test drivers, one for each platform, respectively `driver_android` and `driver_ios`. Before using them in your tests you need to prepare them. In `helpers.py`, fill in the values as described below. Make sure you hunt those values in the entire file as they appear in multiple places:
-	1. For Android: In `ANDROID_BASE_CAPS`: `app`, `appActivity`, `tags`.
-	2. For iOS: In `IOS_BASE_CAPS`: `app`, `tags`.
+#### 1. Install Appium and Dependencies
+
+- Get the latest Android Studio. Start the installer. Select "Custom". Check the tick box to have it create a simulator device for you.
+- Add Android tools to path. Make sure you respect the order in PATH!
+
+	```shell
+	export ANDROID_HOME=/Users/sorel/Library/Android/sdk
+	export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:${PATH}
+	```
+
+- Install the latest XCode and open it to do post-installation steps.
+- Install Carthage: `brew install carthage`
+- Appium server: `npm install -g appium`.
+- Appium Python Client: `pip install Appium-Python-Client`
+- Pytest Sauce Client: `pip install SauceClient`
+
+#### 2. Start the Android Simulator
+
+- Start ADB server for debugging: `adb start-server`.
+- List available simulator devices: `emulator -list-avds`.
+- Start simulator: `emulator @Nexus_5X_API_29_x86 &!`.
+
+#### 3. Start the iOS Simulator
+
+- Check the simulators you have: `xcrun simctl list`.
+- Boot your desired simulator: `xcrun simctl boot "iPhone 8"`.
+- Show your simulator on screen: Run the "Simulator" app on your Mac
+
+#### 4. Install the Test Apps in the Simulators
+
+- In the Android Simulator: `adb install /path/to/apk`
+- In the iOS simulator: `xcrun simctl install "iPhone 8" /path/to/ios/app`.
+- If you don't have Android or iOS apps to test and just want to play with this framework, you can find some test apps at https://github.com/appium/appium.git: `sample-code/apps/ApiDemos-debug.apk` and `sample-code/apps/TestApp.app`.
+
+#### 5. Start Appium
+
+Run `appium` in your terminal.
+
+### Test Creation
+
+#### Create the Test Directory Configuration
+
+Create a `conftest.py` file in each test directory, with a contents like this:
+
+```python
+import os
+from verifit import configure_logging_and_screenshots
+def pytest_configure(config):
+	configure_logging_and_screenshots(config)
+	config.ANDROID_APP = os.path.abspath('/path/to/apk')
+	config.ANDROID_APP_ACTIVITY = '.your.app.activity'
+	config.IOS_APP = os.path.abspath('/path/to/ios/app')
+```
+
+The file `conftest.py` is automatically discovered by Pytest. We import `verifit`, configure logging and screenshots, and define the app details for each platform. The fixtures in `verifit` pick those up when running the tests.
+
+#### Create the Test Files
+
+Have each of your `test_*.py` do the following:
+
+- Import `verifit`: `from verifit import *`.
 - Create a test class.
 - Add `test_*()` methods to your class.
-- In your `test_*()` methods, use the `driver_android` or `driver_ios` fixtures as your driver, depending if you're in a test for Android or iOS.
+- In your `test_*()` methods, use the `driver_android` or `driver_ios` fixtures from `verifit`, depending if you're in a test for Android or iOS.
 - Add test code in your `test_*()` methods, using Appium Python Client.
 
-Your `test_*.py` files depend on some helper modules that you need to copy in your test dir:
-- `conftest.py` is automatically discovered by Pytest. Here we have some pytest fixtures: for the driver per platform, for a device logger. This module uses `helpers.py`.
-- `helpers.py` defines basic capabilities for both Android and iOS, some reporting and logging features.
+### Example
 
 See examples in `test/websocketin/`:
+
 - For Android: `test_mobiledemo_android`. The example connects to Appium's sample Android `ApiDemos-debug.apk`.
 - For iOS: `test_mobiledemo_ios`. The example connects to Appium's sample iOS `TestApp.app`.
-Note: these examples don't intentionally fail, because I just copied and adapted the official Appium sample code.
 
-Quirks:
+**Note**: These examples don't fail intentionally, because I just copied and adapted the official Appium sample code.
+
+### Quirks
+
 - Android doesn't work well with Java 11 and I didn't bother to ruin my Java setup by trying to activate Java 8 temporarily. At least some of the tools don't work with Java 11: SDK Manager, UI Automator Viewer. The latter is the tool that's supposed to show you element IDs and other stuff used in automation.
 - My Mac's Accessibility Inspector doesn't seem to work well with my "iPhone 8" simulator. So I couldn't see any label or ID on the Appium Test app.
 - So I can't inspect mobile app's elements for automation, neither on Android nor iOS.
 - The Python Client for Appium may not be that well documented.
-Solutions:
+
+#### Solutions
+
 - For Android I need a Java 8 setup until further notice. I need to research how to have Java 8 and 11 working interchangeably on Mac.
 - I need to do some more research on getting the element ID inspection work both on Android and iOS. The alternative is to know what IDs I put in the app I develop. 
 - I need to study how does the official JavaScript Appium API maps to the Python Client.

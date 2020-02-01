@@ -1,5 +1,7 @@
 import textwrap
 
+from verifit import *
+
 class TestAndroidBasicInteractions():
 	PACKAGE = 'io.appium.android.apis'
 	ALERT_DIALOG_ACTIVITY = '.app.AlertDialogSamples'
