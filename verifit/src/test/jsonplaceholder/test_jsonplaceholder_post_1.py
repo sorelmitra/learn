@@ -1,6 +1,6 @@
 from verifit import *
 
-def test():
+def test_jsonplaceholder_post_1():
 	name = "jsonplaceholder-post-1"
 
 	command = [

@@ -1,6 +1,6 @@
 from verifit import *
 
-def test():
+def test_websocketin_1():
 	name = "websocketin-1"
 
 	with open(get_other_filename("websocketin-token.txt"), 'r') as f:
