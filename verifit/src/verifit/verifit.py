@@ -7,6 +7,57 @@ from selenium.common.exceptions import InvalidSessionIdException
 
 ###########################################################
 #
+# Logging Tools
+#
+###########################################################
+
+class LogLevel:
+	ERROR = 1
+	WARNING = 2
+	INFO = 3
+	DEBUG = 4
+	TRACE = 5
+
+class Logger:
+	LEVEL = LogLevel.INFO
+	__level_strings__ = {
+		LogLevel.ERROR: 'ERROR',
+		LogLevel.WARNING: 'WARNING',
+		LogLevel.INFO: 'INFO',
+		LogLevel.DEBUG: 'DEBUG',
+		LogLevel.TRACE: 'TRACE'
+	}
+
+	def __init__(self):
+		pass
+
+	def error(self, message):
+		self.__log__(LogLevel.ERROR, message)
+
+	def warning(self, message):
+		self.__log__(LogLevel.WARNING, message)
+
+	def info(self, message):
+		self.__log__(LogLevel.INFO, message)
+
+	def debug(self, message):
+		self.__log__(LogLevel.DEBUG, message)
+
+	def trace(self, message):
+		self.__log__(LogLevel.TRACE, message)
+
+	def __log__(self, level, message):
+		if level > self.LEVEL:
+			return
+		print(f"[{self.__level_strings__[level]}] {message}")
+
+LOG = Logger()
+
+
+
+
+###########################################################
+#
 # Common Tools
 #
 ###########################################################
