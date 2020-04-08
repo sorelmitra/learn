@@ -52,9 +52,7 @@ This is oriented towards demonstrating Kubernetes concepts with examples. It als
 
 ### Pods, Labels&Selectors, Replicas [1a]
 
-Resource [1a] is the first in a series that explains Kubernetes deployments, services, secrets, config maps, daemon sets, and jobs.
-
-The need for understanding the concepts: I like the second paragraph, that states what I think, too: that vanilla Docker is totally different from Kubernetes, and that in order to become efficient at it, you need to understand the concepts, not just the commands. This promises to be a good series!
+*Intro*: Vanilla Docker is totally different from Kubernetes, and in order to become efficient at it, you need to understand the concepts, not just the commands.
 
 *Pod*: A single deployable unit that is a collection of (Docker) containers that run in a single space, sharing the same virtual host. All containers in a pod are deployed on a single node and share the network and data volumes.
 
@@ -75,6 +73,7 @@ The need for understanding the concepts: I like the second paragraph, that state
 *Imperative vs Declarative Deployment*: The _imperative_ way is to deploy things manually, then adding other configurations (such as replica controllers) on top of them. The _declarative_ way is to create a declarative definition of how things should be deployed and configured, then execute that definition in order to deploy and manage the things. The _imperative_ way is good for learning and trying things out. The _declarative_ way is the way to go once things have settled.
 
 *Deployment*: A declarative object used to automate deploying and rolling updates of applications. It allows easy scaling horizontally, easy progressive updates without service outage (by adding more replicas temporarily), rolling back updates in case of error. [5]
+Before deployments, there were replication controllers, which managed pods and ensured a certain number of them were running.
 
 ### Services [1c]
 
