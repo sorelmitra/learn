@@ -1,0 +1,35 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "helm-lint",
+			"type": "shell",
+			"command": "helm",
+			"args": [
+				"lint",
+				"./helm/helm-hello-world"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "helm-template",
+			"type": "shell",
+			"command": "helm",
+			"args": [
+				"template",
+				"./helm/helm-hello-world"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "always"
+			},
+			"problemMatcher": []
+		}
+	]
+}

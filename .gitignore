@@ -1,11 +1,11 @@
-.DS_Store
-
 **/node_modules
 
 **/target
 **/bin
 **/build
 
+# Java
+**/.idea
 **/*.class
 **/*.pyc
 **/*.pch
@@ -67,3 +67,4 @@ botagg/src/chatapi/chatapisite/settings.py
 **/*.VC.opendb
 **/*.vcxproj.user
 **/*.class
+

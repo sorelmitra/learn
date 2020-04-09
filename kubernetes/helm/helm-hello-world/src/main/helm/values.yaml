@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  repository: helm-hello-world
+  tag: latest
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

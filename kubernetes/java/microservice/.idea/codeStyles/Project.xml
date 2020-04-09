@@ -1,7 +1,8 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <JavaCodeStyleSettings>
-      <option name="INSERT_INNER_CLASS_IMPORTS" value="true" />
+      <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="100" />
+      <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="100" />
     </JavaCodeStyleSettings>
   </code_scheme>
 </component>
