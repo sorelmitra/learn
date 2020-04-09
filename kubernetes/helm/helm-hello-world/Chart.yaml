@@ -1,0 +1,5 @@
+apiVersion: v1
+appVersion: "1.0"
+description: Hello, world! says Sorel via Helm
+name: helm-hello-world
+version: 0.1.0
