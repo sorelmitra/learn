@@ -16,9 +16,13 @@
 
 	<properties>
 		<java.version>11</java.version>
+
 		<docker.push.username>sorelmitra</docker.push.username>
 		<docker.image.name>${docker.push.username}/helm-hello-world</docker.image.name>
 		<docker.file.dir>${project.build.directory}/docker-tmp</docker.file.dir>
+
+		<!--suppress UnresolvedMavenProperty -->
+		<helm.target.dir>${env.HELM_HELLO_TARGET_DIR}</helm.target.dir>
 	</properties>
 
 	<dependencies>
@@ -45,11 +49,12 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 
-			<!-- Maven resources plugin: Dockerfile -->
+			<!-- Maven resources plugin -->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.0.2</version>
 				<executions>
+
 					<!-- Maven Resources - Execution "prepare-dockerfile" -->
 					<execution>
 						<id>prepare-dockerfile</id>
@@ -69,6 +74,27 @@
 							<outputDirectory>${docker.file.dir}</outputDirectory>
 						</configuration>
 					</execution>
+
+					<!-- Maven Resources - Execution "copy-helm" -->
+					<execution>
+						<id>copy-helm</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<!-- Apply Maven properties expansion
+                                        to the Dockerfile -->
+									<directory>src/main/helm</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<outputDirectory>${helm.target.dir}</outputDirectory>
+						</configuration>
+					</execution>
+
 				</executions>
 			</plugin>
 

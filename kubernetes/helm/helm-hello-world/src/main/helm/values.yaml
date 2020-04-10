@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: helm-hello-world
+  repository: sorelmitra/helm-hello-world
   tag: latest
   pullPolicy: IfNotPresent
 
