@@ -5,12 +5,16 @@ export let lab = {
 
 export let config = {
 	admin: {
-		endpointIp: lab.ip,
-		port: 8675,
+		server: defaultOrEnv("1.2.3.4", "K6S_SERVER"),
+		port: defaultOrEnv(null, "K6S_PORT"),
 		path: "my-sample-service/api",
 		version: "v5",
 		url: function url() {
-			return `http://${this.endpointIp}:${this.port}/${this.path}/${this.version}`;
+			let serverDesignation = `${this.server}:${this.port}`;
+			if (no(this.port)) {
+				serverDesignation = this.server;
+			}
+			return `http://${serverDesignation}/${this.path}/${this.version}`;
 		},
 
 		/**
@@ -19,16 +23,16 @@ export let config = {
 		 */
 
 		/**
-		 * explorer
+		 * organization
 		 */
-		explorers: {
-			path: "explorers",
-			description: "Sample Explorer ${VU}",
-			name: "explorer ${VU}",
+		organizations: {
+			path: "organizations",
+			description: "Sample Organization ${VU}",
+			name: "organization ${VU}",
 		},
 
 		/**
-		 * explorer/grant
+		 * organization/grant
 		 */
 		grants: {
 			path: "grants",
@@ -37,7 +41,7 @@ export let config = {
 		},
 
 		/**
-		 * explorer/grant/tenant
+		 * organization/grant/tenant
 		 */
 		tenants: {
 			path: "tenants",
@@ -47,7 +51,7 @@ export let config = {
 		},
 
 		/**
-		 * explorer/grant/tenant/application
+		 * organization/grant/tenant/application
 		 */
 		applications: {
 			path: "applications",
@@ -56,7 +60,7 @@ export let config = {
 		},
 
 		/**
-		 * explorer/grant/tenant/application/grant
+		 * organization/grant/tenant/application/application_details
 		 */
 		application_details: {
 			path: "application-details",
@@ -67,7 +71,7 @@ export let config = {
 		},
 
 		/**
-		 * explorer/grant/tenant/grant-type
+		 * organization/grant/tenant/grant-type
 		 */
 		grant_types: {
 			path: "grant-types",
@@ -76,7 +80,36 @@ export let config = {
 		},
 
 		/**
-		 * explorer/grant/tenant/plan
+		 * organization/grant/tenant/explorer-type
+		 */
+		explorer_types: {
+			path: "explorer-types",
+			description: "Sample Explorer Type ${VU}",
+			type: "explorer type ${VU}",
+		},
+
+		/**
+		 * organization/grant/tenant/equipments
+		 */
+		equipments: {
+			path: "equipments",
+			description: "Sample Equipment ${VU}",
+			type: "equipment ${VU}",
+		},
+
+		/**
+		 * organization/grant/tenant/explorer
+		 */
+		explorers: {
+			path: "explorers",
+			description: "Sample Explorer ${VU}",
+			name: "explorer ${VU}",
+			type_id: null,   // Set in the code
+			equipment_ids: null,   // Set in the code
+		},
+
+		/**
+		 * organization/grant/tenant/plan
 		 */
 		plans: {
 			path: "plans",

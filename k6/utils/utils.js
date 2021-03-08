@@ -2,19 +2,27 @@ import { check } from 'k6';
 
 export let checks = {
 
-	statuses: function checkStatuses(response, expectedStatuses) {
+	status: function checkStatus(name, response, expectedStatus) {
 		let checks = {};
-		expectedStatuses.forEach(expectedStatus => {
-			checks[`response status is ${expectedStatus}`] = 
-				r => expectedStatus == r.status;
-		});
+		checks[`${name} / response status is ${expectedStatus}`] = 
+			r => expectedStatus == r.status;
 		check(response, checks);
 	},
 
-	value: function checkValue(fieldName, expected, toCheck) {
+	value: function checkValue(name, fieldName, expected, toCheck) {
 		let checks = {};
-		checks[`value of field <${fieldName}> is <${expected}>`] = 
-			value => expected == value;
+		if (no(toCheck) || toCheck == "") {
+			if (no(expected) || expected == "") {
+				toCheck = "";
+				expected = "";
+			}
+		}
+		checks[`${name} / value of field ${fieldName}`] = 
+			value => {
+				if (expected == value) return true;
+				console.log(`WARNING: Check for field ${name}/${__ITER}_${__VU}/'${fieldName}' failed:\nExpected <${expected}>\n     Got <${value}>\nEnd of WARNING`);
+				return false;
+			};
 		check(toCheck, checks);
 	},
 };
@@ -29,15 +37,28 @@ function isObject(value) {
 	return typeof value === 'object' && value !== null;
 }
 
+export function no(value) {
+	return value == null || value == undefined;
+}
+
 export const FIELD_VARIABLES = {
 	VIRTUAL_USER: "${VU}",
+	ITERATION: "${ITER}",
 };
+
+export function insertTagCategory(category, tag) {
+	let newTag = tag.replace('_', `_${category}_`);
+	return newTag;
+}
 
 /**
  * At the time of writing this code, K6 didn't have a replaceAll() on String.prototype...
  */
 function replaceAllInString(str, toReplace, replacement) {
 	let newStr = str;
+	if (typeof newStr !== 'string') {
+		return newStr;
+	}
 	while (newStr.includes(toReplace)) {
 		newStr = newStr.replace(toReplace, replacement);
 	}
@@ -49,18 +70,18 @@ function replaceVariables(str, variableReplacements) {
 	for (let fieldVariable in FIELD_VARIABLES) {
 		let variableName = FIELD_VARIABLES[fieldVariable];
 		let replacementValue = variableReplacements[variableName];
-		if (replacementValue) {
-			newStr = replaceAllInString(str, variableName, replacementValue);
+		if (!no(replacementValue)) {
+			newStr = replaceAllInString(newStr, variableName, replacementValue);
 		}
 	};
 	return newStr;
 }
 
-export function cloneAndAppend(thing, variableReplacements, keysExcluded = []) {
+export function cloneAndReplaceVars(thing, variableReplacements, keysExcluded = []) {
 	if (Array.isArray(thing)) {
 		let newArray = [];
 		thing.forEach(item => {
-			newArray.push(cloneAndAppend(item, variableReplacements, keysExcluded));
+			newArray.push(cloneAndReplaceVars(item, variableReplacements, keysExcluded));
 		});
 		return newArray;
 	}
@@ -72,8 +93,8 @@ export function cloneAndAppend(thing, variableReplacements, keysExcluded = []) {
 				continue;
 			}
 			let value = thing[key];
-			newObject[key] = cloneAndAppend(value, variableReplacements, keysExcluded);
-			//console.log(`cloneAndAppend: key <${key}>, new value ${newObject[key]}`);
+			newObject[key] = cloneAndReplaceVars(value, variableReplacements, keysExcluded);
+			//console.log(`cloneAndReplaceVars: key <${key}>, new value ${newObject[key]}`);
 		}
 		return newObject;
 	}
@@ -82,7 +103,7 @@ export function cloneAndAppend(thing, variableReplacements, keysExcluded = []) {
 	return newValue;
 }
 
-export function checkValues(fieldName, expectedThing, thingToCheck) {
+export function checkValues(name, fieldName, expectedThing, thingToCheck) {
 	if (Array.isArray(expectedThing)) {
 		if (!Array.isArray(thingToCheck)) {
 			checks.value(fieldName, "of type 'Array'", null);
@@ -91,7 +112,7 @@ export function checkValues(fieldName, expectedThing, thingToCheck) {
 		for (let i = 0; i < expectedThing.length; i++) {
 			let expectedItem = expectedThing[i];
 			let itemToCheck = thingToCheck[i];
-			checkValues(`${fieldName}[${i}]`, expectedItem, itemToCheck);
+			checkValues(name, `${fieldName}[${i}]`, expectedItem, itemToCheck);
 		}
 		return;
 	}
@@ -104,10 +125,44 @@ export function checkValues(fieldName, expectedThing, thingToCheck) {
 		for (let key in expectedThing) {
 			let expectedValue = expectedThing[key];
 			let valueToCheck = thingToCheck[key];
-			checkValues(`${key}`, expectedValue, valueToCheck);
+			checkValues(name, `${key}`, expectedValue, valueToCheck);
 		}
 		return;
 	}
 
-	checks.value(fieldName, expectedThing, thingToCheck);
+	checks.value(name, fieldName, expectedThing, thingToCheck);
 }
+
+export function defaultOrEnv(defaultValue, envName) {
+	let value = __ENV[envName];
+	let isDefault = false;
+	if (no(value)) {
+		value = defaultValue;
+		isDefault = true;
+	}
+	value = convertBooleanString(value);
+	console.log(`${envName}: ${value}, is default: ${isDefault}, type ${typeof value}`);
+	return value;
+}
+
+export function pad(number, length, prefix = '0') {
+	return number.toString().padStart(length, prefix);
+}
+
+function convertBooleanString(value) {
+	if (typeof value != "string") {
+		return value;
+	}
+
+	switch(value.toLowerCase()) {
+	case "false":
+	case "no":
+		return false;
+	case "true":
+	case "yes":
+		return true;
+	}
+
+	return value;
+}
+
