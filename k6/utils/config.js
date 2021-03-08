@@ -27,8 +27,8 @@ export let config = {
 		 */
 		organizations: {
 			path: "organizations",
-			description: "Sample Organization ${VU}_${__ITER}",
-			name: "organization ${VU}_${__ITER}",
+			description: "Sample Organization ${VU}_${ITER}",
+			name: "organization ${VU}_${ITER}",
 		},
 
 		/**
@@ -36,8 +36,8 @@ export let config = {
 		 */
 		grants: {
 			path: "grants",
-			description: "Sample Grant ${VU}_${__ITER}",
-			name: "grant ${VU}_${__ITER}",
+			description: "Sample Grant ${VU}_${ITER}",
+			name: "grant ${VU}_${ITER}",
 		},
 
 		/**
@@ -45,9 +45,9 @@ export let config = {
 		 */
 		tenants: {
 			path: "tenants",
-			description: "Sample Tenant ${VU}_${__ITER}",
-			external_tenant_id: "tenant external id ${VU}_${__ITER}",
-			name: "tenant ${VU}_${__ITER}",
+			description: "Sample Tenant ${VU}_${ITER}",
+			external_tenant_id: "tenant external id ${VU}_${ITER}",
+			name: "tenant ${VU}_${ITER}",
 		},
 
 		/**
@@ -55,8 +55,8 @@ export let config = {
 		 */
 		applications: {
 			path: "applications",
-			description: "Sample Application ${VU}_${__ITER}",
-			name: "application ${VU}_${__ITER}",
+			description: "Sample Application ${VU}_${ITER}",
+			name: "application ${VU}_${ITER}",
 		},
 
 		/**
@@ -64,10 +64,10 @@ export let config = {
 		 */
 		application_details: {
 			path: "application-details",
-			description: "Sample Application Detail ${VU}_${__ITER}",
-			group: "application detail ${VU}_${__ITER}",
-			key: "detail key ${VU}_${__ITER}",
-			value: "detail value ${VU}_${__ITER}",
+			description: "Sample Application Detail ${VU}_${ITER}",
+			group: "application detail ${VU}_${ITER}",
+			key: "detail key ${VU}_${ITER}",
+			value: "detail value ${VU}_${ITER}",
 		},
 
 		/**
@@ -75,8 +75,8 @@ export let config = {
 		 */
 		grant_types: {
 			path: "grant-types",
-			description: "Sample Grant Type ${VU}_${__ITER}",
-			name: "grant type ${VU}_${__ITER}",
+			description: "Sample Grant Type ${VU}_${ITER}",
+			name: "grant type ${VU}_${ITER}",
 		},
 
 		/**
@@ -84,8 +84,8 @@ export let config = {
 		 */
 		explorer_types: {
 			path: "explorer-types",
-			description: "Sample Explorer Type ${VU}_${__ITER}",
-			type: "explorer type ${VU}_${__ITER}",
+			description: "Sample Explorer Type ${VU}_${ITER}",
+			type: "explorer type ${VU}_${ITER}",
 		},
 
 		/**
@@ -93,8 +93,8 @@ export let config = {
 		 */
 		equipments: {
 			path: "equipments",
-			description: "Sample Equipment ${VU}_${__ITER}",
-			type: "equipment ${VU}_${__ITER}",
+			description: "Sample Equipment ${VU}_${ITER}",
+			type: "equipment ${VU}_${ITER}",
 		},
 
 		/**
@@ -102,8 +102,8 @@ export let config = {
 		 */
 		explorers: {
 			path: "explorers",
-			description: "Sample Explorer ${VU}_${__ITER}",
-			name: "explorer ${VU}_${__ITER}",
+			description: "Sample Explorer ${VU}_${ITER}",
+			name: "explorer ${VU}_${ITER}",
 			type_id: null,   // Set in the code
 			equipment_ids: null,   // Set in the code
 		},
@@ -113,13 +113,13 @@ export let config = {
 		 */
 		plans: {
 			path: "plans",
-			description: "Sample Plan ${VU}_${__ITER}",
-			target: "Travel target ${VU}_${__ITER}",
+			description: "Sample Plan ${VU}_${ITER}",
+			target: "Travel target ${VU}_${ITER}",
 			charts: [
-				"zone_${VU}_${__ITER}.svg",
-				"detailed_${VU}_${__ITER}.svg"
+				"zone_${VU}_${ITER}.svg",
+				"detailed_${VU}_${ITER}.svg"
 			],
-			name: "travel plan ${VU}_${__ITER}",
+			name: "travel plan ${VU}_${ITER}",
 			due: "2021-02-15",
 			tags: [
 				"arctic", "cold",
