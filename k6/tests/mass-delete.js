@@ -33,6 +33,7 @@ export function setup() {
 		countVus: defaultOrEnv(0, "K6_VUS"),
 		waitDelete: defaultOrEnv(0, "K6S_WAIT_DELETE"),
 		displayOnly: defaultOrEnv(false, "K6S_DISPLAY_ONLY"),
+		secondsToWaitForPredecessorDeletion: defaultOrEnv(0, "K6_SECONDS_WAIT_PREVIOUS_DELETE"),
 	};
 	if (data.countVus == 0) {
 		console.log("ERROR: Please specify the exact number of VUs in the 'K6_VUS' variable!");
@@ -55,7 +56,7 @@ export default function massDelete(data) {
 		console.log(`VU ${__VU} requested to display only, returning.`);
 		return;
 	}
-	deleteTree(data.root, data.countVus, data.waitDelete);
+	deleteTree(data.root, data.countVus, data.waitDelete, data.secondsToWaitForPredecessorDeletion);
 }
 
 
@@ -102,7 +103,7 @@ function buildTree(node, groupApiData) {
 		3. Walk the tree and make `Delete` on all instances of the thing to delete.
 	- STOP
  */
-function deleteTree(root, countVus, waitDelete) {
+function deleteTree(root, countVus, waitDelete, secondsToWaitForPredecessorDeletion) {
 	if (__VU > countVus) {
 		console.log(`VU ${__VU} > total VUs ${countVus}, doing nothing`);
 		return;
@@ -122,7 +123,7 @@ function deleteTree(root, countVus, waitDelete) {
 			return;
 		}
 
-		let childrenStatus = hasChildInstances(data.node, data.hasChildren);
+		let childrenStatus = hasChildInstances(data.node, data.hasChildren, secondsToWaitForPredecessorDeletion);
 		if (!childrenStatus.areDeleted) {
 			data.message = `: DELETE FAILED, has ${childrenStatus.instancesLeft} children after ${childrenStatus.waitTime} seconds!`;
 			logNode(data, customData);
@@ -131,7 +132,7 @@ function deleteTree(root, countVus, waitDelete) {
 
 		if (shouldCheckPredecessorStatus) {
 			shouldCheckPredecessorStatus = false;
-			let predecessorStatus = hasPredecessorInstances(root, data.node);
+			let predecessorStatus = hasPredecessorInstances(root, data.node, secondsToWaitForPredecessorDeletion);
 			data.message = `: Predecessors ${predecessorStatus.predecessorItem}: ${predecessorStatus.instancesLeft} instances after ${predecessorStatus.waitTime} seconds`;
 			if (no(predecessorStatus.predecessorItem)) {
 				data.message = ": No predecessors";
@@ -210,6 +211,7 @@ function createAndFillApiNode(apiInstance, groupApiData) {
 		groupApiData: groupApiData.groupApiData,
 		configObject: groupApiData.configObject,
 		path: groupApiData.path,
+		parentApiData: groupApiData.parentApiData,
 		id: apiInstance.id,
 	};
 	let meaningfulName = apiInstance.id;
@@ -361,7 +363,7 @@ function getValidatedAncestorsLength(ancestorArray) {
 /**
  * Helper function: Does node have instances of its defined children?
  */
-function hasPredecessorInstances(root, node) {
+function hasPredecessorInstances(root, node, secondsToWaitForPredecessorDeletion) {
 	let status = {
 		areDeleted: true,
 		instancesLeft: 0,
@@ -370,9 +372,13 @@ function hasPredecessorInstances(root, node) {
 	};
 
 	let definedPredecessorItem = getDefinedPredecessor(node);
+	let data = {
+		itemDefinition: definedPredecessorItem,
+		node: node,
+	};
 	//console.log(`DEBUG: Defined predecessor of ${node.apiData.name} is ${definedPredecessorItem}`);
 	if (!no(definedPredecessorItem)) {
-		status = waitForTreeItemsToDisappear(root, getPredecessorCount, definedPredecessorItem);
+		status = waitForTreeItemsToDisappear(root, getPredecessorCount, secondsToWaitForPredecessorDeletion, data);
 	}
 
 	status.predecessorItem = definedPredecessorItem;
@@ -383,7 +389,7 @@ function hasPredecessorInstances(root, node) {
 /**
  * Helper function: Does node have instances of its defined children?
  */
-function hasChildInstances(node, hasChildren) {
+function hasChildInstances(node, hasChildren, secondsToWaitForPredecessorDeletion) {
 	let status = {
 		areDeleted: true,
 		instancesLeft: 0,
@@ -392,7 +398,7 @@ function hasChildInstances(node, hasChildren) {
 	};
 
 	if (hasChildren) {
-		status = waitForTreeItemsToDisappear(node, getChildrenCount);
+		status = waitForTreeItemsToDisappear(node, getChildrenCount, secondsToWaitForPredecessorDeletion);
 	}
 
 	return status;
@@ -403,17 +409,19 @@ function hasChildInstances(node, hasChildren) {
  * Helper function: Waits for tree items to dissappear.
  * Count of items is returned by the callback.
  */
-function waitForTreeItemsToDisappear(node, getItemsCount, callbackData = null) {
+function waitForTreeItemsToDisappear(root, getItemsCount, secondsToWaitForPredecessorDeletion, callbackData = null) {
 	let status = {
 		areDeleted: false,
 		instancesLeft: 0,
-		waitCycles: 10,
-		sleepTime: 2,
+		sleepTime: 10,
+		waitCycles: null,
 	};
+	status.waitCycles = Math.ceil(secondsToWaitForPredecessorDeletion / status.sleepTime);
 
 	let currentCycle = 0;
 	while (true) {
-		status.instancesLeft = getItemsCount(node, callbackData);
+		status.instancesLeft = getItemsCount(root, callbackData);
+		console.log(`DEBUG: [VU${pad(__VU, 3)}] waitForTreeItemsToDisappear: instances left ${status.instancesLeft}, cycle ${currentCycle}/${status.waitCycles}, sleep time ${status.sleepTime} seconds`);
 		if (status.instancesLeft < 1) {
 			status.areDeleted = true;
 			break;
@@ -452,18 +460,28 @@ function getChildrenCount(node) {
  * Helper function: Count existing instances of node's predecessor in the
  * array of items to delete.
  */
-function getPredecessorCount(root, itemDefinition) {
-	let ancestorArray = splitAncestors(itemDefinition);
+function getPredecessorCount(root, predecessorCountData) {
+	let ancestorArray = splitAncestors(predecessorCountData.itemDefinition);
 	let len = getValidatedAncestorsLength(ancestorArray);
 	if (no(len)) return 1;
 
 	let parent = ancestorArray[len - 2];
 	let child = ancestorArray[len - 1];
 
+	let originalAncestorId = getCommonAncestorId(predecessorCountData.node);
+	if (no(originalAncestorId)) {
+		return 0;
+	}
+
 	let predecessorCount = 0;
 	walkTree("preorder", 0, 1, root, (data, customData) => {
 		if (no(customData.shouldCount)) {
 			customData.shouldCount = false;
+		}
+
+		let currentAncestorId = getCommonAncestorId(data.node);
+		if (currentAncestorId != originalAncestorId) {
+			return;
 		}
 
 		if (data.node.apiData.name == parent) {
@@ -482,11 +500,34 @@ function getPredecessorCount(root, itemDefinition) {
 		customData.shouldCount = false;
 		let instances = apiGetAll(data.node.apiData);
 		predecessorCount += instances.length;
-		//console.log(`DEBUG: Instances of ${itemDefinition}: ${instances.length}`);
+		//console.log(`DEBUG: Instances of ${predecessorCountData.itemDefinition}: ${instances.length}`);
 	});
 
-	//console.log(`DEBUG: Total instances of ${itemDefinition}: ${predecessorCount}`);
+	//console.log(`DEBUG: Total instances of ${predecessorCountData.itemDefinition}: ${predecessorCount}`);
 	return predecessorCount;
+}
+
+
+/**
+ * Helper function: Get common ancestor ID, i.e. the subtree root.
+ */
+function getCommonAncestorId(node) {
+	let ancestorArray = splitAncestors(orderedItemsToDelete[orderedItemsToDelete.length - 1]);
+	let len = getValidatedAncestorsLength(ancestorArray);
+	if (no(len)) return 1;
+	let commonAncestorName = ancestorArray[len - 1];
+
+	let apiData = node.apiData;
+	while (!no(apiData)) {
+		if (apiData.name == commonAncestorName) {
+			break;
+		}
+		apiData = apiData.parentApiData;
+	}
+	if (no(apiData)) {
+		return null;
+	}
+	return apiData.id;
 }
 
 
@@ -557,7 +598,7 @@ function logNode(data, customData) {
 		} else {
 			nodeIndexStr = `${pad(data.index, 4)}[${pad(customData.totalNodeCount, 6)}] `;
 		}
-		nodeInfo = ` ${data.node.meaningfulName}`;
+		nodeInfo = ` ${data.node.meaningfulName} - ${data.node.apiData.id}`;
 	}
 
 	console.log(`${indent}${pad(data.level, 2)}:${nodeIndexStr}${data.node.apiData.name}${nodeInfo}${data.message}`);
