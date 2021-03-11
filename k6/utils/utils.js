@@ -1,4 +1,5 @@
 import { check } from 'k6';
+import { config } from './config.js';
 
 export let checks = {
 
@@ -44,6 +45,11 @@ export function no(value) {
 export const FIELD_VARIABLES = {
 	VIRTUAL_USER: "${VU}",
 	ITERATION: "${ITER}",
+	TAG: "${TAG}",
+};
+
+export const FIELD_VARIABLES_GLOBAL_VALUES = {
+	TAG: null,
 };
 
 export function insertTagCategory(category, tag) {
@@ -71,10 +77,40 @@ function replaceVariables(str, variableReplacements) {
 		let variableName = FIELD_VARIABLES[fieldVariable];
 		let replacementValue = variableReplacements[variableName];
 		if (!no(replacementValue)) {
+			//replacementValue = addRandomness(variableName, replacementValue);
 			newStr = replaceAllInString(newStr, variableName, replacementValue);
 		}
 	};
 	return newStr;
+}
+
+function addPseudoRandom(variableName, value) {
+	if (variableName != FIELD_VARIABLES.ITERATION) {
+		return value;
+	}
+	let epochMs = Date.now();
+	let epochStr = epochMs.toString();
+	let pseudoRandom = epochStr.slice(-3);
+	value = `${value}_${pseudoRandom}`;
+	return value;
+}
+
+export function createUUID(){
+    var dt = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (dt + Math.random()*16)%16 | 0;
+        dt = Math.floor(dt/16);
+        return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+function addRandomness(variableName, value) {
+	if (variableName != FIELD_VARIABLES.ITERATION) {
+		return value;
+	}
+	value = `${value}_${createUUID()}`;
+	return value;
 }
 
 export function cloneAndReplaceVars(thing, variableReplacements, keysExcluded = []) {
@@ -133,7 +169,7 @@ export function checkValues(name, fieldName, expectedThing, thingToCheck) {
 	checks.value(name, fieldName, expectedThing, thingToCheck);
 }
 
-export function defaultOrEnv(defaultValue, envName) {
+export function defaultOrEnv(defaultValue, envName, trace = true) {
 	let value = __ENV[envName];
 	let isDefault = false;
 	if (no(value)) {
@@ -141,7 +177,9 @@ export function defaultOrEnv(defaultValue, envName) {
 		isDefault = true;
 	}
 	value = convertBooleanString(value);
-	console.log(`${envName}: ${value}, is default: ${isDefault}, type ${typeof value}`);
+	if (trace) {
+		console.log(`${envName}: ${value}, is default: ${isDefault}, type ${typeof value}`);
+	}
 	return value;
 }
 
@@ -164,5 +202,9 @@ function convertBooleanString(value) {
 	}
 
 	return value;
+}
+
+export function logServer() {
+	console.log(`Server ${config.admin.server}, port ${config.admin.port}`);
 }
 

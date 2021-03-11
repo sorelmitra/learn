@@ -2,7 +2,7 @@ import { sleep } from 'k6';
 import http from 'k6/http';
 import { Counter, Trend } from 'k6/metrics';
 
-import {checks, defaultParams, cloneAndReplaceVars, FIELD_VARIABLES, checkValues, no, insertTagCategory} from '../utils/utils.js';
+import {checks, defaultParams, cloneAndReplaceVars, FIELD_VARIABLES, FIELD_VARIABLES_GLOBAL_VALUES, checkValues, no, insertTagCategory, pad} from '../utils/utils.js';
 import {config} from '../utils/config.js';
 
 export function apiMakeData(name, parentApiData = null) {
@@ -88,12 +88,14 @@ export function apiRunWithMetrics(apiCallback, apiData, sleepTime, metrics) {
 	};
 	apiCallback(apiData);
 	sleep(sleepTime);
-	//console.log(`Executed ${apiCallback.name} on ${apiData.name} ${__VU}`);
 	if (!no(metrics.trend)) {
 		metrics.trend.add(apiData.res.timings.duration, defaultParams.tags);
 	}
 	if (!no(metrics.counter)) {
 		metrics.counter.add(apiData.res.timings.duration, defaultParams.tags);
+	}
+	if (config.options.traceTimings) {
+		console.log(`TRACE: ${apiCallback.name} on ${apiData.name} ${__VU}_${__ITER} took ${pad(apiData.res.timings.duration.toFixed(2))}ms`);
 	}
 }
 
@@ -114,6 +116,9 @@ function createPayload(apiData) {
 	let replacements = {};
 	replacements[FIELD_VARIABLES.VIRTUAL_USER] = __VU;
 	replacements[FIELD_VARIABLES.ITERATION] = __ITER;
+	if (!no(FIELD_VARIABLES_GLOBAL_VALUES.TAG)) {
+		replacements[FIELD_VARIABLES.TAG] = FIELD_VARIABLES_GLOBAL_VALUES.TAG;
+	}
 	return cloneAndReplaceVars(apiData.configObject, replacements, ["path"]);
 }
 

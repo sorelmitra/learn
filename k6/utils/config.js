@@ -1,14 +1,14 @@
-
-export let lab = {
-	ip: "10.1.1.1"
-};
+import { defaultOrEnv, no } from "./utils.js";
 
 export let config = {
+	options: {
+		traceTimings: false,
+	},
 	admin: {
-		server: defaultOrEnv("1.2.3.4", "K6S_SERVER"),
-		port: defaultOrEnv(null, "K6S_PORT"),
+		server: defaultOrEnv("1.2.3.4", "K6S_SERVER", false),
+		port: defaultOrEnv(null, "K6S_PORT", false),
 		path: "my-sample-service/api",
-		version: "v5",
+		version: "v1",
 		url: function url() {
 			let serverDesignation = `${this.server}:${this.port}`;
 			if (no(this.port)) {
@@ -27,7 +27,7 @@ export let config = {
 		 */
 		organizations: {
 			path: "organizations",
-			description: "Sample Organization ${VU}_${ITER}",
+			description: "Sample Organization ${TAG}${VU}_${ITER}",
 			name: "organization ${VU}_${ITER}",
 		},
 

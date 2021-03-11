@@ -2,7 +2,8 @@ import { group, sleep } from 'k6';
 
 import {createFoundation, destroyFoundation} from '../utils/foundation.js';
 import {apiMakeData, apiCreate, apiDelete, apiMakeMetrics, apiRunWithMetrics} from '../api/api.js';
-import { defaultOrEnv } from '../utils/utils.js';
+import { defaultOrEnv, FIELD_VARIABLES_GLOBAL_VALUES, logServer } from '../utils/utils.js';
+import { config } from '../utils/config.js';
 
 let waits = {
 	create: null,
@@ -25,9 +26,11 @@ let metrics = {
 };
 
 export function setup() {
+	logServer();
 	waits.create = defaultOrEnv(0, "K6S_WAIT_CREATE");
 	waits.delete = defaultOrEnv(0, "K6S_WAIT_DELETE");
 
+	FIELD_VARIABLES_GLOBAL_VALUES.TAG = defaultOrEnv("", "K6S_TAG");
 	let data = {
 		foundation: createFoundation(),
 		createOnly: defaultOrEnv(false, "K6S_CREATE_ONLY"),
@@ -37,6 +40,7 @@ export function setup() {
 }
 
 export default function explorerFlow(data) {
+	config.options.traceTimings = defaultOrEnv(false, "K6S_TRACE_TIMINGS", false);
 	let flow = {};
 	//console.log(`DEBUG: Explorer flow iteration ${__ITER}, VU ${__VU}`);
 
