@@ -1,0 +1,62 @@
+loki:
+  # Can't disable this because of error https://github.com/grafana/loki/issues/2731
+  enabled: true 
+
+promtail:
+  enabled: false
+
+fluent-bit:
+  enabled: false
+
+filebeat:
+  enabled: false
+
+logstash:
+  enabled: false
+
+
+
+grafana:
+  enabled: true
+
+  service:
+    type: NodePort
+    nodePort: 32320
+
+  adminUser: admin
+  adminPassword: admin
+
+
+
+prometheus:
+  enabled: true
+
+  server:
+    service:
+      type: NodePort
+      nodePort: 32321
+
+    global:
+      scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+      # Attach these labels to any time series or alerts when communicating with
+      # external systems (federation, remote storage, Alertmanager).
+      external_labels:
+        monitor: 'api-load-test-monitor'
+
+    scrape_configs:
+      # A scrape configuration containing exactly one endpoint to scrape:
+      # Here it's Prometheus itself.
+      # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+      - job_name: 'prometheus'
+        # Override the global default and scrape targets from this job every 5 seconds.
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['loki-prometheus-server:80']
+        
+      # Scrape cAdvisor for CPU and other system metrics
+      - job_name: 'cadvisor'
+        scrape_interval: 5s
+        static_configs:
+          - targets:
+            - cadvisor:8080

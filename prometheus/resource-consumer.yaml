@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: compute
+  name: compute
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: compute
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        run: compute
+    spec:
+      containers:
+      - name: compute
+        image: dj80hd/resource-consumer
+        resources:
+          limits:
+            cpu: "700m"
+            memory: "500Mi"
+          requests:
+            cpu: "500m"
+            memory: "250Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: compute
+  name: compute
+spec:
+  type: NodePort
+  selector:
+    run: compute
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30980
