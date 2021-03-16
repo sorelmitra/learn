@@ -21,8 +21,8 @@ spec:
         image: dj80hd/resource-consumer
         resources:
           limits:
-            cpu: "700m"
-            memory: "500Mi"
+            cpu: "1500m"
+            memory: "10000Mi"
           requests:
             cpu: "500m"
             memory: "250Mi"
