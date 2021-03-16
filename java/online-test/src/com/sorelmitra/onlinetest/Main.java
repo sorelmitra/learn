@@ -12,7 +12,7 @@ enum LogLevels {
     WARNING,
     INFO,
     DEBUG,
-    TRACE;
+    TRACE,
 }
 
 class LogImpl {
@@ -72,8 +72,7 @@ class LogImpl {
                 .limit(logStackSize)
                 .collect(Collectors.toList()));
         StackWalker.StackFrame stackFrame = lastTwoFrames.get(logStackSize - 1);
-        String stackInfo = format("{}::{}", stackFrame.getClassName(), stackFrame.getMethodName());
-        return stackInfo;
+        return format("{}::{}", stackFrame.getClassName(), stackFrame.getMethodName());
     }
 
     private String timestamp() {
@@ -95,8 +94,10 @@ public class Main {
             return b;
         }
         if (b < 0) {
+            LOG.trace("B is negative {}, returning A {}", b, a);
             return a;
         }
+        LOG.trace("Returning sum {}", a + b);
         return a + b;
     }
 }
