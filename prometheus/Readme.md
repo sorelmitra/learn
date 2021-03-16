@@ -156,3 +156,9 @@ More information about stats cAdvisor exposes to Prometheus here:
 https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md
 
 For example to get the CPU load in the past 10 seconds for the specified container, run this query: `container_cpu_load_average_10s{container="name"}`
+
+### Grafana Dashboard
+
+A useful dashboard for Grafana I found [here](https://stefanprodan.com/2016/a-monitoring-solution-for-docker-hosts-containers-and-containerized-services/) and [here](https://github.com/stefanprodan/dockprom), in `grafana/provisioning/dashboards/docker_containers.json`.
+
+I modified it to be more relevant with multiple nodes Kubernetes cluster, do filter out some of the pods and containers, and to add disk usage.  I saved it into `grafana-dashboard.json`.
