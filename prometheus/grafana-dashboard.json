@@ -166,7 +166,7 @@
         }
       ],
       "thresholds": "",
-      "title": "Cluster CPU Cores",
+      "title": "CPU Cores",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -483,50 +483,67 @@
       "valueName": "avg"
     },
     {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
       "datasource": "Prometheus",
-      "decimals": 0,
-      "editable": true,
-      "error": false,
-      "fill": 1,
-      "fillGradient": 0,
-      "grid": {},
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
       "gridPos": {
         "h": 4,
-        "w": 8,
+        "w": 4,
         "x": 0,
         "y": 5
       },
-      "hiddenSeries": false,
       "id": 9,
-      "isNew": true,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 2,
+      "interval": null,
       "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
       "nullPointMode": "connected",
-      "options": {
-        "dataLinks": []
+      "nullText": null,
+      "pluginVersion": "6.7.0",
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": false,
+        "ymax": null,
+        "ymin": null
       },
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "tableColumn": "",
       "targets": [
         {
           "expr": "scalar(count(container_memory_usage_bytes{image!=\"\"}) > 0)",
@@ -537,47 +554,20 @@
           "step": 2
         }
       ],
-      "thresholds": [],
+      "thresholds": "",
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
       "title": "Running Containers",
-      "tooltip": {
-        "msResolution": true,
-        "shared": true,
-        "sort": 0,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
+      "type": "singlestat",
+      "valueFontSize": "80%",
+      "valueMaps": [
         {
-          "format": "none",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
         }
       ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "valueName": "avg"
     },
     {
       "aliasColors": {},
@@ -594,7 +584,7 @@
       "gridPos": {
         "h": 4,
         "w": 8,
-        "x": 8,
+        "x": 4,
         "y": 5
       },
       "hiddenSeries": false,
@@ -623,7 +613,7 @@
       "seriesOverrides": [
         {
           "alias": "load 1m",
-          "color": "#BF1B00"
+          "color": "#3274D9"
         }
       ],
       "spaceLength": 10,
@@ -695,8 +685,8 @@
       "grid": {},
       "gridPos": {
         "h": 4,
-        "w": 8,
-        "x": 16,
+        "w": 12,
+        "x": 12,
         "y": 5
       },
       "hiddenSeries": false,
@@ -726,15 +716,15 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "alias": "read",
+          "alias": "reads per sec",
           "yaxis": 1
         },
         {
-          "alias": "written",
+          "alias": "writes per sec",
           "yaxis": 1
         },
         {
-          "alias": "io time",
+          "alias": "io time ms",
           "yaxis": 2
         }
       ],
@@ -743,28 +733,28 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(irate(node_disk_read_bytes_total[5m]))",
+          "expr": "sum(irate(node_disk_read_bytes_total[1m]))",
           "interval": "2s",
           "intervalFactor": 4,
-          "legendFormat": "read",
+          "legendFormat": "reads per sec",
           "metric": "",
           "refId": "A",
           "step": 8
         },
         {
-          "expr": "sum(irate(node_disk_written_bytes_total[5m]))",
+          "expr": "sum(irate(node_disk_written_bytes_total[1m]))",
           "interval": "2s",
           "intervalFactor": 4,
-          "legendFormat": "written",
+          "legendFormat": "writes per sec",
           "metric": "",
           "refId": "B",
           "step": 8
         },
         {
-          "expr": "sum(irate(node_disk_io_time_seconds_total[5m]))",
+          "expr": "sum(irate(node_disk_io_time_seconds_total[1m])) * 1000",
           "interval": "2s",
           "intervalFactor": 4,
-          "legendFormat": "io time",
+          "legendFormat": "io time ms",
           "metric": "",
           "refId": "C",
           "step": 8
@@ -774,7 +764,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "I/O Usage",
+      "title": "Disk I/O Usage",
       "tooltip": {
         "msResolution": true,
         "shared": true,
@@ -1357,5 +1347,5 @@
   "variables": {
     "list": []
   },
-  "version": 18
+  "version": 27
 }
