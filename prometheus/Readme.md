@@ -159,6 +159,10 @@ A useful dashboard for Grafana I found [here](https://stefanprodan.com/2016/a-mo
 
 I modified it to be more relevant with multiple nodes Kubernetes cluster, do filter out some of the pods and containers, and to add disk usage.  I saved it into `grafana-dashboard.json`.
 
+### Container Disk Usage
+
+It doesn't seem to work, the value's always 0.  There seems to be a known issue on that: https://github.com/google/cadvisor/issues/1816.
+
 ## Documentation on Metrics and Dashboards
 
 - [Prometheus Queries](https://prometheus.io/docs/prometheus/latest/querying/basics/).
