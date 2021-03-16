@@ -96,6 +96,7 @@ try:
     ap = argparse.ArgumentParser(description="This is a test program")
     ap.add_argument("-t", help="Dummy param (short version)")
     ap.add_argument("--test-param", help="Dummy param (long version)")
+    ap.add_argument("-q", action='store_true', help="Be more quiet in output") # Argument without value
     args = ap.parse_args()
     print("Arguments as returned by ArgumentParser.parse_args(): ", str(args))
     if args.t is None:
