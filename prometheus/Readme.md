@@ -125,10 +125,6 @@ Run:
 
 Follow [this guide](https://prometheus.io/docs/prometheus/latest/getting_started/) to configure your first metrics - on Prometheus itself.
 
-### PromQL
-
-See the [docs](https://prometheus.io/docs/prometheus/latest/querying/basics/).
-
 ### Google cAdvisor
 
 If you want to take a look a CPU and RAM, you need cAdvisor: https://github.com/stefanprodan/dockprom/issues/7
@@ -162,3 +158,10 @@ For example to get the CPU load in the past 10 seconds for the specified contain
 A useful dashboard for Grafana I found [here](https://stefanprodan.com/2016/a-monitoring-solution-for-docker-hosts-containers-and-containerized-services/) and [here](https://github.com/stefanprodan/dockprom), in `grafana/provisioning/dashboards/docker_containers.json`.
 
 I modified it to be more relevant with multiple nodes Kubernetes cluster, do filter out some of the pods and containers, and to add disk usage.  I saved it into `grafana-dashboard.json`.
+
+## Documentation on Metrics and Dashboards
+
+- [Prometheus Queries](https://prometheus.io/docs/prometheus/latest/querying/basics/).
+- [Grafana Editor](https://grafana.com/docs/grafana/latest/panels/panel-editor/)
+- [Grafana Prometheus Queries](https://grafana.com/docs/grafana/latest/datasources/prometheus/)
+- [cAdvisor Metrics for Prometheus](https://github.com/google/cadvisor/blob/master/docs/storage/prometheus.md)
