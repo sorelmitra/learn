@@ -19,7 +19,7 @@ Consume resources with:
 	curl --data "millicores=400&durationSec=300" <cluster IP>:30980/ConsumeCPU
 	curl --data "megabytes=400&durationSec=300" <cluster IP>:30980/ConsumeMem
 
-Alternatively, and better! - use `resource-consumer` from [here]().  Consume resources like this:
+Alternatively, and better! - use `resource-consumer` from [here](https://github.com/dj80hd/resource-consumer).  Consume resources like this:
 
 Take up 1/8 CPU for 10 minutes:
 
