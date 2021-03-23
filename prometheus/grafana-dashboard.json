@@ -1009,6 +1009,7 @@
       "dashes": false,
       "datasource": "Prometheus",
       "decimals": 2,
+      "description": "The page cache is the main disk cache used by the Linux kernel. In most cases, the kernel refers to the page cache when reading from or writing to disk. ... If there is enough free memory, the page is kept in the cache for an indefinite period of time and can then be reused by other processes without accessing the disk.",
       "editable": true,
       "error": false,
       "fill": 1,
@@ -1064,7 +1065,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Container Cached Memory Usage",
+      "title": "Container Page Cache Usage",
       "tooltip": {
         "msResolution": true,
         "shared": true,
@@ -1447,5 +1448,5 @@
   "variables": {
     "list": []
   },
-  "version": 28
+  "version": 29
 }

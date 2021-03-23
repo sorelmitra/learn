@@ -159,6 +159,8 @@ A useful dashboard for Grafana I found [here](https://stefanprodan.com/2016/a-mo
 
 I modified it to be more relevant with multiple nodes Kubernetes cluster, do filter out some of the pods and containers, and to add disk usage.  I saved it into `grafana-dashboard.json`.
 
+The dashboard's pretty useful, as it keeps data for a few days and you can choose a time interval to look at, either from the shortcuts from the menu, either by entering an interval of the form `now-4h TO now-3h` to look at the 4th hour back from the history.
+
 ### Container Disk Usage
 
 It doesn't seem to work, the value's always 0.  There seems to be a known issue on that: https://github.com/google/cadvisor/issues/1816.
