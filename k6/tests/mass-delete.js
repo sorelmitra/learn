@@ -10,16 +10,33 @@ import {defaultOrEnv, no, pad} from '../utils/utils.js';
  * have a parent uses `root` as it's formal parent.  
  * The array is iterated in reverse order when building the tree 
  * and in normal order when deleting.
+ * 
+ * isLeaf must be set to true for items which don't have children, 
+ * and to false for items which have children.
+ * 
+ * Based on the isLeaf value the code knows when to stop searching
+ * for the common ancestor, i.e. don't wait for all children X of
+ * parent Y1 to be deleted if we're in parent Y2.  To achieve this,
+ * the function findFirstDefinedNotLeafAncestor() walks the array below
+ * to first find the definition of X.
+ * Then it goes on to find the definition of Y, where Y is the first
+ * element that has isLeaf false and that is an ancestor of X.
+ * 
+ * Further on, once the common defined ancestor that is not a leaf
+ * was found, the code in getPredecessorCount() makes sure that
+ * when watching for all children in hasPredecessorInstances()
+ * we don't wait for instances of X to be deleted from parent Y1
+ * if we're in parent Y2.
  */
 let orderedItemsToDelete = [
-	`tenants/explorers`,
-	`tenants/explorer_types`,
-	`tenants/grant_types`,
-	`tenants/applications`,
-	`applications/application_details`,
-	`grants/tenants`,
-	`organizations/grants`,
-	`root/organizations`,
+	{item: `tenants/explorers`, isLeaf: true},
+	{item: `tenants/explorer_types`, isLeaf: true},
+	{item: `tenants/grant_types`, isLeaf: true},
+	{item: `applications/application_details`, isLeaf: true},
+	{item: `tenants/applications`, isLeaf: false},
+	{item: `grants/tenants`, isLeaf: false},
+	{item: `organizations/grants`, isLeaf: false},
+	{item: `root/organizations`, isLeaf: false},
 ];
 
 
@@ -293,7 +310,7 @@ function getDefinedChildren(node) {
 	let definedChildren = [];
 
 	orderedItemsToDelete.forEach(itemDefinition => {
-		let ancestorArray = splitAncestors(itemDefinition);
+		let ancestorArray = splitAncestors(itemDefinition.item);
 		let len = getValidatedAncestorsLength(ancestorArray);
 		if (no(len)) return null;
 		let parent = ancestorArray[len - 2];
@@ -319,7 +336,7 @@ function getDefinedPredecessor(node) {
 	let foundIndex = -1;
 
 	orderedItemsToDelete.forEach(itemDefinition => {
-		let ancestorArray = splitAncestors(itemDefinition);
+		let ancestorArray = splitAncestors(itemDefinition.item);
 		let len = getValidatedAncestorsLength(ancestorArray);
 		if (no(len)) return null;
 		let child = ancestorArray[len - 1];
@@ -335,12 +352,13 @@ function getDefinedPredecessor(node) {
 		return null;
 	}
 
-	return orderedItemsToDelete[foundIndex];
+	return orderedItemsToDelete[foundIndex].item;
 }
 
 
 /**
- * Helper function: Get defined children for a node based on the API name.
+ * Helper function: Split item definition into an array with the ancestors
+ * first and then the child.
  */
 function splitAncestors(itemDefinition) {
 	return itemDefinition.split("/");
@@ -353,7 +371,7 @@ function splitAncestors(itemDefinition) {
 function getValidatedAncestorsLength(ancestorArray) {
 	let len = ancestorArray.length;
 	if (len < 2) {
-		console.log(`ERROR: orderedItemsToDelete contains item <${itemDefinition}> which is not of the form <ancestors.../child>`);
+		console.log(`ERROR: orderedItemsToDelete contains item <${ancestorArray[0]}> which is not of the form <ancestors.../child>`);
 		return null;
 	}
 	return len;
@@ -512,10 +530,10 @@ function getPredecessorCount(root, predecessorCountData) {
  * Helper function: Get common ancestor ID, i.e. the subtree root.
  */
 function getCommonAncestorId(node) {
-	let ancestorArray = splitAncestors(orderedItemsToDelete[orderedItemsToDelete.length - 1]);
-	let len = getValidatedAncestorsLength(ancestorArray);
-	if (no(len)) return 1;
-	let commonAncestorName = ancestorArray[len - 1];
+	let commonAncestorName = findFirstDefinedNotLeafAncestor(node);
+	if (no(commonAncestorName)) {
+		return null;
+	}
 
 	let apiData = node.apiData;
 	while (!no(apiData)) {
@@ -528,6 +546,54 @@ function getCommonAncestorId(node) {
 		return null;
 	}
 	return apiData.id;
+}
+
+/**
+ * Helper function: Find the first defined ancestor that is not leaf
+ * in the ordered items to delete.
+ */
+function findFirstDefinedNotLeafAncestor(node) {
+	let childName = node.apiData.name;
+	let parentName = null;
+	while (true) {
+		let itemDefinition = getItemDefinition(childName);
+		if (no(itemDefinition)) break;
+		let ancestorArray = splitAncestors(itemDefinition.item);
+		let len = getValidatedAncestorsLength(ancestorArray);
+		if (no(len)) break;
+		parentName = ancestorArray[len - 2];
+		let parentItemDefinition = getItemDefinition(parentName);
+		if (no(parentItemDefinition)) {
+			console.log(`ERROR: Cannot find item definition for ${parentName}`);
+			break;
+		}
+		if (!parentItemDefinition.isLeaf) {
+			break;
+		}
+		childName = parentName;
+	}
+	console.log(`DEBUG: Common ancestor of ${node.apiData.name} is ${parentName}`);
+	return parentName;
+}
+
+/**
+ * Helper function: Get item definition of given node.
+ */
+function getItemDefinition(childName) {
+	let foundItemDefinition = null;
+	console.log(`DEBUG: Getting item definition for ${childName}`);
+	orderedItemsToDelete.forEach(itemDefinition => {
+		let ancestorArray = splitAncestors(itemDefinition.item);
+		let len = getValidatedAncestorsLength(ancestorArray);
+		if (no(len)) return null;
+		let child = ancestorArray[len - 1];
+		if (childName == child) {
+			console.log(`DEBUG: childName ${childName} == child ${child}`);
+			foundItemDefinition = itemDefinition;
+		}
+	});
+
+	return foundItemDefinition;
 }
 
 
