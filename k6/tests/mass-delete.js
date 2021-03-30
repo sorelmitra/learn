@@ -28,6 +28,7 @@ import {defaultOrEnv, no, pad} from '../utils/utils.js';
  * we don't wait for instances of X to be deleted from parent Y1
  * if we're in parent Y2.
  */
+let orderedItemsRootName = "root";
 let orderedItemsToDelete = [
 	{item: `tenants/explorers`, isLeaf: true},
 	{item: `tenants/explorer_types`, isLeaf: true},
@@ -36,7 +37,7 @@ let orderedItemsToDelete = [
 	{item: `tenants/applications`, isLeaf: false},
 	{item: `grants/tenants`, isLeaf: false},
 	{item: `organizations/grants`, isLeaf: false},
-	{item: `root/organizations`, isLeaf: false},
+	{item: `${orderedItemsRootName}/organizations`, isLeaf: false},
 ];
 
 
@@ -136,7 +137,7 @@ function deleteTree(root, countVus, waitDelete, secondsToWaitForPredecessorDelet
 			return;
 		}
 
-		if (data.index % countVus != __VU - 1) {
+		if (!isIndexAssignedToCurrentVU(countVus, data.index)) {
 			return;
 		}
 
@@ -172,6 +173,14 @@ function deleteTree(root, countVus, waitDelete, secondsToWaitForPredecessorDelet
 		data.message = `: DELETED ${deletedStr}`;
 		logNode(data, customData);
 	});
+}
+
+
+/**
+ * Helper Function: Partition to VUs based on index in tree children array.
+ */
+function isIndexAssignedToCurrentVU(countVus, index) {
+	return index % countVus == __VU;
 }
 
 
@@ -379,7 +388,7 @@ function getValidatedAncestorsLength(ancestorArray) {
 
 
 /**
- * Helper function: Does node have instances of its defined children?
+ * Helper function: Does node have instances of its defined predecessors?
  */
 function hasPredecessorInstances(root, node, secondsToWaitForPredecessorDeletion) {
 	let status = {
@@ -396,11 +405,24 @@ function hasPredecessorInstances(root, node, secondsToWaitForPredecessorDeletion
 	};
 	//console.log(`DEBUG: Defined predecessor of ${node.apiData.name} is ${definedPredecessorItem}`);
 	if (!no(definedPredecessorItem)) {
+		console.log(`DEBUG: [VU${pad(__VU, 3)}] Waiting for predecessors of ${getNodeNameInContext(node)} to be deleted`);
 		status = waitForTreeItemsToDisappear(root, getPredecessorCount, secondsToWaitForPredecessorDeletion, data);
 	}
 
 	status.predecessorItem = definedPredecessorItem;
 	return status;
+}
+
+
+/**
+ * Helper function: Get node name with meaningful context
+ */
+function getNodeNameInContext(node) {
+	if (no(node.apiData.path)) {
+		return node.apiData.name;
+	}
+
+	return node.apiData.path;
 }
 
 
@@ -438,8 +460,9 @@ function waitForTreeItemsToDisappear(root, getItemsCount, secondsToWaitForPredec
 
 	let currentCycle = 0;
 	while (true) {
-		status.instancesLeft = getItemsCount(root, callbackData);
-		console.log(`DEBUG: [VU${pad(__VU, 3)}] waitForTreeItemsToDisappear: instances left ${status.instancesLeft}, cycle ${currentCycle}/${status.waitCycles}, sleep time ${status.sleepTime} seconds`);
+		let itemsCountData = getItemsCount(root, callbackData);
+		status.instancesLeft = itemsCountData.count;
+		console.log(`DEBUG: [VU${pad(__VU, 3)}] waitForTreeItemsToDisappear: instances of ${itemsCountData.name}: left ${status.instancesLeft}, cycle ${currentCycle}/${status.waitCycles}, sleep time ${status.sleepTime} seconds`);
 		if (status.instancesLeft < 1) {
 			status.areDeleted = true;
 			break;
@@ -470,7 +493,10 @@ function getChildrenCount(node) {
 		let childInstances = apiGetAll(childApiData);
 		instancesLeft += childInstances.length;
 	});
-	return instancesLeft;
+	return {
+		count: instancesLeft,
+		name: `children of ${getNodeNameInContext(node)}`,
+	};
 }
 
 
@@ -481,14 +507,22 @@ function getChildrenCount(node) {
 function getPredecessorCount(root, predecessorCountData) {
 	let ancestorArray = splitAncestors(predecessorCountData.itemDefinition);
 	let len = getValidatedAncestorsLength(ancestorArray);
-	if (no(len)) return 1;
+	if (no(len)) {
+		return {
+			count: 1,
+			name: `predecessors of ${getNodeNameInContext(predecessorCountData.node)} - WRONG DATA ITEM DEFINITION!`,
+		};
+	}
 
 	let parent = ancestorArray[len - 2];
 	let child = ancestorArray[len - 1];
 
 	let originalAncestorId = getCommonAncestorId(predecessorCountData.node);
 	if (no(originalAncestorId)) {
-		return 0;
+		return {
+			count: 0,
+			name: `predecessors of ${getNodeNameInContext(predecessorCountData.node)}`,
+		};
 	}
 
 	let predecessorCount = 0;
@@ -522,7 +556,10 @@ function getPredecessorCount(root, predecessorCountData) {
 	});
 
 	//console.log(`DEBUG: Total instances of ${predecessorCountData.itemDefinition}: ${predecessorCount}`);
-	return predecessorCount;
+	return {
+		count: predecessorCount,
+		name: `predecessors of ${getNodeNameInContext(predecessorCountData.node)}`,
+	};
 }
 
 
@@ -564,7 +601,9 @@ function findFirstDefinedNotLeafAncestor(node) {
 		parentName = ancestorArray[len - 2];
 		let parentItemDefinition = getItemDefinition(parentName);
 		if (no(parentItemDefinition)) {
-			console.log(`ERROR: Cannot find item definition for ${parentName}`);
+			if (parentName != orderedItemsRootName) {
+				console.log(`ERROR: Cannot find item definition for ${parentName}`);
+			}
 			break;
 		}
 		if (!parentItemDefinition.isLeaf) {
@@ -572,7 +611,7 @@ function findFirstDefinedNotLeafAncestor(node) {
 		}
 		childName = parentName;
 	}
-	console.log(`DEBUG: Common ancestor of ${node.apiData.name} is ${parentName}`);
+	//console.log(`DEBUG: Common ancestor of ${node.apiData.name} is ${parentName}`);
 	return parentName;
 }
 
@@ -581,14 +620,14 @@ function findFirstDefinedNotLeafAncestor(node) {
  */
 function getItemDefinition(childName) {
 	let foundItemDefinition = null;
-	console.log(`DEBUG: Getting item definition for ${childName}`);
+	//console.log(`DEBUG: Getting item definition for ${childName}`);
 	orderedItemsToDelete.forEach(itemDefinition => {
 		let ancestorArray = splitAncestors(itemDefinition.item);
 		let len = getValidatedAncestorsLength(ancestorArray);
 		if (no(len)) return null;
 		let child = ancestorArray[len - 1];
 		if (childName == child) {
-			console.log(`DEBUG: childName ${childName} == child ${child}`);
+			//console.log(`DEBUG: childName ${childName} == child ${child}`);
 			foundItemDefinition = itemDefinition;
 		}
 	});
