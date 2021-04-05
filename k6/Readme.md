@@ -15,8 +15,11 @@ K6_VUS=24 K6_ITERATIONS=1000 K6S_CREATE_ONLY=yes K6S_TRACE_TIMINGS=yes K6S_SERVE
 To delete everything that's been created, you would run this:
 
 ```shell
-K6_VUS=1 K6_ITERATIONS=1 K6S_DISPLAY_ONLY=yes K6S_SERVER=<IP> K6S_PORT=<Port> k6 run --include-system-env-vars tests/mass-delete.js
+K6_VUS=24 K6_ITERATIONS=24 K6_SECONDS_WAIT_PREVIOUS_DELETE=60 K6S_DISPLAY_ONLY=no K6S_SERVER=<IP> K6S_PORT=<Port> k6 run --include-system-env-vars tests/mass-delete.js
 ```
+
+NOTE: There are still issues with the number of VUs in mass-delete.  If you notice deletion isn't triggered, adjust the number of VUs up of down.
+
 
 The environment variables are used to pass in information both to K6 itself and to the scripts we wrote:
 
