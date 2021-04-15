@@ -74,6 +74,14 @@ Mass deletion is an example of a parallel programming that can be achieved withi
 
 - The other interesting feature is waiting for an entire group of resources to be deleted before we start deleting a new group.  This ordering is defined in the same `orderedItemsToDelete` variable as above, where the order of deletion is defined by walking the array from beginning to end.  So once requests to delete have been launched for the entire group and the code moves to a new group, a Get ALL on the previous group is being issued periodically until it returns an empty set or a timeout expires.  When the empty set is returned, deletion of the new group proceeds.  If the timeout expires the entire process is canceled.
 
+### Known Issues
+
+There are some bugs when deleting a number of resources that's smaller than the number of VUs.  In some cases, deletion might not get triggered for certain items.  In this case, just lower the number of VUs and rerun the tools.
+
+Seldom I noticed that even with a large number of resources some of them might not get deleted, in which case the usual workaround is to rerun the tool with the same parameters.
+
+The above issues are not blocking and while annoying they have easy workarounds.
+
 ### Example of how Mass Deletion Works
 
 So assuming the tree of resources looks like this:
