@@ -4,6 +4,39 @@ This tool shows K6 in action with some complex code and configuration.  It build
 
 A "flow" in K6 terminology is a sequence of logical actions on a given service.
 
+# Configuration
+
+The tool can be used for virtually any API.  To configure it for your API, just open `config.js` and enter there the details of your API under `admin`, including:
+
+- Server location and port.
+- API path and version.
+- (You don't need to change the `url()` function, in theory.)
+- API payload templates used for creation.  These templates are JavaScript objects that are converted into JSON when actually calling the API, and in this process, a rudimentary variable replacement takes place.  A variable is of the form `${name}`.  The system currently understands the following variables:
+	- `VU`: Current Virtual User as passed on by K6.
+	- `ITER`: Current Iteration as passed on by K6.
+	- `TAG`: Tag used when computing metrics, it is applied only at the root level, which in the case of the dummy API used here, is `organizations`.  The tag servers to differentiate metrics between different root trees, if needed.  Passed on by using the `K6S_TAG` environment variable.
+
+Sample payload configuration:
+
+```javascript
+organizations: {
+	path: "organizations",
+	description: "Sample Organization ${TAG}${VU}_${ITER}",
+	name: "organization ${VU}_${ITER}",
+},
+```
+
+Using a combination of `${VU}` and `${ITER}` you can generate unique IDs in your payloads, if needed.
+
+## Caveats
+
+The script can be easily configured for any API, as described above.  However, if you want to support **multiple** APIs simultaneously, there's some work to be done to:
+
+- Rename `admin` in `config.js` to the name of API 1
+- Add a parallel `X` object in `config.js` for API 2
+- Do the same for N APIs
+- Change hardcoded usage of `admin` in a few places of code to receive a parameter depending on which API is selected
+
 # Usage
 
 To create 1000 flows of a explorer in 24 parallel executions, you would run this:
@@ -18,7 +51,7 @@ To delete everything that's been created, you would run this:
 K6_VUS=24 K6_ITERATIONS=24 K6_SECONDS_WAIT_PREVIOUS_DELETE=60 K6S_DISPLAY_ONLY=no K6S_SERVER=<IP> K6S_PORT=<Port> k6 run --include-system-env-vars tests/mass-delete.js
 ```
 
-NOTE: There are still issues with the number of VUs in mass-delete.  If you notice deletion isn't triggered, adjust the number of VUs up of down.
+NOTE: There are still issues with the number of VUs in mass-delete.  If you notice deletion isn't triggered, adjust the number of VUs up of down.  See below for more details on mass deletion and its known issues.
 
 
 The environment variables are used to pass in information both to K6 itself and to the scripts we wrote:
@@ -29,6 +62,7 @@ The environment variables are used to pass in information both to K6 itself and 
 - `K6S_SERVER`: Script variable, specifies the server to connect to.
 - `K6S_PORT`: Script variable, specifies the port to use when connecting to the server.
 - `K6S_TRACE_TIMINGS`: Script variable, boolean true/false or yes/no.  If true, individual timings are being traced in the logs.  Helpful when debugging stuff.
+- `K6S_TAG`: Tag to apply at root level to differentiate between trees when computing metrics.  See Configuration above.
 - `K6S_CREATE_ONLY`: Script variable, boolean.  If true, the script that recognizes it only does the creation part.  Otherwise, it deletes what it has created as soon as creation was finished.
 - `K6S_DISPLAY_ONLY`: Script variable, applicable to mass-delete.  If true, it will only display the tree but not delete anything.
 
@@ -70,13 +104,13 @@ Mass deletion is an example of a parallel programming that can be achieved withi
 
 - The setup code first calls the API and obtains a tree of API resources, based on the known items declared in `orderedItemsToDelete` variable.  This tree is passed to each instance of the `massDelete` function, which does all the work.
 
-- The `massDelete` function walks the tree in post-order and when it reaches a group of items to delete, it uses `__VU`, `K6S_VUS`, the count of items to delete in the current group, and the current item index to decide whether the current item should be deleted.  Essentially the current item is deleted if `index % K6S_VUS == __VU - 1`, which basically splits the entire group of items to delete in disjunct sets assigned to each of the available VUs based on the VU number.
+- The `massDelete` function walks the tree in post-order and when it reaches a group of items to delete, it uses `__VU`, `K6S_VUS`, the count of items to delete in the current group, and the current item index to decide whether the current item should be deleted.  Essentially the current item is deleted if `index % K6S_VUS == __VU`, which basically splits the entire group of items to delete in disjunct sets assigned to each of the available VUs based on the VU number.
 
 - The other interesting feature is waiting for an entire group of resources to be deleted before we start deleting a new group.  This ordering is defined in the same `orderedItemsToDelete` variable as above, where the order of deletion is defined by walking the array from beginning to end.  So once requests to delete have been launched for the entire group and the code moves to a new group, a Get ALL on the previous group is being issued periodically until it returns an empty set or a timeout expires.  When the empty set is returned, deletion of the new group proceeds.  If the timeout expires the entire process is canceled.
 
 ### Known Issues
 
-There are some bugs when deleting a number of resources that's smaller than the number of VUs.  In some cases, deletion might not get triggered for certain items.  In this case, just lower the number of VUs and rerun the tools.
+There are some bugs when deleting a number of resources that's smaller than the number of configured VUs.  In some cases, deletion might not get triggered for certain items.  In this case, just lower the number of VUs and rerun the tools.
 
 Seldom I noticed that even with a large number of resources some of them might not get deleted, in which case the usual workaround is to rerun the tool with the same parameters.
 
@@ -118,7 +152,7 @@ Also assume we start 3 VUs.  Then the `explorers` subtree would be split among V
 
 - `explorers`
 	- `explorer1`: VU 1
-	- `explorer4`:: VU 1
+	- `explorer4`: VU 1
 	- `explorer2`: VU 2
 	- `explorer3`: VU 3
 
