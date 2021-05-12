@@ -180,7 +180,10 @@ function deleteTree(root, countVus, waitDelete, secondsToWaitForPredecessorDelet
  * Helper Function: Partition to VUs based on index in tree children array.
  */
 function isIndexAssignedToCurrentVU(countVus, index) {
-	return index % countVus == __VU;
+	if (countVus < 2) {
+		return true;
+	}
+	return index % countVus == __VU - 1;
 }
 
 
