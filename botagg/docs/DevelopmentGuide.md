@@ -95,7 +95,7 @@ cd src/chatapi
 Create an isolated Python environment, and install dependencies:
 
 ```bash
-virtualenv env
+virtualenv pyvirtenv
 npm run env-install
 ```
 

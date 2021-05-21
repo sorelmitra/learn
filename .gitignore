@@ -43,7 +43,7 @@ appium.log
 
 # Python
 __pycache__
-env/
+pyvirtenv/
 botagg/src/chatapi/static
 botagg/src/chatapi/db.sqlite3
 
