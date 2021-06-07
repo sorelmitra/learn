@@ -14,6 +14,10 @@ import {defaultOrEnv, no, pad} from '../utils/utils.js';
  * isLeaf must be set to true for items which don't have children, 
  * and to false for items which have children.
  * 
+ * skipDelete must be set to true for items which must not be deleted,
+ * e.g. those that the API you're calling is deleting automatically.
+ * If it's ommitted, it is assumed to be false.
+ * 
  * Based on the isLeaf value the code knows when to stop searching
  * for the common ancestor, i.e. don't wait for all children X of
  * parent Y1 to be deleted if we're in parent Y2.  To achieve this,
@@ -34,7 +38,7 @@ let orderedItemsToDelete = [
 	{item: `tenants/explorer_types`, isLeaf: true},
 	{item: `tenants/grant_types`, isLeaf: true},
 	{item: `applications/application_details`, isLeaf: true},
-	{item: `tenants/applications`, isLeaf: false},
+	{item: `tenants/applications`, isLeaf: false, skipDelete: true},
 	{item: `grants/tenants`, isLeaf: false},
 	{item: `organizations/grants`, isLeaf: false},
 	{item: `${orderedItemsRootName}/organizations`, isLeaf: false},
@@ -167,6 +171,9 @@ function deleteTree(root, countVus, waitDelete, secondsToWaitForPredecessorDelet
 
 		//if (data.index == 1) return;  // Test predecessor check
 
+		if (hasSkipDeleteInDefinition(data.node.apiData.name)) {
+			return;
+		}
 		let deleted = apiDelete(data.node.apiData);
 		sleep(waitDelete);
 		let deletedStr = deleted ? "OK" : "FAILED";
@@ -492,6 +499,9 @@ function getChildrenCount(node) {
 		return instancesLeft;
 	}
 	definedChildren.forEach(childName => {
+		if (hasSkipDeleteInDefinition(childName)) {
+			return;
+		}
 		let childApiData = apiMakeData(childName, node.apiData);
 		let childInstances = apiGetAll(childApiData);
 		instancesLeft += childInstances.length;
@@ -549,6 +559,10 @@ function getPredecessorCount(root, predecessorCountData) {
 		}
 
 		if (!customData.shouldCount) {
+			return;
+		}
+
+		if (predecessorCountData.itemDefinition.skipDelete) {
 			return;
 		}
 
@@ -616,6 +630,22 @@ function findFirstDefinedNotLeafAncestor(node) {
 	}
 	//console.log(`DEBUG: Common ancestor of ${node.apiData.name} is ${parentName}`);
 	return parentName;
+}
+
+/**
+ * Helper function: Whether the given node name has a member named "skipDelete"
+ * and that member has the value of true.
+ */
+function hasSkipDeleteInDefinition(nodeName) {
+	let itemDefinition = getItemDefinition(nodeName);
+	if (no(itemDefinition)) {
+		console.log(`ERROR: Cannot find item definition for ${nodeName}`);
+		return false;
+	}
+	if (no(itemDefinition.skipDelete)) {
+		return false;
+	}
+	return itemDefinition.skipDelete;
 }
 
 /**
