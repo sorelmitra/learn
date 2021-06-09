@@ -4,39 +4,6 @@ This tool shows K6 in action with some complex code and configuration.  It build
 
 A "flow" in K6 terminology is a sequence of logical actions on a given service.
 
-# Configuration
-
-The tool can be used for virtually any API.  To configure it for your API, just open `config.js` and enter there the details of your API under `admin`, including:
-
-- Server location and port.
-- API path and version.
-- (You don't need to change the `url()` function, in theory.)
-- API payload templates used for creation.  These templates are JavaScript objects that are converted into JSON when actually calling the API, and in this process, a rudimentary variable replacement takes place.  A variable is of the form `${name}`.  The system currently understands the following variables:
-	- `VU`: Current Virtual User as passed on by K6.
-	- `ITER`: Current Iteration as passed on by K6.
-	- `TAG`: Tag used when computing metrics, it is applied only at the root level, which in the case of the dummy API used here, is `organizations`.  The tag servers to differentiate metrics between different root trees, if needed.  Passed on by using the `K6S_TAG` environment variable.
-
-Sample payload configuration:
-
-```javascript
-organizations: {
-	path: "organizations",
-	description: "Sample Organization ${TAG}${VU}_${ITER}",
-	name: "organization ${VU}_${ITER}",
-},
-```
-
-Using a combination of `${VU}` and `${ITER}` you can generate unique IDs in your payloads, if needed.
-
-## Caveats
-
-The script can be easily configured for any API, as described above.  However, if you want to support **multiple** APIs simultaneously, there's some work to be done to:
-
-- Rename `admin` in `config.js` to the name of API 1
-- Add a parallel `X` object in `config.js` for API 2
-- Do the same for N APIs
-- Change hardcoded usage of `admin` in a few places of code to receive a parameter depending on which API is selected
-
 # Usage
 
 To create 1000 flows of a explorer in 24 parallel executions, you would run this:
@@ -62,7 +29,7 @@ The environment variables are used to pass in information both to K6 itself and 
 - `K6S_SERVER`: Script variable, specifies the server to connect to.
 - `K6S_PORT`: Script variable, specifies the port to use when connecting to the server.
 - `K6S_TRACE_TIMINGS`: Script variable, boolean true/false or yes/no.  If true, individual timings are being traced in the logs.  Helpful when debugging stuff.
-- `K6S_TAG`: Tag to apply at root level to differentiate between trees when computing metrics.  See Configuration above.
+- `K6S_TAG`: Tag used when creating the root level element, which in the case of the dummy API used here, is `organizations`.  The `TAG` is added to the `VU` and `ITER` on the root level element, and by specifying a new value for each run of the scripts, multiple root level trees can be created.  Passed on by using the `K6S_TAG` environment variable.
 - `K6S_CREATE_ONLY`: Script variable, boolean.  If true, the script that recognizes it only does the creation part.  Otherwise, it deletes what it has created as soon as creation was finished.
 - `K6S_DISPLAY_ONLY`: Script variable, applicable to mass-delete.  If true, it will only display the tree but not delete anything.
 - `K6S_SECONDS_WAIT_PREVIOUS_DELETE`: Script variable, applicable to mass-delete.  How many seconds does each VU wait for deletion of the predecessors of the current resources it's trying to delete.  Default is 10 seconds.  The explanation for this variable is that when multiple VUs delete resources of a particular type, each VU gets a slice of the resources to delete.  Thus, certain VUs might finish earlier and move to the successor resources.  This might result in those VUs trying to delete a successor resource for which the predecessors weren't deleted because they were in the slice of other VUs who haven't finished yet.  Thus, the script must be able to wait for all instances of predecessor resources to be deleted.  Depending of the speed of the API you're testing, a value of tens of seconds should be plenty.
@@ -158,3 +125,37 @@ Also assume we start 3 VUs.  Then the `explorers` subtree would be split among V
 	- `explorer3`: VU 3
 
 Once delete requests have been issued for the entire `explorers` group, before moving on to `explorer_types` group, a Get ALL requests will be issued for `explorers` and if it returns an empty set, then it will proceed to deleting `explorer_types`.  Otherwise it will start a timer to wait for the actual deletion to happen but will not reissue the deletion requests.
+
+## Adding New APIs
+
+The tool can be used for virtually any API.  To configure it for your API, just open `config.js` and enter there the details of your API under `admin`, including:
+
+- Server location and port.
+- API path and version.
+- (You don't need to change the `url()` function, in theory.)
+- API payload templates used for creation.  These templates are JavaScript objects that are converted into JSON when actually calling the API, and in this process, a rudimentary variable replacement takes place.  A variable is of the form `${name}`.  The system currently understands the following variables:
+	- `VU`: Current Virtual User as passed on by K6.
+	- `ITER`: Current Iteration as passed on by K6.
+	- `TAG`: Tag used when creating the root level element, which in the case of the dummy API used here, is `organizations`.  The `TAG` is added to the `VU` and `ITER` on the root level element, and by specifying a new value for each run of the scripts, multiple root level trees can be created.  Passed on by using the `K6S_TAG` environment variable.
+
+Sample payload configuration:
+
+```javascript
+organizations: {
+	path: "organizations",
+	description: "Sample Organization ${TAG}${VU}_${ITER}",
+	name: "organization ${VU}_${ITER}",
+},
+```
+
+Using a combination of `${VU}` and `${ITER}` you can generate unique IDs in your payloads, if needed.
+
+## Caveats
+
+The script can be easily configured for any API, as described above.  However, if you want to support **multiple** APIs simultaneously, there's some work to be done to:
+
+- Rename `admin` in `config.js` to the name of API 1
+- Add a parallel `X` object in `config.js` for API 2
+- Do the same for N APIs
+- Change hardcoded usage of `admin` in a few places of code to receive a parameter depending on which API is selected
+
