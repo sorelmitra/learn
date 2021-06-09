@@ -55,7 +55,7 @@ export function setup() {
 		countVus: defaultOrEnv(0, "K6_VUS"),
 		waitDelete: defaultOrEnv(0, "K6S_WAIT_DELETE"),
 		displayOnly: defaultOrEnv(false, "K6S_DISPLAY_ONLY"),
-		secondsToWaitForPredecessorDeletion: defaultOrEnv(0, "K6_SECONDS_WAIT_PREVIOUS_DELETE"),
+		secondsToWaitForPredecessorDeletion: defaultOrEnv(10, "K6S_SECONDS_WAIT_PREVIOUS_DELETE"),
 	};
 	if (data.countVus == 0) {
 		console.log("ERROR: Please specify the exact number of VUs in the 'K6_VUS' variable!");

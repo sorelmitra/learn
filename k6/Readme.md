@@ -48,7 +48,7 @@ K6_VUS=24 K6_ITERATIONS=1000 K6S_CREATE_ONLY=yes K6S_TRACE_TIMINGS=yes K6S_SERVE
 To delete everything that's been created, you would run this:
 
 ```shell
-K6_VUS=24 K6_ITERATIONS=24 K6_SECONDS_WAIT_PREVIOUS_DELETE=60 K6S_DISPLAY_ONLY=no K6S_SERVER=<IP> K6S_PORT=<Port> k6 run --include-system-env-vars tests/mass-delete.js
+K6_VUS=24 K6_ITERATIONS=24 K6S_SECONDS_WAIT_PREVIOUS_DELETE=60 K6S_DISPLAY_ONLY=no K6S_SERVER=<IP> K6S_PORT=<Port> k6 run --include-system-env-vars tests/mass-delete.js
 ```
 
 NOTE: There are still issues with the number of VUs in mass-delete.  If you notice deletion isn't triggered, adjust the number of VUs up of down.  See below for more details on mass deletion and its known issues.
@@ -65,6 +65,7 @@ The environment variables are used to pass in information both to K6 itself and 
 - `K6S_TAG`: Tag to apply at root level to differentiate between trees when computing metrics.  See Configuration above.
 - `K6S_CREATE_ONLY`: Script variable, boolean.  If true, the script that recognizes it only does the creation part.  Otherwise, it deletes what it has created as soon as creation was finished.
 - `K6S_DISPLAY_ONLY`: Script variable, applicable to mass-delete.  If true, it will only display the tree but not delete anything.
+- `K6S_SECONDS_WAIT_PREVIOUS_DELETE`: Script variable, applicable to mass-delete.  How many seconds does each VU wait for deletion of the predecessors of the current resources it's trying to delete.  Default is 10 seconds.  The explanation for this variable is that when multiple VUs delete resources of a particular type, each VU gets a slice of the resources to delete.  Thus, certain VUs might finish earlier and move to the successor resources.  This might result in those VUs trying to delete a successor resource for which the predecessors weren't deleted because they were in the slice of other VUs who haven't finished yet.  Thus, the script must be able to wait for all instances of predecessor resources to be deleted.  Depending of the speed of the API you're testing, a value of tens of seconds should be plenty.
 
 # Code Structure
 
