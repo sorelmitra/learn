@@ -1,0 +1,3 @@
+**/test/sys/**/*answer.json
+**/__pycache__
+**/.DS_Store
