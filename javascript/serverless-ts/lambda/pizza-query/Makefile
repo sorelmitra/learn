@@ -1,5 +1,5 @@
 BUNDLE_NAME := pizzemQueryPizza
-TARGET_DIR := ../../target/pizzem
+TARGET_DIR := ../../target/${BUNDLE_NAME}
 DIST_CODE_DIR := ${TARGET_DIR}/dist
 BUNDLE_DIR_NAME := bundle
 BUNDLE_DIR := ${DIST_CODE_DIR}/../${BUNDLE_DIR_NAME}
