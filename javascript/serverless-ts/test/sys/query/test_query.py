@@ -10,7 +10,7 @@ def test_query_pizza():
 
 	command = [
 		"curl", 
-		"-X", "GET",
+		"-X", "POST",
 		"-H", f"x-api-key: {apiKey}",
 		"-H", "Content-Type: application/json",
 		f"https://{server}/{path}",

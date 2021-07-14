@@ -10,20 +10,28 @@ BUNDLED_TGZ=contactme-${PACKAGE_VERSION}.tgz
 TARGET_TGZ=${TARGET}.tgz
 TARGET_ZIP=${TARGET}.zip
 
-all: compile deploy
+all: deploy
 
 compile:
-	npx tsc
+	mkdir -p ${DIST_CODE_DIR}
+	npx babel --verbose --extensions '.ts' --out-dir ${DIST_CODE_DIR} src
+
+prodprep:
+	rm -rf ${DIST_CODE_DIR}/node_modules
 	cp -r node_modules ${DIST_CODE_DIR}
+	cp package.json ${DIST_CODE_DIR}
+	cd ${DIST_CODE_DIR} && npm prune --production
 
 zip:
 	mkdir -p ${BUNDLE_DIR}
 	cd ${DIST_CODE_DIR} && zip -r ../${BUNDLE_DIR_NAME}/${TARGET_ZIP} .
 
-deploy: zip
+bundle: compile prodprep zip
+
+deploy: bundle
 	aws lambda update-function-code --function-name ${BUNDLE_NAME} --zip-file fileb://${BUNDLE_DIR}/${TARGET_ZIP}
 
 clean:
 	rm -rfv ${TARGET_DIR}/
 
-.PHONY: compile zip deploy
+.PHONY: compile prodprep zip deploy

@@ -1,16 +1,9 @@
+import { queryService } from "../services/query";
 
 export default [
 	{
-		method: 'GET',
+		method: 'POST',
 		path: '/pizzemQueryPizza',
-		handler: (request, h) => {
-			return h.response({
-				myObject: {
-					msg: 'Hello, world!',
-					statusCode: 0,
-				},
-				serverless: request.serverless
-			})
-		}
+		handler: request => queryService.run(request)
 	}
 ];
