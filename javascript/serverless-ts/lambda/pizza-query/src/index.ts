@@ -1,4 +1,4 @@
-import hl from './common/hapiLambda';
+import hl from 'hapi-lambda-sorel';
 import api from './api';
 
 let server;

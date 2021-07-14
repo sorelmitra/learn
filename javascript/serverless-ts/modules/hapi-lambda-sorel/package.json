@@ -1,0 +1,17 @@
+{
+  "name": "hapi-lambda-sorel",
+  "version": "1.0.0",
+  "description": "A Hapi.dev adapter for AWS Lambda",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Node.JS",
+    "Hapi",
+    "AWS",
+    "Lambda"
+  ],
+  "author": "Sorel Mitra",
+  "license": "ISC"
+}
