@@ -1,12 +1,14 @@
 import hl from 'hapi-lambda-sorel';
+
 import api from './api';
+import DbDynamo from './db/dbDynamo';
 import Routes from './routes/routes';
 import Query from "./services/query";
 
 let server;
 export const handler = async (event, context) => {
 	console.log("INIT");
-	if (!server) server = await api.init(new Routes(new Query()));
+	if (!server) server = await api.init(new Routes(new Query(new DbDynamo())));
 	console.log("transformRequest: event", event);
 	const req = hl.transformRequest(event, {});
 	console.log("inject: request", req);

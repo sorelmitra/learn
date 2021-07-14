@@ -1,10 +1,18 @@
+import { Db } from "../db/db";
 
 class Query {
-	constructor() {
+	db: Db;
+	constructor(db: Db) {
+		this.db = db;
 	}
 
 	run(request) {
-		return [{ type: "carbonara", description: "Meat me!" }, { type: "quattro-stagioni", description: "Cheese me!" }];
+		if (undefined === process.env.PIZZA_TYPES_TABLE) {
+			return new Error("Missing environment variable PIZZA_TYPES_TABLE!");
+		}
+		return this.db.getAll({
+			table: process.env.PIZZA_TYPES_TABLE
+		});
 	}
 }
 
