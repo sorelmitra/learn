@@ -8,4 +8,4 @@ class Query {
 	}
 }
 
-export let queryService: Query = new Query();
+export default Query;

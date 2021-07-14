@@ -1,9 +1,9 @@
 import * as Hapi from '@hapi/hapi';
 
-import routes from './routes/base';
+import Routes from './routes/routes';
 import plugins from './plugins';
 
-const init = async () => {
+const init = async (routes: Routes) => {
 	// create base server
 	const server = await new Hapi.Server({
 		port: process.env.port || 3001,
@@ -17,7 +17,7 @@ const init = async () => {
 	});
 
 	await server.register(plugins);
-	server.route(routes);
+	server.route(routes.buildDefault());
 	return server;
 };
 
