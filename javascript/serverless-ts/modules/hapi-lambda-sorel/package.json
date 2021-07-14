@@ -1,6 +1,6 @@
 {
   "name": "hapi-lambda-sorel",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A Hapi.dev adapter for AWS Lambda",
   "main": "index.js",
   "scripts": {

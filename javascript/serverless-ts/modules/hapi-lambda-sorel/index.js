@@ -63,7 +63,7 @@ const transformResponse = response => {
   };
 };
 
-export default {
+module.exports = {
   transformRequest,
   transformResponse
 };
