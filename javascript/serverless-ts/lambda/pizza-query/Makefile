@@ -29,7 +29,7 @@ zip:
 bundle: compile prodprep zip
 
 deploy: bundle
-	aws lambda update-function-code --function-name ${BUNDLE_NAME} --zip-file fileb://${BUNDLE_DIR}/${TARGET_ZIP}
+	AWS_PAGER="" aws lambda update-function-code --function-name ${BUNDLE_NAME} --zip-file fileb://${BUNDLE_DIR}/${TARGET_ZIP}
 
 clean:
 	rm -rfv ${TARGET_DIR}/

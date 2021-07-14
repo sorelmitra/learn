@@ -6,7 +6,7 @@ class Query {
 		this.db = db;
 	}
 
-	run(request) {
+	async run(request) {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
 			return new Error("Missing environment variable PIZZA_TYPES_TABLE!");
 		}

@@ -6,5 +6,5 @@ export type DbOptions = {
 export type DbModel = Pizza;
 
 export interface Db {
-	getAll(options: DbOptions): DbModel[];
+	getAll(options: DbOptions): Promise<DbModel[]>;
 }
