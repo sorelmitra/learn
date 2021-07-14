@@ -9,8 +9,9 @@ export const handler = async (event, context) => {
 	const req = hl.transformRequest(event, {});
 	console.log("inject: request", req);
 	const res = await server.inject(req);
-	console.log("transformResponse: response", res);
+	console.log("transformResponse: res", res);
 	const response = hl.transformResponse(res);
 
+	console.log("final response", res);
 	return response;
 };

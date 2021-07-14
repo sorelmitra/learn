@@ -4,14 +4,7 @@ class Query {
 	}
 
 	run(request) {
-		console.log("Request", request);
-		let by = request.payload.by;
-		return {
-			myObject: {
-				msg: `Hello, world by ${by}!`,
-				statusCode: 0,
-			}
-		};
+		return [{ type: "carbonara", description: "Meat me!" }, { type: "quattro-stagioni", description: "Cheese me!" }];
 	}
 }
 

@@ -1,1 +1,10 @@
-{"myObject":{"msg":"Hello, world!","statusCode":0}}
+[
+	{
+		"type": "carbonara",
+		"description": "Meat me!"
+	},
+	{
+		"type": "quattro-stagioni",
+		"description": "Cheese me!"
+	}
+]

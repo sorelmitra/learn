@@ -1,7 +1,9 @@
-lambda_query:
-	cd lambda/pizza-query && make
+lambdas: lambda_query
 
 test:
 	pytest .
 
-.PHONY: test
+lambda_query:
+	cd lambda/pizza-query && make
+
+.PHONY: test lambdas

@@ -55,6 +55,7 @@ botagg/src/chatmob/.env
 botagg/src/chatbotapi/.env
 botagg/src/samplebot/.env
 botagg/src/chatapi/chatapisite/settings.py
+verifit/venv
 
 # Edu
 *~

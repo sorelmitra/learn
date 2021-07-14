@@ -15,6 +15,7 @@
     "@hapi/hapi": "^20.1.5",
     "@hapi/inert": "^6.0.3",
     "@hapi/vision": "^6.1.0",
+    "aws-sdk": "^2.945.0",
     "hapi-lambda-sorel": "^1.0.3"
   },
   "devDependencies": {
