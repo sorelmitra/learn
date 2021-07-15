@@ -8,7 +8,7 @@ class Repo {
 
 	async getAll() {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
-			return new Error("Missing environment variable PIZZA_TYPES_TABLE!");
+			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
 		}
 		return this.db.getAll({
 			table: process.env.PIZZA_TYPES_TABLE
@@ -17,7 +17,7 @@ class Repo {
 
 	async getByType(type: string) {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
-			return new Error("Missing environment variable PIZZA_TYPES_TABLE!");
+			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
 		}
 		return this.db.getAll({
 			table: process.env.PIZZA_TYPES_TABLE,
