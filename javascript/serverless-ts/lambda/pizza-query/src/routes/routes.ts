@@ -13,8 +13,13 @@ class Routes {
 				method: 'GET',
 				path: '/pizzemQueryPizza',
 				handler: async (request) => {
-					let r = await this.query.run(request);
-					return r;
+					try {
+						return await this.query.run(request);
+					} catch (error) {
+						return {
+							oooooops: error
+						}
+					}
 				}
 			}
 		];
