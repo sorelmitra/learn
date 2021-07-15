@@ -27,6 +27,16 @@ class Repo {
 			}
 		});
 	}
+
+	create(pizza: Pizza) {
+		if (undefined === process.env.PIZZA_TYPES_TABLE) {
+			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
+		}
+		return this.db.create({
+			table: process.env.PIZZA_TYPES_TABLE,
+			data: pizza,
+		});
+	}
 }
 
 export default Repo;

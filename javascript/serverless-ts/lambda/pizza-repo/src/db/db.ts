@@ -4,7 +4,8 @@ export type DbOptions = {
 	filter?: {
 		name: string;
 		value: string;
-	}
+	};
+	data?: DbModel;
 };
 
 export type DbError = {
@@ -15,6 +16,7 @@ export type DbModel = Pizza | DbError;
 
 export interface Db {
 	getAll(options: DbOptions): Promise<DbModel[]>;
+	create(options: DbOptions): Promise<DbModel>;
 }
 
 export class DbUtils {

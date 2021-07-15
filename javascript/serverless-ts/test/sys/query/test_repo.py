@@ -24,3 +24,13 @@ def test_query_pizza_by_type():
 		"-o", get_output_filename(),
 	])
 	assert re.sub(r'\s+', "", expected) == re.sub(r'\s+', "", actual)
+
+def test_create_pizza():
+	expected, actual = run_test(common_command + [
+		"-X", "POST",
+		f"{server}/pizzas",
+		"--data", f"@{get_input_filename()}",
+		"-o", get_output_filename(),
+	])
+	assert re.sub(r'\s+', "", expected) == re.sub(r'\s+', "", actual)
+

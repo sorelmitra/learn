@@ -5,6 +5,12 @@ import { PromiseResult } from 'aws-sdk/lib/request';
 import { Db, DbModel, DbOptions, DbUtils } from "./db";
 
 class DbDynamo implements Db {
+	documentClient: DocumentClient;
+
+	constructor(documentClient: DocumentClient) {
+		this.documentClient = documentClient;
+	}
+
 	async getAll(options: DbOptions): Promise<DbModel[]> {
 		console.log("DynamoDB entry");
 		let values: DbModel[] = [];
@@ -19,7 +25,6 @@ class DbDynamo implements Db {
 	}
 
 	async scanTable(options: DbOptions) {
-		let documentClient = new DocumentClient();
 		const params: DocumentClient.ScanInput = {
 			TableName: options.table,
 		};
@@ -40,7 +45,7 @@ class DbDynamo implements Db {
 			i++;
 			console.log(`Table ${options.table} scan take ${i}`);
 			try {
-				items = await documentClient.scan(params).promise();
+				items = await this.documentClient.scan(params).promise();
 			} catch (error) {
 				console.log(`Table ${options.table} scan take ${i} ERROR`, error);
 				throw error;
@@ -56,6 +61,25 @@ class DbDynamo implements Db {
 		console.log(`Table ${options.table} scan: ${scanResults.length} results after ${i} scans`);
 		return scanResults;
 	};
+
+	async create(options: DbOptions): Promise<DbModel> {
+		if (undefined === options.data) {
+			return { error: "Missing data to create in the DB!" };
+		}
+		try {
+			let params: DocumentClient.PutItemInput = {
+				TableName: options.table,
+				Item: {},
+			};
+			for (let key in options.data) {
+				params.Item[key] = options.data[key];
+			}
+			let r: DocumentClient.PutItemOutput = await this.documentClient.put(params).promise();
+			return options.data;
+		} catch (error) {
+			return { error: error };
+		}
+	}
 }
 
 export default DbDynamo;

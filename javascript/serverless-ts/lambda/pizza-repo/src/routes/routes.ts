@@ -18,7 +18,12 @@ class Routes {
 				method: 'GET',
 				path: '/pizzas/:{pizzaType}',
 				handler: async (request) => await this.repo.getByType(request.params.pizzaType)
-			}
+			},
+			{
+				method: 'POST',
+				path: '/pizzas',
+				handler: async (request) => await this.repo.create(request.payload)
+			},
 		];
 	}
 }
