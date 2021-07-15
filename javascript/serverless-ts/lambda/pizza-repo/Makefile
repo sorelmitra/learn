@@ -1,4 +1,4 @@
-BUNDLE_NAME := pizzemQueryPizza
+BUNDLE_NAME := pizzem-repo
 TARGET_DIR := ../../target/${BUNDLE_NAME}
 DIST_CODE_DIR := ${TARGET_DIR}/dist
 BUNDLE_DIR_NAME := bundle
