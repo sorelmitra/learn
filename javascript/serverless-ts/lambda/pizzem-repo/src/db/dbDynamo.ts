@@ -80,6 +80,28 @@ class DbDynamo implements Db {
 			return { error: error };
 		}
 	}
+
+	async delete(options: DbOptions): Promise<DbModel> {
+		if (undefined === options.id) {
+			return { error: "Missing data to create in the DB!" };
+		}
+		try {
+			let params: DocumentClient.DeleteItemInput = {
+				TableName: options.table,
+				Key: {
+					id: options.id,
+				},
+			};
+			let r: DocumentClient.DeleteItemOutput = await this.documentClient.delete(params).promise();
+			return {
+				id: options.id,
+				pizzaType: "not implemented",
+				status: "not implemented",
+			};
+		} catch (error) {
+			return { error: error };
+		}
+	}
 }
 
 export default DbDynamo;

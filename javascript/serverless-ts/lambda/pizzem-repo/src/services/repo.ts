@@ -6,7 +6,7 @@ class Repo {
 		this.db = db;
 	}
 
-	async getAll() {
+	async getAllPizzas() {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
 			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
 		}
@@ -15,7 +15,7 @@ class Repo {
 		});
 	}
 
-	async getByType(type: string) {
+	async getPizzaByType(type: string) {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
 			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
 		}
@@ -28,13 +28,33 @@ class Repo {
 		});
 	}
 
-	create(pizza: Pizza) {
+	createPizza(pizza: Pizza) {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
 			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
 		}
 		return this.db.create({
 			table: process.env.PIZZA_TYPES_TABLE,
 			data: pizza,
+		});
+	}
+
+	createOrder(order: Order) {
+		if (undefined === process.env.PIZZA_ORDERS_TABLE) {
+			return [{ error: "Missing environment variable PIZZA_ORDERS_TABLE!" }];
+		}
+		return this.db.create({
+			table: process.env.PIZZA_ORDERS_TABLE,
+			data: order,
+		});
+	}
+
+	deleteOrder(id: string) {
+		if (undefined === process.env.PIZZA_ORDERS_TABLE) {
+			return [{ error: "Missing environment variable PIZZA_ORDERS_TABLE!" }];
+		}
+		return this.db.delete({
+			table: process.env.PIZZA_ORDERS_TABLE,
+			id: id,
 		});
 	}
 }

@@ -6,17 +6,19 @@ export type DbOptions = {
 		value: string;
 	};
 	data?: DbModel;
+	id?: string;
 };
 
 export type DbError = {
 	error: any;
 };
 
-export type DbModel = Pizza | DbError;
+export type DbModel = Pizza | Order | DbError;
 
 export interface Db {
 	getAll(options: DbOptions): Promise<DbModel[]>;
 	create(options: DbOptions): Promise<DbModel>;
+	delete(options: DbOptions): Promise<DbModel>;
 }
 
 export class DbUtils {

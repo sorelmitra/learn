@@ -12,17 +12,27 @@ class Routes {
 			{
 				method: 'GET',
 				path: '/pizzas',
-				handler: async (request) => await this.repo.getAll()
+				handler: async (request) => await this.repo.getAllPizzas()
 			},
 			{
 				method: 'GET',
 				path: '/pizzas/:{pizzaType}',
-				handler: async (request) => await this.repo.getByType(request.params.pizzaType)
+				handler: async (request) => await this.repo.getPizzaByType(request.params.pizzaType)
 			},
 			{
 				method: 'POST',
 				path: '/pizzas',
-				handler: async (request) => await this.repo.create(request.payload)
+				handler: async (request) => await this.repo.createPizza(request.payload)
+			},
+			{
+				method: 'POST',
+				path: '/orders',
+				handler: async (request) => await this.repo.createOrder(request.payload)
+			},
+			{
+				method: 'DELETE',
+				path: '/orders/:{id}',
+				handler: async (request) => await this.repo.deleteOrder(request.params.id)
 			},
 		];
 	}
