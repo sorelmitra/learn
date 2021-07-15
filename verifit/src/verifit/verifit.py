@@ -96,16 +96,19 @@ def start_command(command):
 def get_other_filename(filename):
 	return script_path(f"{filename}")
 
-def get_input_filename(name):
+def get_input_filename():
+	name = inspect.stack()[1][3]
 	return script_path(f"{name}.json")
 
-def get_output_filename(name):
+def get_output_filename():
+	name = inspect.stack()[1][3]
 	return script_path(f"{name}-answer.json")
 
 def get_expected_output_filename(name):
 	return script_path(f"{name}-expected.json")
 
-def run_test(command, name):
+def run_test(command):
+	name = inspect.stack()[1][3]
 	input_filename = script_path(f"{name}.json")
 	output_filename = script_path(f"{name}-answer.json")
 	expected_output_filename = script_path(f"{name}-expected.json")
