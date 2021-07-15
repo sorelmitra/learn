@@ -1,7 +1,7 @@
 {
-  "name": "pizzem-querry-pizza",
+  "name": "pizzem-repo",
   "version": "1.0.0",
-  "description": "Query for pizza in the dummy pizzem project",
+  "description": "Pizza repo in the dummy pizzem project",
   "main": "src/index.js",
   "scripts": {
     "lint": "npx standard --fix && npx standard",

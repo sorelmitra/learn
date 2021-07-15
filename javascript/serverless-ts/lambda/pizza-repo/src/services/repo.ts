@@ -1,6 +1,6 @@
 import { Db } from "../db/db";
 
-class Query {
+class Repo {
 	db: Db;
 	constructor(db: Db) {
 		this.db = db;
@@ -29,4 +29,4 @@ class Query {
 	}
 }
 
-export default Query;
+export default Repo;

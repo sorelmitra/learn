@@ -20,11 +20,11 @@ Tech stack: TypeScript, node.js, hapi.js, DynamoDB, DynamoDB Streams, S3, SQS, S
 Data flows:
 
 ```
-Query Pizza Types -> Lambda pizzemQueryPizza -> DynamoDB -> HTTPS
+Query Pizza Types -> Lambda pizzemRepo -> DynamoDB -> HTTPS
 
-Query Orders by Email -> Lambda pizzemQueryOrder -> DynamoDB -> HTTPS
+Query Orders by Email -> Lambda pizzemRepo -> DynamoDB -> HTTPS
 
-Order Change Request -> Lambda pizzemUpdateOrder -> Dynamo DB -> Streams ->
+Order Change Request -> Lambda pizzemRepo -> Dynamo DB -> Streams ->
 	-> Lambda pizzemChangeRequest (*) -> SNS (*y) ->
 		Lambda pizzemEnqueueEmailOrderUpdate -> SQS ->
 			-> Lambda pizzemEmailOrderUpdate -> SES -> Send Email

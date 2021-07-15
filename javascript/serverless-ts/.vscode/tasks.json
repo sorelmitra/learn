@@ -25,10 +25,10 @@
 		{
 			"type": "npm",
 			"script": "test",
-			"path": "lambda/pizza-query/",
+			"path": "lambda/pizza-repo/",
 			"group": "test",
 			"problemMatcher": [],
-			"label": "unit - lambda/pizza-query",
+			"label": "unit - lambda/pizza-repo",
 			"detail": "jest -c jest.config.unit.js"
 		}
 	]

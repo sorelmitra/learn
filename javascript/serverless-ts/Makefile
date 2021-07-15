@@ -1,9 +1,9 @@
-lambdas: lambda_query
+lambdas: lambda_repo
 
 test:
 	pytest .
 
-lambda_query:
-	cd lambda/pizza-query && make
+lambda_repo:
+	cd lambda/pizza-repo && make
 
 .PHONY: test lambdas
