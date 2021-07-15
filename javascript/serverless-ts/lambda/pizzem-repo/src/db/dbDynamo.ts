@@ -30,11 +30,11 @@ class DbDynamo implements Db {
 		};
 
 		if (options.filter) {
-			params.FilterExpression = `#type = :this_type`;
+			params.FilterExpression = `#id_field_name = :id_field_value`;
 			params.ExpressionAttributeNames = {};
-			params.ExpressionAttributeNames[`#type`] = `type`;
+			params.ExpressionAttributeNames[`#id_field_name`] = options.filter.name;
 			params.ExpressionAttributeValues = {
-				":this_type": options.filter.value
+				":id_field_value": options.filter.value
 			};
 		}
 
@@ -76,6 +76,41 @@ class DbDynamo implements Db {
 			}
 			let r: DocumentClient.PutItemOutput = await this.documentClient.put(params).promise();
 			return options.data;
+		} catch (error) {
+			return { error: error };
+		}
+	}
+
+	async patch(options: DbOptions): Promise<DbModel> {
+		if (undefined === options.patch) {
+			return { error: "Missing patch in the DB!" };
+		}
+		let m: DbModel[] = await this.getAll({
+			table: options.table,
+			filter: {
+				name: options.patch.id.key,
+				value: options.patch.id.value,
+			}
+		});
+		console.log("patch find item result", m);
+		if (m.length < 1) {
+			return { error: `Couldn't find item with id ${options.patch.id.value} in table ${options.table}` };
+		}
+		let existingItem = m[0];
+		for (let key in options.patch.data) {
+			existingItem[key] = options.patch.data[key];
+		}
+		try {
+			let params: DocumentClient.PutItemInput = {
+				TableName: options.table,
+				Item: {},
+			};
+			for (let key in existingItem) {
+				params.Item[key] = existingItem[key];
+			}
+			console.log("patch item", params.Item);
+			let r: DocumentClient.PutItemOutput = await this.documentClient.put(params).promise();
+			return existingItem;
 		} catch (error) {
 			return { error: error };
 		}

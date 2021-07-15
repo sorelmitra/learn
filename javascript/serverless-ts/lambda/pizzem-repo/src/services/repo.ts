@@ -48,6 +48,22 @@ class Repo {
 		});
 	}
 
+	patchOrder(id: string, payload: any) {
+		if (undefined === process.env.PIZZA_ORDERS_TABLE) {
+			return [{ error: "Missing environment variable PIZZA_ORDERS_TABLE!" }];
+		}
+		return this.db.patch({
+			table: process.env.PIZZA_ORDERS_TABLE,
+			patch: {
+				id: {
+					key: "id",
+					value: id,
+				},
+				data: payload
+			}
+		});
+	}
+
 	deleteOrder(id: string) {
 		if (undefined === process.env.PIZZA_ORDERS_TABLE) {
 			return [{ error: "Missing environment variable PIZZA_ORDERS_TABLE!" }];

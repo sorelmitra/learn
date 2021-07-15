@@ -34,6 +34,11 @@ class Routes {
 				path: '/orders/:{id}',
 				handler: async (request) => await this.repo.deleteOrder(request.params.id)
 			},
+			{
+				method: 'patch',
+				path: '/orders/:{id}',
+				handler: async (request) => await this.repo.patchOrder(request.params.id, request.payload)
+			},
 		];
 	}
 }
