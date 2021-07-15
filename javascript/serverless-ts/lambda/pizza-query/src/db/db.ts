@@ -1,6 +1,10 @@
 
 export type DbOptions = {
 	table: string;
+	filter?: {
+		name: string;
+		value: string;
+	}
 };
 
 export type DbError = {

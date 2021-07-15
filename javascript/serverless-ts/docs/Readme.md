@@ -36,3 +36,13 @@ Order Change Request -> Lambda pizzemUpdateOrder -> Dynamo DB -> Streams ->
 (*) As per https://stackoverflow.com/questions/38576679/multiple-aws-lambda-functions-on-a-single-dynamodb-stream, DynamoDB Streams doesn't want more than two lambdas listening on it, so to support extending the system it's a good design decision to have a single Lambda that listens on DynamoDB Streams and publish to SNS.
 
 (*y) SNS might not seem obvious here but it helps resolve an important problem: decoupling the Lambda that notifies of the change from the (possibly many) other Lambdas that do particular processing of that change.
+
+# AWS Configuration
+
+## API Gateway & `Hapi` Routes
+
+I created a single API.  For each relevant REST path I created a resource with Lambda Function and `Use Lambda Proxy Integration` checked under `<Method>` -> Integration Request.
+
+I created an API key for accessing the API and passed it under the `x-api-key` header.
+
+In `Hapi`, each API Gateway resource has its own route.

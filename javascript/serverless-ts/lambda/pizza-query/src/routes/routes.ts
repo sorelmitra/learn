@@ -11,8 +11,13 @@ class Routes {
 		return [
 			{
 				method: 'GET',
-				path: '/pizzemQueryPizza',
-				handler: async (request) => await this.query.run(request)
+				path: '/pizzas',
+				handler: async (request) => await this.query.getAll()
+			},
+			{
+				method: 'GET',
+				path: '/pizzas/:{pizzaType}',
+				handler: async (request) => await this.query.getByType(request.params.pizzaType)
 			}
 		];
 	}
