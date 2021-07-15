@@ -11,26 +11,27 @@ You need to create a system for a pizza ordering app. This system should be desi
 - I must be notified via email each time the status of my order changes (e.g. order received, order being prepared, order being delivered, etc.)
 - A receipt has to be generated and stored in S3 for each order (don’t get fancy with it, a .txt will do). Once generated and saved, a copy of the file has to be sent to the customer’s provided email.
 
-Tech stack: TypeScript, node.js, hapi.js, DynamoDB, DynamoDB Streams, S3, SQS, SNS, Lambda, Serverless Framework, SES
+Tech stack: TypeScript, Node.JS, `Hapi.Dev`, DynamoDB, DynamoDB Streams, S3, SQS, SNS, Lambda, Serverless Framework, SES
 
 - AWS SNS & SQS: https://stackoverflow.com/a/13692720/6239668
 - AWS DynamoDB Streams use cases & more: https://dynobase.dev/dynamodb-streams/
-- Node.JS Express vs Hapi: https://www.simform.com/express-vs-hapi/
+- Node.JS Express vs `Hapi`: https://www.simform.com/express-vs-hapi/
 
 Data flows:
 
 ```
-Query Pizza Types -> Lambda pizzemRepo -> DynamoDB -> HTTPS
+Query Pizza Types -> Lambda pizzem-repo -> DynamoDB -> HTTPS
+Create Pizza Types -> Lambda pizzem-repo -> DynamoDB -> HTTPS
 
-Query Orders by Email -> Lambda pizzemRepo -> DynamoDB -> HTTPS
+Query Orders by Email -> Lambda pizzem-repo -> DynamoDB -> HTTPS
 
-Order Change Request -> Lambda pizzemRepo -> Dynamo DB -> Streams ->
-	-> Lambda pizzemChangeRequest (*) -> SNS (*y) ->
-		Lambda pizzemEnqueueEmailOrderUpdate -> SQS ->
-			-> Lambda pizzemEmailOrderUpdate -> SES -> Send Email
-		Lambda pizzemEnqueueSaveReceipt -> SQS -> 
-			Lambda pizzemSaveReceipt -> S3 -> Store receipt -> SQS -> 
-				-> Lambda pizzemEmailReceipt -> SES -> Send Email
+Order Change Request -> Lambda pizzem-repo -> Dynamo DB -> Streams ->
+	-> Lambda pizzem-repo-observer (*) -> SNS (*y) ->
+		Lambda pizzem-order-observer -> SQS ->
+			-> Lambda pizzem-order-email -> SES -> Send Email
+		Lambda pizzem-receipt-observer -> SQS -> 
+			Lambda pizzem-receipt-store -> S3 -> Store receipt -> SQS -> 
+				-> Lambda pizzem-receipt-email -> SES -> Send Email
 ```
 
 (*) As per https://stackoverflow.com/questions/38576679/multiple-aws-lambda-functions-on-a-single-dynamodb-stream, DynamoDB Streams doesn't want more than two lambdas listening on it, so to support extending the system it's a good design decision to have a single Lambda that listens on DynamoDB Streams and publish to SNS.

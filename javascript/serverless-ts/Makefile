@@ -4,6 +4,6 @@ test:
 	pytest .
 
 lambda_repo:
-	cd lambda/pizza-repo && make
+	cd lambda/pizzem-repo && make
 
 .PHONY: test lambdas
