@@ -4,12 +4,32 @@
 		{
 			"type": "shell",
 			"command": [
-				"make", "lambdas", "test"
+				"make",
+				"lambdas",
+				"test"
 			],
-			"problemMatcher": [
-			],
+			"problemMatcher": [],
 			"group": "build",
 			"label": "lambdas - deploy & test"
+		},
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"test"
+			],
+			"problemMatcher": [],
+			"group": "test",
+			"label": "lambdas - test"
+		},
+		{
+			"type": "npm",
+			"script": "test",
+			"path": "lambda/pizza-query/",
+			"group": "test",
+			"problemMatcher": [],
+			"label": "unit - lambda/pizza-query",
+			"detail": "jest -c jest.config.unit.js"
 		}
 	]
 }
