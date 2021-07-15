@@ -24,7 +24,7 @@ prodprep:
 
 zip:
 	mkdir -p ${BUNDLE_DIR}
-	cd ${DIST_CODE_DIR} && zip -r ../${BUNDLE_DIR_NAME}/${TARGET_ZIP} .
+	cd ${DIST_CODE_DIR} && zip -r -q ../${BUNDLE_DIR_NAME}/${TARGET_ZIP} .
 
 bundle: compile prodprep zip
 

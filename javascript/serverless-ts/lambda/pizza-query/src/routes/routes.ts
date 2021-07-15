@@ -12,15 +12,7 @@ class Routes {
 			{
 				method: 'GET',
 				path: '/pizzemQueryPizza',
-				handler: async (request) => {
-					try {
-						return await this.query.run(request);
-					} catch (error) {
-						return {
-							oooooops: error
-						}
-					}
-				}
+				handler: async (request) => await this.query.run(request)
 			}
 		];
 	}

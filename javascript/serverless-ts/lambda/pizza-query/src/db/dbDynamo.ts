@@ -2,18 +2,19 @@ import { AWSError } from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { PromiseResult } from 'aws-sdk/lib/request';
 
-import { Db, DbModel, DbOptions } from "./db";
+import { Db, DbModel, DbOptions, DbUtils } from "./db";
 
 class DbDynamo implements Db {
 	async getAll(options: DbOptions): Promise<DbModel[]> {
 		console.log("DynamoDB entry");
 		let values: DbModel[] = [];
 		try {
-			let r = await this.scanTable(options.table);
+			let r: DocumentClient.AttributeMap[] = await this.scanTable(options.table);
 			console.log(`Scan ${options.table} results`, r);
+			r.forEach(item => values.push(DbUtils.convert(item)));
 			return values;
 		} catch (error) {
-			throw error;
+			return [{ error: error }];
 		}
 	}
 
@@ -36,7 +37,7 @@ class DbDynamo implements Db {
 				throw error;
 			}
 			if (undefined === items.Items) {
-				console.log(`Table ${tableName} scan: NO results`);
+				console.log(`Table ${tableName} scan: no results`);
 				return scanResults;
 			}
 			items.Items.forEach((item) => scanResults.push(item));
