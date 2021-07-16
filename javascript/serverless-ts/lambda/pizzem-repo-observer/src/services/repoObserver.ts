@@ -20,14 +20,17 @@ export class RepoObserver {
 		this.eventHandlers[event] = handler;
 	}
 
-	process(dynamoDbRecords: any) {
+	process(dynamoDbRecords: any): number {
+		let n = 0;
 		dynamoDbRecords.forEach((record) => {
 			console.log('DynamoDB Stream record', JSON.stringify(record, null, 2));
 
 			if (record.eventName == 'INSERT') {
 				this.processInsertEvent(record);
+				n++;
 			}
 		});
+		return n;
 	}
 
 	private processInsertEvent(record: any) {

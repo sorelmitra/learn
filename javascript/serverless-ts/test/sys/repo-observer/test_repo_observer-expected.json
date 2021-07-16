@@ -1,1 +1,11 @@
-"Processed 1 events"
+[
+	{
+		"originalEvent": {
+			"id": "13",
+			"pizzaType": "vegan",
+			"oldStatus": "received",
+			"newStatus": "processing"
+		},
+		"status": "Success: Published to arn:aws:sns:us-east-1:676878834678:pizzem-order-changes"
+	}
+]
