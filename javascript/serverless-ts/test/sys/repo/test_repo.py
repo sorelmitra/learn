@@ -1,5 +1,5 @@
 from verifit import *
-import re, string, time
+import re, time
 
 apiKey = "18yKKTwlod4V7bSRAK2wK2Vn1GObHPV13nUMXx4w"
 server = "https://5jej7wt976.execute-api.us-east-1.amazonaws.com/DEV"
