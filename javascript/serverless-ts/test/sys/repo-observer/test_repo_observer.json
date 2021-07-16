@@ -1,0 +1,40 @@
+{
+    "Records": [
+        {
+            "eventID": "7de3041dd709b024af6f29e4fa13d34c",
+            "eventName": "INSERT",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "region",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1626442914000,
+                "Keys": {
+                    "id": {
+                        "S": "13"
+                    },
+                    "pizzaType": {
+                        "S": "vegan"
+                    },
+					"status": {
+						"S": "received"
+					}
+                },
+                "NewImage": {
+                    "id": {
+                        "S": "13"
+                    },
+                    "pizzaType": {
+                        "S": "vegan"
+                    },
+					"status": {
+						"S": "processing"
+					}
+                },
+                "SequenceNumber": "13021600000000001596893679",
+                "SizeBytes": 112,
+                "StreamViewType": "NEW_IMAGE"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:us-east-1:676878834678:table/pizzem-orders/stream/2021-07-16T09:53:03.799"
+        }
+    ]
+}
