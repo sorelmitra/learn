@@ -1,7 +1,7 @@
 import OrderStatusChangeEvent from "../models/orderStatusChangeEvent";
 
 export enum RepoObserverEvents {
-	INSERT = "INSERT",
+	MODIFY = "MODIFY",
 }
 
 type EventHandler = (orderEvent: OrderStatusChangeEvent) => void;
@@ -11,7 +11,7 @@ export class RepoObserver {
 	eventKeyMapping = {
 		id: ["NewImage", "id"],
 		pizzaType: ["NewImage", "pizzaType"],
-		oldStatus: ["Keys", "status"],
+		oldStatus: ["OldImage", "status"],
 		newStatus: ["NewImage", "status"],
 	}
 	constructor() {}
@@ -25,23 +25,27 @@ export class RepoObserver {
 		dynamoDbRecords.forEach((record) => {
 			console.log('DynamoDB Stream record', JSON.stringify(record, null, 2));
 
-			if (record.eventName == 'INSERT') {
-				this.processInsertEvent(record);
+			if (record.eventName == RepoObserverEvents.MODIFY) {
+				this.processModifyEvent(record);
 				n++;
 			}
 		});
 		return n;
 	}
 
-	private processInsertEvent(record: any) {
+	private processModifyEvent(record: any) {
 		let orderEvent: OrderStatusChangeEvent = new OrderStatusChangeEvent();
 		for (let key in this.eventKeyMapping) {
 			let image: string = this.eventKeyMapping[key][0];
 			let imageKey: string = this.eventKeyMapping[key][1];
-			orderEvent[key] = record.dynamodb[image][imageKey].S;
+			if (undefined === record.dynamodb[image]) {
+				orderEvent[key] = null;
+			} else {
+				orderEvent[key] = record.dynamodb[image][imageKey].S;
+			}
 		}
 		console.log("orderEvent", orderEvent);
-		this.invokeEventHandler(RepoObserverEvents.INSERT, orderEvent);
+		this.invokeEventHandler(RepoObserverEvents.MODIFY, orderEvent);
 	}
 
 	private invokeEventHandler(event: RepoObserverEvents, orderEvent: OrderStatusChangeEvent) {

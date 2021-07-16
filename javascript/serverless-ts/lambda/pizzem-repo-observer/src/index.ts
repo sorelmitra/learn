@@ -11,7 +11,7 @@ export const handler = async (event, context) => {
 
 	return new Promise<EventNotifierPublishResult[]>((resolve, reject) => {
 		let publishedEvents: EventNotifierPublishResult[] = [];
-		repoObserver.on(RepoObserverEvents.INSERT, 
+		repoObserver.on(RepoObserverEvents.MODIFY, 
 			async (orderEvent: OrderStatusChangeEvent) => {
 				try {
 					let r: EventNotifierPublishResult = await repoEventsNotifier.publish(orderEvent);

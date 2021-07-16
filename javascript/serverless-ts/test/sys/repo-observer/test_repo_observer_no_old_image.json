@@ -2,7 +2,7 @@
     "Records": [
         {
             "eventID": "7de3041dd709b024af6f29e4fa13d34c",
-            "eventName": "MODIFY",
+            "eventName": "INSERT",
             "eventVersion": "1.1",
             "eventSource": "aws:dynamodb",
             "awsRegion": "region",
@@ -22,17 +22,6 @@
                     },
 					"status": {
 						"S": "processing"
-					}
-                },
-                "OldImage": {
-                    "id": {
-                        "S": "13"
-                    },
-                    "pizzaType": {
-                        "S": "vegan"
-                    },
-					"status": {
-						"S": "received"
 					}
                 },
                 "SequenceNumber": "13021600000000001596893679",
