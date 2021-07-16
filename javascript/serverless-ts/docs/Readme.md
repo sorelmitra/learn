@@ -26,7 +26,7 @@ Create Pizza Types -> Lambda pizzem-repo -> DynamoDB -> HTTPS
 Query Orders by Email -> Lambda pizzem-repo -> DynamoDB -> HTTPS
 
 Order Change Request -> Lambda pizzem-repo -> Dynamo DB -> Streams ->
-	-> Lambda pizzem-repo-observer (*) -> SNS (*y) ->
+	-> Lambda (*r) pizzem-repo-observer (*) -> SNS (*y) ->
 		Lambda pizzem-order-observer -> SQS ->
 			-> Lambda pizzem-order-email -> SES -> Send Email
 		Lambda pizzem-receipt-observer -> SQS -> 
@@ -37,6 +37,8 @@ Order Change Request -> Lambda pizzem-repo -> Dynamo DB -> Streams ->
 (*) As per https://stackoverflow.com/questions/38576679/multiple-aws-lambda-functions-on-a-single-dynamodb-stream, DynamoDB Streams doesn't want more than two lambdas listening on it, so to support extending the system it's a good design decision to have a single Lambda that listens on DynamoDB Streams and publish to SNS.
 
 (*y) SNS might not seem obvious here but it helps resolve an important problem: decoupling the Lambda that notifies of the change from the (possibly many) other Lambdas that do particular processing of that change.
+
+(*r) As per https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
 
 # AWS Configuration
 

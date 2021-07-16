@@ -1,35 +1,125 @@
 {
 	"version": "2.0.0",
 	"tasks": [
+		/*
+		 *
+		 *
+		 * Build & Deploy
+		 *
+		 *
+		 */
 		{
 			"type": "shell",
 			"command": [
 				"make",
 				"lambdas",
-				"test"
+				"autotest"
 			],
 			"problemMatcher": [],
 			"group": "build",
-			"label": "lambdas - deploy & test"
+			"label": "Deploy & Autotest all lambdas"
 		},
 		{
 			"type": "shell",
 			"command": [
 				"make",
-				"test"
+				"lambda_repo",
+				"autotest_lambda_repo"
+			],
+			"problemMatcher": [],
+			"group": "build",
+			"label": "Deploy & Autotest lambda/pizzem-repo"
+		},
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"lambda_repo_observer",
+				"autotest_lambda_repo_observer"
+			],
+			"problemMatcher": [],
+			"group": "build",
+			"label": "Deploy & Autotest lambda/pizzem-repo-observer"
+		},
+
+
+
+		/*
+		 *
+		 *
+		 * Autotest
+		 *
+		 *
+		 */
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"autotest"
 			],
 			"problemMatcher": [],
 			"group": "test",
-			"label": "lambdas - test"
+			"label": "Autotest all lambdas"
 		},
 		{
-			"type": "npm",
-			"script": "test",
-			"path": "lambda/pizza-repo/",
-			"group": "test",
+			"type": "shell",
+			"command": [
+				"make",
+				"autotest_lambda_repo"
+			],
 			"problemMatcher": [],
-			"label": "unit - lambda/pizza-repo",
-			"detail": "jest -c jest.config.unit.js"
-		}
+			"group": "test",
+			"label": "Autotest lambda/pizzem-repo"
+		},
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"autotest_lambda_repo_observer"
+			],
+			"problemMatcher": [],
+			"group": "test",
+			"label": "Autotest lambda/pizzem-repo-observer"
+		},
+
+
+
+		/*
+		 *
+		 *
+		 * Unit Test
+		 *
+		 *
+		 */
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"unittest_lambda_repo"
+			],
+			"problemMatcher": [],
+			"group": "test",
+			"label": "Unit Test lambda/pizzem-repo"
+		},
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"unittest_lambda_repo_observer"
+			],
+			"problemMatcher": [],
+			"group": "test",
+			"label": "Unit Test lambda/pizzem-repo-observer"
+		},
+		{
+			"type": "shell",
+			"command": [
+				"make",
+				"unittest"
+			],
+			"problemMatcher": [],
+			"group": "test",
+			"label": "Unit Test all lambdas"
+		},
 	]
 }

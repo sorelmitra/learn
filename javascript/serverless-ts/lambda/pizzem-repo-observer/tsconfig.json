@@ -10,7 +10,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "outDir": "../../target/pizzem-repo/dist",
+    "outDir": "../../target/pizzem-repo-observer/dist",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
