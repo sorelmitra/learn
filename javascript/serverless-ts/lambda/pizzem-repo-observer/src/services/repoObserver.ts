@@ -8,6 +8,12 @@ type EventHandler = (orderEvent: OrderStatusChangeEvent) => void;
 
 export class RepoObserver {
 	eventHandlers = {};
+	eventKeyMapping = {
+		id: ["NewImage", "id"],
+		pizzaType: ["NewImage", "pizzaType"],
+		oldStatus: ["Keys", "status"],
+		newStatus: ["NewImage", "status"],
+	}
 	constructor() {}
 
 	on(event: RepoObserverEvents, handler: EventHandler) {
@@ -26,15 +32,9 @@ export class RepoObserver {
 
 	private processInsertEvent(record: any) {
 		let orderEvent: OrderStatusChangeEvent = new OrderStatusChangeEvent();
-		let keyMapping = {
-			id: ["NewImage", "id"],
-			pizzaType: ["NewImage", "pizzaType"],
-			oldStatus: ["Keys", "status"],
-			newStatus: ["NewImage", "status"],
-		}
-		for (let key in keyMapping) {
-			let image: string = keyMapping[key][0];
-			let imageKey: string = keyMapping[key][1];
+		for (let key in this.eventKeyMapping) {
+			let image: string = this.eventKeyMapping[key][0];
+			let imageKey: string = this.eventKeyMapping[key][1];
 			orderEvent[key] = record.dynamodb[image][imageKey].S;
 		}
 		console.log("orderEvent", orderEvent);

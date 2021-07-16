@@ -15,4 +15,5 @@ export const handler = async (event, context) => {
 		});
 	
 	repoObserver.process(event.Records);
+	return `Processed ${0} events`;
 };
