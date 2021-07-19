@@ -1,0 +1,21 @@
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:676878834678:pizzem-order-changes:245adb30-935b-4840-80b6-377741b7cdc5",
+      "Sns":"",
+      "Type": "Notification",
+      "MessageId": "dab8b490-4db3-5a2e-9ffd-edff3fcee203",
+      "TopicArn": "arn:aws:sns:us-east-1:676878834678:pizzem-order-changes",
+      "Subject": "Pizza order 15 changed from processing to payed",
+      "Message": "{\"id\":\"15\",\"pizzaType\":\"lungalola\",\"oldStatus\":\"processing\",\"newStatus\":\"payed\"}",
+      "Timestamp": "2021-07-19T12:29:49.330Z",
+      "SignatureVersion": "1",
+      "Signature": "sign9348",
+      "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-010a507c1833636cd94bdb98bd93083a.pem",
+      "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:676878834678:pizzem-order-changes:245adb30-935b-4840-80b6-377741b7cdc5",
+      "MessageAttributes": {}
+    }
+  ]
+}
