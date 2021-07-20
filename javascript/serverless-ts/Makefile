@@ -5,6 +5,7 @@ lambdas_deploy = \
 	order_observer.deploy \
 	receipt_observer.deploy \
 	order_email.deploy \
+	receipt_store.deploy \
 
 lambdas_unittest = $(lambdas_deploy:deploy=unittest)
 lambdas_autotest = $(lambdas_deploy:deploy=autotest)
@@ -14,12 +15,14 @@ repo_observer.dir := lambda/pizzem-repo-observer
 order_observer.dir := lambda/pizzem-order-observer
 receipt_observer.dir := lambda/pizzem-receipt-observer
 order_email.dir := lambda/pizzem-order-email
+receipt_store.dir := lambda/pizzem-receipt-store
 
 repo.autotest.dir := test/sys/repo
 repo_observer.autotest.dir := test/sys/repo-observer
 order_observer.autotest.dir := test/sys/order-observer
 receipt_observer.autotest.dir := test/sys/receipt-observer
 order_email.autotest.dir := test/sys/order-email
+receipt_store.autotest.dir := test/sys/receipt-store
 
 deploy: $(lambdas_deploy)
 
