@@ -1,53 +1,41 @@
-DIR_LAMBDA_REPO := lambda/pizzem-repo
-DIR_LAMBDA_REPO_OBSERVER := lambda/pizzem-repo-observer
-DIR_LAMBDA_ORDER_OBSERVER := lambda/pizzem-order-observer
-DIR_LAMBDA_RECEIPT_OBSERVER := lambda/pizzem-receipt-observer
 
-DIR_AUTOTEST_LAMBDA_REPO := test/sys/repo
-DIR_AUTOTEST_LAMBDA_REPO_OBSERVER := test/sys/repo-observer
-DIR_AUTOTEST_LAMBDA_ORDER_OBSERVER := test/sys/order-observer
-DIR_AUTOTEST_LAMBDA_RECEIPT_OBSERVER := test/sys/receipt-observer
+lambdas_deploy = \
+	repo.deploy \
+	repo_observer.deploy \
+	order_observer.deploy \
+	receipt_observer.deploy \
+	order_email.deploy \
 
-lambdas: lambda_repo lambda_repo_observer lambda_order_observer lambda_receipt_observer
+lambdas_unittest = $(lambdas_deploy:deploy=unittest)
+lambdas_autotest = $(lambdas_deploy:deploy=autotest)
 
-lambda_repo:
-	cd $(DIR_LAMBDA_REPO) && make
+repo.dir := lambda/pizzem-repo
+repo_observer.dir := lambda/pizzem-repo-observer
+order_observer.dir := lambda/pizzem-order-observer
+receipt_observer.dir := lambda/pizzem-receipt-observer
+order_email.dir := lambda/pizzem-order-email
 
-lambda_repo_observer:
-	cd $(DIR_LAMBDA_REPO_OBSERVER) && make
+repo.autotest.dir := test/sys/repo
+repo_observer.autotest.dir := test/sys/repo-observer
+order_observer.autotest.dir := test/sys/order-observer
+receipt_observer.autotest.dir := test/sys/receipt-observer
+order_email.autotest.dir := test/sys/order-email
 
-lambda_order_observer:
-	cd $(DIR_LAMBDA_ORDER_OBSERVER) && make
+deploy: $(lambdas_deploy)
 
-lambda_receipt_observer:
-	cd $(DIR_LAMBDA_RECEIPT_OBSERVER) && make
+unittest: $(lambdas_unittest)
 
-autotest: autotest_lambda_repo autotest_lambda_repo_observer autotest_lambda_order_observer autotest_lambda_receipt_observer
+autotest: $(lambdas_autotest)
 
-autotest_lambda_repo:
-	pytest $(DIR_AUTOTEST_LAMBDA_REPO)
+%.deploy:
+	$(eval target_name := $(@:.deploy=))
+	cd $($(target_name).dir) && make
 
-autotest_lambda_repo_observer:
-	pytest $(DIR_AUTOTEST_LAMBDA_REPO_OBSERVER)
+%.unittest:
+	$(eval target_name := $(@:.unittest=))
+	cd $($(target_name).dir) && npm test
 
-autotest_lambda_order_observer:
-	pytest $(DIR_AUTOTEST_LAMBDA_ORDER_OBSERVER)
+%.autotest:
+	$(eval target_name := $(@:.autotest=))
+	pytest $($(target_name).autotest.dir)
 
-autotest_lambda_receipt_observer:
-	pytest $(DIR_AUTOTEST_LAMBDA_RECEIPT_OBSERVER)
-
-unittest: unittest_lambda_repo unittest_lambda_repo_observer unittest_lambda_order_observer unittest_lambda_receipt_observer
-
-unittest_lambda_repo:
-	cd $(DIR_LAMBDA_REPO) && npm test
-
-unittest_lambda_repo_observer:
-	cd $(DIR_LAMBDA_REPO_OBSERVER) && npm test
-
-unittest_lambda_order_observer:
-	cd $(DIR_LAMBDA_ORDER_OBSERVER) && npm test
-
-unittest_lambda_receipt_observer:
-	cd $(DIR_LAMBDA_RECEIPT_OBSERVER) && npm test
-
-.PHONY: test autotest_lambda_repo autotest_lambda_repo_observer lambdas lambda_repo lambda_repo_observer

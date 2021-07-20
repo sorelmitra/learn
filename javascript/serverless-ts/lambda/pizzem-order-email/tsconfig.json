@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "noEmit": false,
+    "noImplicitAny": false,
+    "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown", "dom", "esnext"],
+    "module": "commonjs",
+    "target": "es2019",
+    "strict": true,
+    "allowJs": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "../../target/pizzem-order-email/dist",
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  },
+  "include": ["src", "test"]
+}
