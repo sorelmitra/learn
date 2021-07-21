@@ -28,11 +28,11 @@ class Repo {
 		});
 	}
 
-	createPizza(pizza: Pizza) {
+	async createPizza(pizza: Pizza) {
 		if (undefined === process.env.PIZZA_TYPES_TABLE) {
 			return [{ error: "Missing environment variable PIZZA_TYPES_TABLE!" }];
 		}
-		return this.db.create({
+		return await this.db.create({
 			table: process.env.PIZZA_TYPES_TABLE,
 			data: pizza,
 		});

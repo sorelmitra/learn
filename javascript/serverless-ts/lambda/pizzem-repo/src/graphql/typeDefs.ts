@@ -5,9 +5,17 @@ export const typeDefs = gql`
         hello: String
         pizzas(type: String): [Pizza]!
     }
+    input PizzaInput {
+        type: String
+        description: String
+    }
+    type Mutation {
+        createPizza(value: PizzaInput!): Pizza!
+    }
     type Pizza {
         type: String
         description: String
+        error: String
     }
 `;
 

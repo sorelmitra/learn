@@ -1,5 +1,6 @@
 {
   "target": "graphql",
-  "query": "query X($type: String) { pizzas(type: $type) {type description} }",
-  "variables": "{\"type\": \"pepperoni\"}"
+  "query": "query GetPizzasByType($type: String) { pizzas(type: $type) {type description} } mutation AddPizza($newPizza: PizzaInput!) {createPizza(value: $newPizza) {type description error}}",
+  "variables": "{\"type\": \"pepperoni\", \"newPizza\": {\"type\": \"pepperoni\", \"description\": \"Another pepperoni with garlic\"}}",
+  "operationName": "AddPizza"
 }

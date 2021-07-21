@@ -18,6 +18,11 @@ export class Resolvers {
                     return await this.repo.getAllPizzas();
                 },
             },
+            Mutation: {
+                createPizza: async (_obj, args, _context, _info) => {
+                    return await this.repo.createPizza(args.pizza);
+                },
+            }
         };
     }
 }
