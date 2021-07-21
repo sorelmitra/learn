@@ -12,6 +12,10 @@
       {
         "type": "quattro-stagioni",
         "description": "A lot of cheese!"
+      },
+      {
+        "type": "mangoni",
+        "description": "A mango with garlic pizza, ha?"
       }
     ]
   }

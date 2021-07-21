@@ -6,11 +6,11 @@ export const typeDefs = gql`
         pizzas(type: String): [Pizza]!
     }
     input PizzaInput {
-        type: String
-        description: String
+        type: String!
+        description: String!
     }
     type Mutation {
-        createPizza(value: PizzaInput!): Pizza!
+        createPizza(pizza: PizzaInput!): Pizza!
     }
     type Pizza {
         type: String

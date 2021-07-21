@@ -32,4 +32,10 @@ def test_graphql_get_pizzas_by_type():
 	])
 	assert re.sub(r'\s+', "", expected) == re.sub(r'\s+', "", actual)
 
+def test_graphql_create_pizza():
+	expected, actual = run_test(common_command + [
+		"--data", f"@{get_input_filename()}",
+		"-o", get_output_filename(),
+	])
+	assert re.sub(r'\s+', "", expected) == re.sub(r'\s+', "", actual)
 

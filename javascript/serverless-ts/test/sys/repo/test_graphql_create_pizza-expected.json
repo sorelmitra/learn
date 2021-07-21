@@ -1,0 +1,9 @@
+{
+  "data": {
+    "createPizza": {
+      "type": "mangoni",
+      "description": "A mango with garlic pizza, ha?",
+      "error": null
+    }
+  }
+}

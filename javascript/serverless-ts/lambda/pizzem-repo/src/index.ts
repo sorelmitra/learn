@@ -28,7 +28,7 @@ async function graphQlHandler(event, context) {
 }
 
 export const handler = async (event, context) => {
-	if (undefined !== event.body) {
+	if (event.body) {
 		let o = JSON.parse(event.body);
 		if (o.target == "graphql") {
 			return graphQlHandler(event, context);
