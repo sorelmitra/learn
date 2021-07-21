@@ -1,0 +1,4 @@
+{
+  "target": "graphql",
+  "query": "{ hello }"
+}

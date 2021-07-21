@@ -1,0 +1,5 @@
+{
+  "target": "graphql",
+  "query": "query X($type: String) { pizzas(type: $type) {type description} }",
+  "variables": "{\"type\": \"pepperoni\"}"
+}

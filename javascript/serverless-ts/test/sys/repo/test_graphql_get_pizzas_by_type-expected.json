@@ -1,0 +1,10 @@
+{
+  "data": {
+    "pizzas": [
+      {
+        "type": "pepperoni",
+        "description": "Me good!"
+      }
+    ]
+  }
+}

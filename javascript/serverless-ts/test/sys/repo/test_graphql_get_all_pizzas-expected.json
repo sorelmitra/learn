@@ -1,0 +1,18 @@
+{
+  "data": {
+    "pizzas": [
+      {
+        "type": "pepperoni",
+        "description": "Me good!"
+      },
+      {
+        "type": "carbonara",
+        "description": "Eat me!"
+      },
+      {
+        "type": "quattro-stagioni",
+        "description": "A lot of cheese!"
+      }
+    ]
+  }
+}
