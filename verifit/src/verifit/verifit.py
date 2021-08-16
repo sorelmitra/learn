@@ -1,4 +1,4 @@
-import inspect, os, subprocess, sys, pytest, datetime, copy
+import inspect, os, subprocess, sys, pytest, datetime, copy, re
 
 from appium import webdriver
 from selenium.common.exceptions import InvalidSessionIdException
@@ -135,6 +135,44 @@ def run_triggered_background_test(background_test_command, trigger_command, name
 	got = load_file_as_string(output_filename)
 	expected = load_file_as_string(expected_output_filename)
 	return (expected, got)
+
+def read_token():
+	with open("token.txt") as f_token:
+		return f_token.read()
+
+def escape_for_json(str1):
+	str1 = str1.replace('"', '\\"').replace('\n', '\\n').replace('\\', '\\\\')
+	return str1
+
+
+
+###########################################################
+#
+# Tools for GraphQL Testing
+#
+###########################################################
+
+def prepare_graphql_query(template_filename, query_filename, vars_filename, op_name, output_filename):
+	body_filename = template_filename
+	with open(script_path(body_filename)) as f_body:
+		body = f_body.read()
+		with open(script_path(query_filename)) as f_query:
+			query = f_query.read()
+			with open(script_path(vars_filename)) as f_vars:
+				variables = f_vars.read()
+	query = escape_for_json(query)
+	variables = escape_for_json(variables)
+	op_re = re.compile(r'__OPERATION_NAME__')
+	body = op_re.sub(op_name, body)
+	op_query = re.compile(r'__QUERY__')
+	body = op_query.sub(query, body)
+	op_query = re.compile(r'__VARIABLES__')
+	body = op_query.sub(variables, body)
+
+	with open(output_filename, "wt") as f_out:
+		f_out.write(body)
+
+	return output_filename
 
 
 
