@@ -1,26 +1,25 @@
 from verifit import *
 
-def test_websocketin_1():
-	name = "websocketin-1"
 
-	with open(get_other_filename("websocketin-token.txt"), 'r') as f:
-		token = f.read()
+def test_websocketin_1():
+	token = r'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm&notify_self'
+	server = f"wss://demo.piesocket.com/v3/channel_1?api_key={token}"
 
 	trigger_command = [
 		"vitwss", "send",
-		"--input-file", get_input_filename(name), 
-		f"wss://connect.websocket.in/v2/1998?token={token}"
+		"--input-file", get_input_filename(),
+		server
 	]
 
 	background_test_command = [
 		"vitwss", "receive",
 		"--packets-to-receive", "1",
 		"--wait-ms", "10000", 
-		"--output-file", get_output_filename(name),
-		f"wss://connect.websocket.in/v2/1998?token={token}"
+		"--output-file", get_output_filename(),
+		server
 		]
 	
-	expected, got = run_triggered_background_test(
-		background_test_command, trigger_command, name)
-	assert expected == got
+	expected, actual = run_triggered_background_test(
+		background_test_command, trigger_command)
+	assert expected == actual
 

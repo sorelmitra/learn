@@ -1,4 +1,10 @@
-import inspect, os, subprocess, sys, pytest, datetime, copy, re
+import copy
+import datetime
+import inspect
+import os
+import pytest
+import re
+import subprocess
 
 from appium import webdriver
 from selenium.common.exceptions import InvalidSessionIdException
@@ -62,15 +68,16 @@ LOG = Logger()
 ###########################################################
 
 def script_path(filename):
+    # Have tried several ways to get this path, including hardcoded and:
     # dir = sys.path[0] # uses Python Path entries, not reliable
-    # dir = "test/jsonplaceholder" # Hardcoded
+    # This solution is based on reflection.
     # First index is stack function, second index is file name.
     # Partially reliable, works only if
     # - this function is called from within another function from this file,
     #   which in turn is called directly from the test file.
     # Best solution I have so far.
-    dir = os.path.dirname(inspect.stack()[2][1])
-    return os.path.join(dir, filename)
+    current_dir = os.path.dirname(inspect.stack()[2][1])
+    return os.path.join(current_dir, filename)
 
 
 def load_file_as_string(filepath):
@@ -114,7 +121,6 @@ def get_expected_output_filename(name):
 
 def run_test(command):
     name = inspect.stack()[1][3]
-    input_filename = script_path(f"{name}.json")
     output_filename = script_path(f"{name}-answer.json")
     expected_output_filename = script_path(f"{name}-expected.json")
     try:
@@ -124,11 +130,11 @@ def run_test(command):
     run_command(command)
     got = load_file_as_string(output_filename)
     expected = load_file_as_string(expected_output_filename)
-    return (expected, got)
+    return expected, got
 
 
-def run_triggered_background_test(background_test_command, trigger_command, name):
-    input_filename = script_path(f"{name}.json")
+def run_triggered_background_test(background_test_command, trigger_command):
+    name = inspect.stack()[1][3]
     output_filename = script_path(f"{name}-answer.json")
     expected_output_filename = script_path(f"{name}-expected.json")
     try:
@@ -140,7 +146,7 @@ def run_triggered_background_test(background_test_command, trigger_command, name
     background_test.wait()
     got = load_file_as_string(output_filename)
     expected = load_file_as_string(expected_output_filename)
-    return (expected, got)
+    return expected, got
 
 
 def read_token():
@@ -219,17 +225,17 @@ def take_screenshot_and_syslog(driver, device_logger, calling_request):
     __save_log_type(driver, device_logger, calling_request, 'syslog')
 
 
-def __save_log_type(driver, device_logger, calling_request, type):
+def __save_log_type(driver, device_logger, calling_request, log_type):
     logcat_dir = device_logger.logcat_dir
     screenshot_dir = device_logger.screenshot_dir
 
     try:
         driver.save_screenshot(os.path.join(screenshot_dir, calling_request + '.png'))
-        logcat_data = driver.get_log(type)
+        logcat_data = driver.get_log(log_type)
     except InvalidSessionIdException:
         logcat_data = ''
 
-    with open(os.path.join(logcat_dir, '{}_{}.log'.format(calling_request, type)), 'w') as logcat_file:
+    with open(os.path.join(logcat_dir, '{}_{}.log'.format(calling_request, log_type)), 'w') as logcat_file:
         for data in logcat_data:
             data_string = '%s:  %s\n' % (data['timestamp'], data['message'].encode('utf-8'))
             logcat_file.write(data_string)

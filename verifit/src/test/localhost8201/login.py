@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 
+
 def login(driver, wait, link_to_check):
 	driver.get("http://localhost:8201")
 	driver.find_element_by_link_text("Login").click()

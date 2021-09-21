@@ -6,6 +6,7 @@ from selenium.webdriver.support.expected_conditions import presence_of_element_l
 
 from login import *
 
+
 def go_to_your_content(driver, wait):
 	# Login
 	link_text_content = "Your Content"
@@ -13,6 +14,7 @@ def go_to_your_content(driver, wait):
 
 	# Go to Your Content
 	driver.find_element_by_link_text(link_text_content).click()
+
 
 def do_add_content(driver, wait):
 	# Go to Add Content
@@ -26,6 +28,7 @@ def do_add_content(driver, wait):
 	driver.find_element_by_name("title").send_keys(link_text_title)
 	driver.find_element_by_css_selector(f'form>input[type="submit"][value="{link_text_add_content}"]').click()
 	wait.until(presence_of_element_located((By.LINK_TEXT, link_text_title)))
+
 
 def do_update_content(driver, wait):
 	# Go to Update Content
@@ -44,6 +47,7 @@ def do_update_content(driver, wait):
 	driver.find_element_by_css_selector(f'form>input[type="submit"][value="Update Content"]').click()
 	wait.until(presence_of_element_located((By.LINK_TEXT, link_text_title)))
 
+
 def test_content():
 	with webdriver.Chrome() as driver:
 		wait = WebDriverWait(driver, 10)
@@ -51,6 +55,7 @@ def test_content():
 		go_to_your_content(driver, wait)
 		do_add_content(driver, wait)
 		do_update_content(driver, wait)
+
 
 def test_content_wrong():
 	with webdriver.Chrome() as driver:

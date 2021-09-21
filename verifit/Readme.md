@@ -27,9 +27,10 @@ I need to set up a frame that would help me with automatic system testing of the
 1. REST API
 2. SOAP API
 3. WebSockets API
-4. Micro-services (via one of the supported APIs above)
-5. Web UI
-6. Mobile UI, both iOS and Android, ideally cross-platform
+4. GraphQL API
+5. Micro-services (via one of the supported APIs above)
+6. Web UI
+7. Mobile UI, both iOS and Android, ideally cross-platform
 
 ## Types of Data
 
@@ -114,8 +115,8 @@ The directory structure can be inspected in `src/test` and has the following key
 	- `<name>-input.json` is the file to input for the commands in the test case. It will be created manually based on the test requirements.
 	- `<name>-expected.json` is the expected output of the test command.  It will be created manually based on the test requirements. The easiest way is to actually execute the test, verify the result, and once you're sure it's good, copy it with this name.
 	- `<name>-output.json` is the output got during running. Once you verified it's correct, you can overwrite `<name>-expected.json` with it.
-		In the above, `<name>` must correspond to the variable `name` that's defined in `test_*.py`.
-	- Any other file a test case might need. E.g. `websocketin-token.txt`, which contains the token for websocket.in that's used to demo the WebSockets test support.
+		In the above, `<name>` is the part of the test file name that comes after `test_`, e.g. `stuff` for `test_stuff.py`.
+	- Any other file a test case might need.
 
 ## Binary Data Support
 
@@ -137,10 +138,9 @@ Have your `test_*.py` do the following:
 
 - Import `verifit`: `from verifit import *`.
 - Define at least a `test_*()` function. In the function:
-	- Define `name` to the name of the test.
 	- Define `command` to run `curl` with the needed parameters for the service you're testing.
-	- Run the actual test: `expected, got = run_test(command, name)`. 
-	- Assert the result: `assert expected == got`.
+	- Run the actual test: `expected, actual = run_test(command, name)`. 
+	- Assert the result: `assert expected == actual`.
 
 ### Example
 
@@ -169,17 +169,37 @@ Have your `test_*.py` do the following:
 
 - Import `verifit`: `from verifit import *`.
 - Define at least a `test_*()` function. In the function:
-	- Define `name` to the name of the test.
 	- Define `trigger_command` to run the command that triggers WebSocket output, e.g. `vitwss` for sending data.
 	- Define `background_test_command` to run the command that expects WebSocket output, e.g `vitwss` for receiving data.
-	- Run the actual test: `expected, got = run_triggered_background_test(background_test_command, trigger_command, name)`. 
-	- Assert the result: `assert expected == got`.
+	- Run the actual test: `expected, actual = run_triggered_background_test(background_test_command, trigger_command, name)`. 
+	- Assert the result: `assert expected == actual`.
 
 ### Example
 
-See example in `test/websocketin/test_websocketin_1.py`. The example connects to https://www.websocket.in/docs. It supports multiple users on a channel, sends to all of them. Supports authentication tokens.
+See example in `test/websocketin/test_websocketin_1.py`. The example connects to an online WebSocket test server.
 
-**Note**: The example intentionally fails to show you how it looks when it does so.
+## GraphQL Support
+
+### Status: TODO
+
+### Installation
+
+Install `vitgql`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
+It takes a GraphQl template file and produces and launches a cURL request to the specified endpoint.
+
+### Test Creation
+
+Have your `test_*.py` do the following:
+
+- Import `verifit`: `from verifit import *`.
+- Define at least a `test_*()` function. In the function:
+	- Define `command` to run `vitgql` with the needed parameters for the service you're testing.
+	- Run the actual test: `expected, actual = run_test(command, name)`.
+	- Assert the result: `assert expected == actual`.
+
+### Example
+
+See example in `test/graphqlzero/test_graphqlzero_1.py`. The example connects to an online GraphQL test server.
 
 ## Micro-Services Support
 
