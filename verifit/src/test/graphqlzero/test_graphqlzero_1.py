@@ -1,6 +1,7 @@
 from verifit import *
 
-def test_websocketin_1():
+
+def test_graphqlzero_1():
 	command = [
 		"vitgql",
 		get_input_filename(),

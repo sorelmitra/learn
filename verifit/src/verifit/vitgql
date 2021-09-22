@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import logging
+import os
+import sys
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+class GraphQLVerify:
+
+	def __init__(self):
+		super().__init__()
+		self.args = {}
+		self.LOG = None
+		self.filename_graphql_opname = ""
+		self.filename_graphql_query = ""
+		self.filename_graphql_variables = ""
+		self.filename_graphql_request = ""
+		self.filename_graphql_response = ""
+
+
+	def _escape_for_json(self, str1):
+		str1 = str1.replace('"', '\\"').replace('\n', '\\n').replace('\\', '\\\\')
+		return str1
+
+
+	def _opname_path(self, filename):
+		return os.path.dirname(filename)
+
+
+	def _prepare_graphql_query(self):
+		with open(self.filename_graphql_opname) as f_opname:
+			body = json.load(f_opname)
+			with open(self._opname_path(self.filename_graphql_query)) as f_query:
+				query = f_query.read()
+				with open(self._opname_path(self.filename_graphql_variables)) as f_vars:
+					variables = f_vars.read()
+		query = self._escape_for_json(query)
+		variables = self._escape_for_json(variables)
+		body['query'] = query
+		body['variables'] = variables
+
+		with open(self._opname_path(self.filename_graphql_request, "wt")) as f_out:
+			json.dump(body, f_out)
+
+
+	def run_with_args(self):
+		ap = argparse.ArgumentParser(description="Verify It! GraphQL test tool.")
+		ap_subparsers = ap.add_subparsers(title="commands", description="Commands to send to a GraphQL endpoint. Each command has its own arguments, run it with '-h' to see them.", help="Valid commands.")
+
+		# "send" subparser
+		ap_sub_send = ap_subparsers.add_parser("send", help="Send given GraphQL data to an endpoint, and write the response to a file.")
+		ap_sub_send.add_argument("--input-file", help="File with JSON skeleton for the GraphQL request, must be of the form { \"operationName\": \"GET_POST\" }", required=True)
+		ap_sub_send.add_argument("--output-file", help="File where to write the GraphQL response", required=True)
+
+		self.args = ap.parse_args()
+
+
+gqlv = GraphQLVerify()
+gqlv.run_with_args()

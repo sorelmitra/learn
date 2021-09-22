@@ -1,7 +1,7 @@
 from verifit import *
 
 
-def test_jsonplaceholder_post_1():
+def test_rest_api_post_1():
 	command = [
 		"curl", 
 		"-X", "POST", 

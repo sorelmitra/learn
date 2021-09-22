@@ -109,7 +109,7 @@ The helper module resides in `src/verifit/verifit.py`.
 
 The directory structure can be inspected in `src/test` and has the following key items:
 
-- A subdirectory for each test suite or sub-suite, or whatever grouping makes sense for the project you're working on. E.g. `test/jsonplaceholder`.
+- A subdirectory for each test suite or sub-suite, or whatever grouping makes sense for the project you're working on. E.g. `test/rest_api`.
 - In this subdirectory the following items appear:
 	- `test_*.py`: The test case itself. It basically defines a name for the test, a few commands to run, one of which being the actual test command. It then launches the commands and compares the output to the expected one.
 	- `<name>-input.json` is the file to input for the commands in the test case. It will be created manually based on the test requirements.
@@ -144,7 +144,7 @@ Have your `test_*.py` do the following:
 
 ### Example
 
-See example in `test/jsonplaceholder/test_jsonplaceholder_post_1.py`. The example sends to https://jsonplaceholder.typicode.com/posts, which offers various dummy APIs.
+See example in `test/rest_api/test_rest_api_post_1.py`. The example sends to an online dummy API.
 
 **Note**: The example intentionally fails to show you how it looks when it does so.
 
@@ -176,7 +176,7 @@ Have your `test_*.py` do the following:
 
 ### Example
 
-See example in `test/websocketin/test_websocketin_1.py`. The example connects to an online WebSocket test server.
+See example in `test/websockets/test_websockets_1.py`. The example connects to an online WebSocket test server.
 
 ## GraphQL Support
 
@@ -314,7 +314,7 @@ Have each of your `test_*.py` do the following:
 
 ### Example
 
-See examples in `test/websocketin/`:
+See examples in `test/websockets/`:
 
 - For Android: `test_mobiledemo_android`. The example connects to Appium's sample Android `ApiDemos-debug.apk`.
 - For iOS: `test_mobiledemo_ios`. The example connects to Appium's sample iOS `TestApp.app`.
