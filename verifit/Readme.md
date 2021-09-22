@@ -199,7 +199,7 @@ Have your `test_*.py` do the following:
 
 ### Example
 
-See example in `test/graphqlzero/test_graphqlzero_1.py`. The example connects to an online GraphQL test server.
+See example in `test/graphql/test_graphql_1.py`. The example connects to an online GraphQL test server.
 
 ## Micro-Services Support
 
