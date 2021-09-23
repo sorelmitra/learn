@@ -35,25 +35,25 @@ class GraphQLVerify:
 
 	def _fill_in_filenames(self):
 		filename_no_ext, _ = os.path.splitext(os.path.basename(self.filename_graphql_opname))
-		self.filename_graphql_query = f'{filename_no_ext}.graphql'
-		self.filename_graphql_variables = f'{filename_no_ext}.vars.json'
-		self.filename_graphql_request = f'{filename_no_ext}.req.json'
-		self.filename_graphql_response = f'{filename_no_ext}-answer.json'
+		self.filename_graphql_query = self._opname_path(f'{filename_no_ext}.graphql')
+		self.filename_graphql_variables = self._opname_path(f'{filename_no_ext}.vars.json')
+		self.filename_graphql_request = self._opname_path(f'{filename_no_ext}.req.json')
+		self.filename_graphql_response = self._opname_path(f'{filename_no_ext}-answer.json')
 
 	def _prepare_graphql_query(self):
 		self.LOG.info(f'Generating GraphQL request to {self.filename_graphql_request} based on {self.filename_graphql_opname}, {self.filename_graphql_query}, {self.filename_graphql_variables}')
 		with open(self.filename_graphql_opname) as f_opname:
 			body = json.load(f_opname)
-			with open(self._opname_path(self.filename_graphql_query)) as f_query:
+			with open(self.filename_graphql_query) as f_query:
 				query = f_query.read()
-				with open(self._opname_path(self.filename_graphql_variables)) as f_vars:
+				with open(self.filename_graphql_variables) as f_vars:
 					variables = f_vars.read()
 		# query = self._escape_for_json(query)
 		# variables = self._escape_for_json(variables)
 		body['query'] = query
 		body['variables'] = variables
 
-		with open(self._opname_path(self.filename_graphql_request), "wt") as f_out:
+		with open(self.filename_graphql_request, "wt") as f_out:
 			json.dump(body, f_out)
 
 
@@ -65,7 +65,7 @@ class GraphQLVerify:
 			f"{self.server}",
 			"--compressed",
 			"--data", f"@{self.filename_graphql_request}",
-			"-o", self._opname_path(self.filename_graphql_response),
+			"-o", self.filename_graphql_response,
 		]
 		if self.token is not None:
 			launch_command = launch_command + ["-H", f"Authorization: {self.token}",]
