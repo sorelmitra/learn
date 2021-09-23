@@ -9,5 +9,5 @@ def test_graphql_1():
 		"--server", "https://graphqlzero.almansi.me/api"
 	]
 
-	expected, actual = run_test(command)
+	expected, actual = run_test(command, update_snapshot=True)
 	assert_equals_ignore_whitespaces(expected, actual)

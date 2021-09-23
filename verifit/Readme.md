@@ -205,6 +205,8 @@ Have your `test_*.py` do the following:
 
 See example in `test/graphql/test_graphql_1.py`. The example connects to an online GraphQL test server.
 
+**Note**: The example intentionally updates snapshot to showcase that.
+
 ## Micro-Services Support
 
 This is done via one of the supported APIs above, or by creating a tool similar to `vitwss` that adapts to whatever the micro-service uses for input/output.

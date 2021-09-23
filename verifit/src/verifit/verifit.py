@@ -1,11 +1,13 @@
 import copy
 import datetime
 import inspect
+import json
 import os
-import pytest
 import re
 import subprocess
+from shutil import copyfile
 
+import pytest
 from appium import webdriver
 from selenium.common.exceptions import InvalidSessionIdException
 
@@ -124,7 +126,7 @@ def get_expected_output_filename(name):
     return script_path(f"{name}-expected.json")
 
 
-def run_test(command):
+def run_test(command, update_snapshot=False):
     name = inspect.stack()[1][3]
     output_filename = script_path(f"{name}-answer.json")
     expected_output_filename = script_path(f"{name}-expected.json")
@@ -135,6 +137,8 @@ def run_test(command):
     run_command(command)
     actual = load_file_as_string(output_filename)
     expected = load_file_as_string(expected_output_filename)
+    if update_snapshot:
+        do_update_snapshot(output_filename, expected_output_filename)
     return expected, actual
 
 
@@ -152,6 +156,17 @@ def run_triggered_background_test(background_test_command, trigger_command):
     got = load_file_as_string(output_filename)
     expected = load_file_as_string(expected_output_filename)
     return expected, got
+
+
+def do_update_snapshot(src_filename, dst_filename):
+    _, ext = os.path.splitext(src_filename)
+    if ext.lower() == ".json":
+        with open(src_filename) as f_src:
+            s = json.load(f_src)
+            with open(dst_filename, "wt") as f_dst:
+                json.dump(s, f_dst, indent=2)
+    else:
+        copyfile(src_filename, dst_filename)
 
 
 def read_token():
