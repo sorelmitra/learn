@@ -1,4 +1,4 @@
-query GET_POST($id: Int) {
+query GET_POST($id: ID!) {
   post(id: $id) {
     id
     title

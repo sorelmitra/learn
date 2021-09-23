@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import os
+import subprocess
 import sys
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -19,6 +20,8 @@ class GraphQLVerify:
 		self.filename_graphql_variables = ""
 		self.filename_graphql_request = ""
 		self.filename_graphql_response = ""
+		self.server = ""
+		self.token = None
 
 
 	def _escape_for_json(self, str1):
@@ -27,23 +30,47 @@ class GraphQLVerify:
 
 
 	def _opname_path(self, filename):
-		return os.path.dirname(filename)
+		return os.path.join(os.path.dirname(self.filename_graphql_opname), filename)
 
+
+	def _fill_in_filenames(self):
+		filename_no_ext, _ = os.path.splitext(os.path.basename(self.filename_graphql_opname))
+		self.filename_graphql_query = f'{filename_no_ext}.graphql'
+		self.filename_graphql_variables = f'{filename_no_ext}.vars.json'
+		self.filename_graphql_request = f'{filename_no_ext}.req.json'
+		self.filename_graphql_response = f'{filename_no_ext}-answer.json'
 
 	def _prepare_graphql_query(self):
+		self.LOG.info(f'Generating GraphQL request to {self.filename_graphql_request} based on {self.filename_graphql_opname}, {self.filename_graphql_query}, {self.filename_graphql_variables}')
 		with open(self.filename_graphql_opname) as f_opname:
 			body = json.load(f_opname)
 			with open(self._opname_path(self.filename_graphql_query)) as f_query:
 				query = f_query.read()
 				with open(self._opname_path(self.filename_graphql_variables)) as f_vars:
 					variables = f_vars.read()
-		query = self._escape_for_json(query)
-		variables = self._escape_for_json(variables)
+		# query = self._escape_for_json(query)
+		# variables = self._escape_for_json(variables)
 		body['query'] = query
 		body['variables'] = variables
 
-		with open(self._opname_path(self.filename_graphql_request, "wt")) as f_out:
+		with open(self._opname_path(self.filename_graphql_request), "wt") as f_out:
 			json.dump(body, f_out)
+
+
+	def _launch_query(self):
+		launch_command = [
+			"curl",
+			"-X", "POST",
+			"-H" "Content-Type: application/json",
+			f"{self.server}",
+			"--compressed",
+			"--data", f"@{self.filename_graphql_request}",
+			"-o", self._opname_path(self.filename_graphql_response),
+		]
+		if self.token is not None:
+			launch_command = launch_command + ["-H", f"Authorization: {self.token}",]
+		self.LOG.info(f'Launching GraphQL query to {self.server}, writing response to {self.filename_graphql_response}, command {launch_command}')
+		subprocess.run(launch_command)
 
 
 	def run_with_args(self):
@@ -54,8 +81,22 @@ class GraphQLVerify:
 		ap_sub_send = ap_subparsers.add_parser("send", help="Send given GraphQL data to an endpoint, and write the response to a file.")
 		ap_sub_send.add_argument("--input-file", help="File with JSON skeleton for the GraphQL request, must be of the form { \"operationName\": \"GET_POST\" }", required=True)
 		ap_sub_send.add_argument("--output-file", help="File where to write the GraphQL response", required=True)
+		ap_sub_send.add_argument("--server", help="Server where to launch the GraphQL request", required=True)
+		ap_sub_send.add_argument("--token", help="Authorization token for the server", required=False)
+
+		self.LOG = logging.getLogger("General")
 
 		self.args = ap.parse_args()
+		self.filename_graphql_opname = self.args.input_file
+		self._fill_in_filenames()
+		self.server = self.args.server
+		try:
+			self.token = self.args.token
+		except AttributeError:
+			pass
+
+		self._prepare_graphql_query()
+		self._launch_query()
 
 
 gqlv = GraphQLVerify()

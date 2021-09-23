@@ -3,12 +3,11 @@ from verifit import *
 
 def test_graphql_1():
 	command = [
-		"vitgql",
-		get_input_filename(),
-		"-o", get_output_filename()
+		"vitgql", "send",
+		"--input-file", get_input_filename(),
+		"--output-file", get_output_filename(),
+		"--server", "https://graphqlzero.almansi.me/api"
 	]
 
 	expected, actual = run_test(command)
-	assert expected == actual
-
-
+	assert_equals_ignore_whitespaces(expected, actual)

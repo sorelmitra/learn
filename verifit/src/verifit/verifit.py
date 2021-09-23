@@ -86,6 +86,11 @@ def load_file_as_string(filepath):
     return content
 
 
+def assert_equals_ignore_whitespaces(expected, actual):
+    assert re.sub(r'\s+', "", actual) == re.sub(r'\s+', "", expected)
+
+
+
 ###########################################################
 #
 # Tools for Tests Based on Commands and Output
@@ -128,9 +133,9 @@ def run_test(command):
     except FileNotFoundError:
         pass
     run_command(command)
-    got = load_file_as_string(output_filename)
+    actual = load_file_as_string(output_filename)
     expected = load_file_as_string(expected_output_filename)
-    return expected, got
+    return expected, actual
 
 
 def run_triggered_background_test(background_test_command, trigger_command):
