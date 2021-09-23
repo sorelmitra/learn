@@ -180,11 +180,6 @@ def do_update_snapshot_json(dst_filename, src_filename):
         do_update_snapshot_default(src_filename, dst_filename)
 
 
-def read_token():
-    with open("token.txt") as f_token:
-        return f_token.read()
-
-
 
 
 ###########################################################
