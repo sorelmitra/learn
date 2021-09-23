@@ -69,7 +69,7 @@ class GraphQLVerify:
 		]
 		if self.token is not None:
 			launch_command = launch_command + ["-H", f"Authorization: {self.token}",]
-		self.LOG.info(f'Launching GraphQL query to {self.server}, writing response to {self.filename_graphql_response})
+		self.LOG.info(f'Launching GraphQL query to {self.server}, writing response to {self.filename_graphql_response}')
 		subprocess.run(launch_command)
 
 
