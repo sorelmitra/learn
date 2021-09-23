@@ -135,10 +135,10 @@ def run_test(command, update_snapshot=False):
     except FileNotFoundError:
         pass
     run_command(command)
-    actual = load_file_as_string(output_filename)
-    expected = load_file_as_string(expected_output_filename)
     if update_snapshot:
         do_update_snapshot(output_filename, expected_output_filename)
+    actual = load_file_as_string(output_filename)
+    expected = load_file_as_string(expected_output_filename)
     return expected, actual
 
 
@@ -161,12 +161,23 @@ def run_triggered_background_test(background_test_command, trigger_command):
 def do_update_snapshot(src_filename, dst_filename):
     _, ext = os.path.splitext(src_filename)
     if ext.lower() == ".json":
+        do_update_snapshot_json(dst_filename, src_filename)
+    else:
+        do_update_snapshot_default(dst_filename, src_filename)
+
+
+def do_update_snapshot_default(dst_filename, src_filename):
+    copyfile(src_filename, dst_filename)
+
+
+def do_update_snapshot_json(dst_filename, src_filename):
+    try:
         with open(src_filename) as f_src:
             s = json.load(f_src)
             with open(dst_filename, "wt") as f_dst:
                 json.dump(s, f_dst, indent=2)
-    else:
-        copyfile(src_filename, dst_filename)
+    except:
+        do_update_snapshot_default(src_filename, dst_filename)
 
 
 def read_token():
