@@ -10,4 +10,4 @@ def test_graphql_1():
 	]
 
 	expected, actual = run_test(command, update_snapshot=True)
-	assert_equals_ignore_whitespaces(expected, actual)
+	assert actual == expected

@@ -110,13 +110,19 @@ The helper module resides in `src/verifit/verifit.py`.
 The directory structure can be inspected in `src/test` and has the following key items:
 
 - A subdirectory for each test suite or sub-suite, or whatever grouping makes sense for the project you're working on. E.g. `test/rest_api`.
-- In this subdirectory the following items appear:
+- In this subdirectory the following items are **required**:
     - `test_blah.py`: Test file containing at least one test _function_.
-    - `test_*()` _function_ inside the test file.  The test case itself.  It defines a name for the test, and the actual test code.
+		- `test_*()` _function_ inside the test file.  The test case itself.  It defines a name for the test, and the actual test code.
+    - For some types of tests, that's all we need.  E.g. Web UI or Mobile don't usually use test input files.
+- For tests that require input and output data, we **may** add other files:
     - `test_*.json` is the file to input for the commands in the test case. It will be created manually based on the test requirements.
-    - `test_*-expected.json` is the expected output of the test command.  It will be created manually based on the test requirements. The easiest way is to actually execute the test, verify the result, and once you're sure it's good, copy it with this name.
+    - `test_*-expected.json` is the expected output, or **snapshot**, of the test command.  It will be created manually based on the test requirements. The easiest way is to actually execute the test, verify the result, and once you're sure it's good, *update the snapshot*.
     - `test_*-answer.json` is the output got during running. Once you verified it's correct, you can overwrite `test_*-expected.json` with it.
     - Any other file a test case might need.
+	- To *update the snapshot* do one of:
+		- Manually copy `test_*-answer.json` over `test_*-expected.json`
+		- Pass `updateSnapshot=True` to the `run_test()` function
+		- Set environment variable `UPDATE_SNAPSHOT` to `1` or `True` before executing `pytest`.
 
 ## Binary Data Support
 

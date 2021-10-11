@@ -82,14 +82,16 @@ def script_path(filename):
     return os.path.join(current_dir, filename)
 
 
-def load_file_as_string(filepath):
+def load_file_as_string(filepath, format=False):
     with open(filepath) as f:
         content = f.read()
+    if format:
+        try:
+            formatted_content = json.dumps(json.loads(content), indent=2)
+            content = formatted_content
+        except:
+            pass
     return content
-
-
-def assert_equals_ignore_whitespaces(expected, actual):
-    assert re.sub(r'\s+', "", actual) == re.sub(r'\s+', "", expected)
 
 
 
@@ -126,6 +128,14 @@ def get_expected_output_filename(name):
     return script_path(f"{name}-expected.json")
 
 
+def get_test_results(expected_output_filename, output_filename, update_snapshot):
+    actual = load_file_as_string(output_filename, format=True)
+    update_file_content(actual, output_filename)
+    maybe_update_snapshot(output_filename, expected_output_filename, update_snapshot)
+    expected = load_file_as_string(expected_output_filename)
+    return expected, actual
+
+
 def run_test(command, update_snapshot=False):
     name = inspect.stack()[1][3]
     output_filename = script_path(f"{name}-answer.json")
@@ -135,14 +145,10 @@ def run_test(command, update_snapshot=False):
     except FileNotFoundError:
         pass
     run_command(command)
-    if update_snapshot:
-        do_update_snapshot(output_filename, expected_output_filename)
-    actual = load_file_as_string(output_filename)
-    expected = load_file_as_string(expected_output_filename)
-    return expected, actual
+    return get_test_results(expected_output_filename, output_filename, update_snapshot)
 
 
-def run_triggered_background_test(background_test_command, trigger_command):
+def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False):
     name = inspect.stack()[1][3]
     output_filename = script_path(f"{name}-answer.json")
     expected_output_filename = script_path(f"{name}-expected.json")
@@ -153,33 +159,29 @@ def run_triggered_background_test(background_test_command, trigger_command):
     background_test = start_command(background_test_command)
     run_command(trigger_command)
     background_test.wait()
-    got = load_file_as_string(output_filename)
-    expected = load_file_as_string(expected_output_filename)
-    return expected, got
+    return get_test_results(expected_output_filename, output_filename, update_snapshot)
 
 
-def do_update_snapshot(src_filename, dst_filename):
+def update_file_content(content, filename):
+    with open(filename, "wt") as f:
+        f.write(content)
+
+
+def maybe_update_snapshot(src_filename, dst_filename, update_snapshot):
+    if not should_update_snapshot(update_snapshot):
+        return
     _, ext = os.path.splitext(src_filename)
-    if ext.lower() == ".json":
-        do_update_snapshot_json(dst_filename, src_filename)
-    else:
-        do_update_snapshot_default(dst_filename, src_filename)
-
-
-def do_update_snapshot_default(dst_filename, src_filename):
     copyfile(src_filename, dst_filename)
 
 
-def do_update_snapshot_json(dst_filename, src_filename):
+def should_update_snapshot(update_snapshot):
+    print("should_update_snapshot", update_snapshot)
+    if update_snapshot:
+        return True
     try:
-        with open(src_filename) as f_src:
-            s = json.load(f_src)
-            with open(dst_filename, "wt") as f_dst:
-                json.dump(s, f_dst, indent=2)
-    except:
-        do_update_snapshot_default(src_filename, dst_filename)
-
-
+        return os.environ["UPDATE_SNAPSHOT"]
+    except KeyError:
+        return False
 
 
 ###########################################################
