@@ -1,4 +1,6 @@
 /**
+ * This is functional, but poorly written: hardly maintainable and not optimal.
+ * 
  * Paste this as well as the associated CSS into https://jscomplete.com/playground
  */
 
