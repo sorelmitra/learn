@@ -4,10 +4,6 @@
  * Paste this as well as the associated CSS into https://jscomplete.com/playground
  */
 
-const featureFlags = {
-	showRoundBanner: false
-};
-
 const utils = {
 	range: (start, end) => Array.from({length: end - start + 1}, (_, i) => start + i)
 };
@@ -59,6 +55,9 @@ const Results = ( {items} ) => {
 };
 
 const useGameEngine = () => {
+	const [featureFlags, setFeatureFlags] = useState({
+		showRoundBanner: false
+	});
 	const [playButtonDisabled, setPlayButtonDisabled] = useState(false);
 	const [roundBannerHidden, setRoundBannerHidden] = useState(true);
 	const wasRoundBannerShown = useRef();
@@ -211,6 +210,7 @@ const useGameEngine = () => {
 
 	console.log('render game', starsCount, candidateSum, usedButtonsCount);
 	return {
+		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
 		playButtonDisabled, buttonStates, starsCount, results
@@ -219,21 +219,30 @@ const useGameEngine = () => {
 
 const Game = () => {
 	const {
+		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
 		playButtonDisabled, buttonStates, starsCount, results
 	} = useGameEngine();
 	
 	return (
-		<div className='game'>
-			<div className='round-banner' hidden={roundBannerHidden}>
+		<div className="game">
+			<div className="round-banner" hidden={roundBannerHidden}>
 				New Round!
 			</div>
-			<div className='control-buttons'>
+			<div className="control-buttons">
 				<button onClick={playNextRound} disabled={playButtonDisabled}>Play</button>
+				<label>
+					<input
+						name="showRoundBanner"
+						type="checkbox"
+						defaultChecked={featureFlags.showRoundBanner}
+						onChange={() => setFeatureFlags({...featureFlags, showRoundBanner: !featureFlags.showRoundBanner})} />
+					Banner?
+				</label>
 				<button onClick={resetGame}>Reset</button>
 			</div>
-			<div className='body'>
+			<div className="body">
 				<Buttons states={buttonStates} changeStateOnClick={changeStateOnClick} />
 				<Stars count={starsCount} />
 			</div>
