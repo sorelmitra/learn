@@ -126,12 +126,23 @@ const useGameEngine = () => {
 		}
 	}, [timerTick]);
 
+	const resetButtonStates = () => {
+		setButtonStates(buttonStates.map(state => {
+			if (state === INITIAL) return AVAILABLE;
+			if (candidateSum !== starsCount
+				&& [CANDIDATE, WRONG].find(s => s === state)) {
+				return AVAILABLE;
+			}
+			return state;
+		} ));
+	};
+	
 	const startRound = () => {
 		if (starsCount > 0) {
 			candidateSum === starsCount ? updateResult(SUCCESS) : updateResult(FAILED);
 		}
 		setStarsCount(Math.floor(1 + Math.random() * 9));
-		setButtonStates(buttonStates.map(state => state === INITIAL ? AVAILABLE : state ));
+		resetButtonStates();
 		setCandidateSum(0);
 		addResult(PENDING);
 		setTimerTick(timerSeconds);
