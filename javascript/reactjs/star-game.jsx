@@ -61,6 +61,10 @@ const useGameEngine = () => {
 	const [playButtonDisabled, setPlayButtonDisabled] = useState(false);
 	const [roundBannerHidden, setRoundBannerHidden] = useState(true);
 	const wasRoundBannerShown = useRef();
+	const timerInterval = useRef();
+	const [timerHidden, setTimerHidden] = useState(true);
+	const [timerSeconds, setTimerSeconds] = useState(3);
+	const [timerTick, setTimerTick] = useState(3);
 	const [starsCount, setStarsCount] = useState(0);
 	const [buttonStates, setButtonStates] = useState(utils.range(1, 9).map(() => INITIAL));
 	const [candidateSum, setCandidateSum] = useState(0);
@@ -96,6 +100,29 @@ const useGameEngine = () => {
 		setResults(results);
 	};
 
+	const clearTimer = () => {
+		setTimerHidden(true);
+		clearTimeout(timerInterval.current);
+		timerInterval.current = null;
+	};
+
+	const startTimer = () => {
+		timerInterval.current = setTimeout(() => {
+			console.log('tick!', timerTick);
+			setTimerTick(timerTick - 1);
+		}, 1 * 1000);
+		setTimerHidden(false);
+	};
+
+	useEffect(() => {
+		if (timerTick === 0) {
+			playNextRound();
+		} else if (starsCount > 0) {
+			clearTimer();
+			startTimer();
+		}
+	}, [timerTick]);
+
 	const startRound = () => {
 		if (starsCount > 0) {
 			candidateSum === starsCount ? updateResult(SUCCESS) : updateResult(FAILED);
@@ -104,6 +131,9 @@ const useGameEngine = () => {
 		setButtonStates(buttonStates.map(state => state === INITIAL ? AVAILABLE : state ));
 		setCandidateSum(0);
 		addResult(PENDING);
+		setTimerTick(timerSeconds);
+		clearTimer();
+		startTimer();
 	};
 
 	const playNextRound = () => {
@@ -118,7 +148,10 @@ const useGameEngine = () => {
 		wasRoundBannerShown.current = true;
 	};
 
-	useEffect(() => wasRoundBannerShown.current = false, []);
+	useEffect(() => {
+		wasRoundBannerShown.current = false;
+		timerInterval.current = null;
+	}, []);
 
 	useEffect(() => {
 		if (wasRoundBannerShown.current && roundBannerHidden) {
@@ -175,6 +208,7 @@ const useGameEngine = () => {
 		if (starsCount > 0 && candidateSum === starsCount) {
 			updateResult(SUCCESS);
 			if (usedButtonsCount === buttonStates.length) {
+				clearTimer();
 				setPlayButtonDisabled(true);
 				addResult(GAME_OVER);
 				setStarsCount(0);
@@ -200,6 +234,7 @@ const useGameEngine = () => {
 	};
 	
 	const resetGame = () => {
+		clearTimer();
 		setStarsCount(0);
 		setButtonStates(buttonStates.map(() => INITIAL));
 		setCandidateSum(0);
@@ -208,11 +243,12 @@ const useGameEngine = () => {
 		setPlayButtonDisabled(false);
 	};
 
-	console.log('render game', starsCount, candidateSum, usedButtonsCount);
+	console.log('render game', starsCount, candidateSum, usedButtonsCount, timerTick);
 	return {
 		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
+		timerHidden, timerTick,
 		playButtonDisabled, buttonStates, starsCount, results
 	};
 }
@@ -222,6 +258,7 @@ const Game = () => {
 		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
+		timerHidden, timerTick,
 		playButtonDisabled, buttonStates, starsCount, results
 	} = useGameEngine();
 	
@@ -245,6 +282,9 @@ const Game = () => {
 			<div className="body">
 				<Buttons states={buttonStates} changeStateOnClick={changeStateOnClick} />
 				<Stars count={starsCount} />
+			</div>
+			<div className="timer" hidden={timerHidden}>
+				{timerTick}
 			</div>
 			<Results items={results} />
 		</div>

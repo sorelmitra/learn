@@ -112,8 +112,11 @@
 
 .timer {
 	color: #666;
+  font-family: monospace;
+  font-size: 40px;
   margin-top: 3px;
   margin-left: 3px;
+  text-align: center;
 }
 
 .round-banner {
