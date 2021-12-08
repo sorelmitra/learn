@@ -55,6 +55,7 @@ const Results = ( {items} ) => {
 };
 
 const useGameEngine = () => {
+	const [playButtonDisabled, setPlayButtonDisabled] = useState(false);
 	const [starsCount, setStarsCount] = useState(0);
 	const [buttonStates, setButtonStates] = useState(utils.range(1, 9).map(() => INITIAL));
 	const [candidateSum, setCandidateSum] = useState(0);
@@ -153,7 +154,8 @@ const useGameEngine = () => {
 	};
 
 	const gameOverOnAllButtonsUsed = () => {
-		if (usedButtonsCount === buttonStates.length) {
+		if (usedButtonsCount === buttonStates.length - 7) {
+			setPlayButtonDisabled(true);
 			updateResult(GAME_OVER);
 			setStarsCount(0);
 			setCandidateSum(0);
@@ -178,26 +180,28 @@ const useGameEngine = () => {
 		setStarsCount(0);
 		setButtonStates(buttonStates.map(() => INITIAL));
 		setCandidateSum(0);
+		setUsedButtonsCount(0);
 		setResults([]);
+		setPlayButtonDisabled(false);
 	};
 
 	console.log('render game', starsCount, candidateSum, usedButtonsCount);
 	return {
 		playNextRound, resetGame, changeStateOnClick,
-		buttonStates, starsCount, results
+		playButtonDisabled, buttonStates, starsCount, results
 	};
 }
 
 const Game = () => {
 	const {
 		playNextRound, resetGame, changeStateOnClick,
-		buttonStates, starsCount, results
+		playButtonDisabled, buttonStates, starsCount, results
 	} = useGameEngine();
 	
 	return (
 		<div className='game'>
 			<div className='control-buttons'>
-				<button onClick={playNextRound}>Play</button>
+				<button onClick={playNextRound} disabled={playButtonDisabled}>Play</button>
 				<button onClick={resetGame}>Reset</button>
 			</div>
 			<div className='body'>
