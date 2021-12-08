@@ -56,7 +56,8 @@ const Results = ( {items} ) => {
 
 const useGameEngine = () => {
 	const [featureFlags, setFeatureFlags] = useState({
-		showRoundBanner: false
+		showRoundBanner: false,
+		hasTimer: false
 	});
 	const [playButtonDisabled, setPlayButtonDisabled] = useState(false);
 	const [roundBannerHidden, setRoundBannerHidden] = useState(true);
@@ -101,12 +102,14 @@ const useGameEngine = () => {
 	};
 
 	const clearTimer = () => {
+		if (!featureFlags.hasTimer) return;
 		setTimerHidden(true);
 		clearTimeout(timerInterval.current);
 		timerInterval.current = null;
 	};
 
 	const startTimer = () => {
+		if (!featureFlags.hasTimer) return;
 		timerInterval.current = setTimeout(() => {
 			console.log('tick!', timerTick);
 			setTimerTick(timerTick - 1);
@@ -248,7 +251,7 @@ const useGameEngine = () => {
 		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
-		timerHidden, timerTick,
+		timerHidden, timerTick, timerSeconds,
 		playButtonDisabled, buttonStates, starsCount, results
 	};
 }
@@ -258,7 +261,7 @@ const Game = () => {
 		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
-		timerHidden, timerTick,
+		timerHidden, timerTick, timerSeconds,
 		playButtonDisabled, buttonStates, starsCount, results
 	} = useGameEngine();
 	
