@@ -102,8 +102,8 @@ const useGameEngine = () => {
 	};
 
 	const clearTimer = () => {
-		if (!featureFlags.hasTimer) return;
 		setTimerHidden(true);
+		if (!featureFlags.hasTimer) return;
 		clearTimeout(timerInterval.current);
 		timerInterval.current = null;
 	};
@@ -251,7 +251,7 @@ const useGameEngine = () => {
 		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
-		timerHidden, timerTick, timerSeconds,
+		timerHidden, timerTick, timerSeconds, setTimerSeconds,
 		playButtonDisabled, buttonStates, starsCount, results
 	};
 }
@@ -261,7 +261,7 @@ const Game = () => {
 		featureFlags, setFeatureFlags,
 		playNextRound, resetGame, changeStateOnClick,
 		roundBannerHidden,
-		timerHidden, timerTick, timerSeconds,
+		timerHidden, timerTick, timerSeconds, setTimerSeconds, 
 		playButtonDisabled, buttonStates, starsCount, results
 	} = useGameEngine();
 	
@@ -272,14 +272,41 @@ const Game = () => {
 			</div>
 			<div className="control-buttons">
 				<button onClick={playNextRound} disabled={playButtonDisabled}>Play</button>
-				<label>
-					<input
-						name="showRoundBanner"
-						type="checkbox"
-						defaultChecked={featureFlags.showRoundBanner}
-						onChange={() => setFeatureFlags({...featureFlags, showRoundBanner: !featureFlags.showRoundBanner})} />
-					Banner?
-				</label>
+				<div>
+					<label>
+						<input
+							name="showRoundBanner"
+							type="checkbox"
+							defaultChecked={featureFlags.showRoundBanner}
+							onChange={() => setFeatureFlags({...featureFlags, showRoundBanner: !featureFlags.showRoundBanner})} />
+						Banner?
+					</label>
+				</div>
+				<div>
+					<label>
+						<input
+							name="hasTimer"
+							type="checkbox"
+							defaultChecked={featureFlags.hasTimer}
+							onChange={() => setFeatureFlags({...featureFlags, hasTimer: !featureFlags.hasTimer})} />
+						Timer?
+					</label>
+					<label>
+						<input
+							className="timer-seconds"
+							name="timerSeconds"
+							type="text"
+							value={timerSeconds}
+							onChange={
+								e => {
+									if (e.target.value < 1) e.target.value = 1;
+									if (e.target.value > 9) e.target.value = 9;
+									setTimerSeconds(e.target.value);
+								}
+							} />
+						sec
+					</label>
+				</div>
 				<button onClick={resetGame}>Reset</button>
 			</div>
 			<div className="body">

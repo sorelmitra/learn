@@ -119,6 +119,11 @@
   text-align: center;
 }
 
+.timer-seconds {
+  width: 20px;
+  margin-left: 5px;
+}
+
 .round-banner {
   position: absolute;
   top: 50px;
