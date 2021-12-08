@@ -136,8 +136,12 @@ const useGameEngine = () => {
 			return state;
 		} ));
 	};
-	
+
 	const startRound = () => {
+		if (results.length > 49) {
+			gameOver();
+			return;
+		}
 		if (starsCount > 0) {
 			candidateSum === starsCount ? updateResult(SUCCESS) : updateResult(FAILED);
 		}
@@ -218,16 +222,19 @@ const useGameEngine = () => {
 		setUsedButtonsCount(newUsedButtonsCount);
 	};
 
+	const gameOver = () => {
+		clearTimer();
+		setPlayButtonDisabled(true);
+		addResult(GAME_OVER);
+		setStarsCount(0);
+		setCandidateSum(0);
+	};
+
 	const newRoundOrGameOver = () => {
 		if (starsCount > 0 && candidateSum === starsCount) {
 			updateResult(SUCCESS);
 			if (usedButtonsCount === buttonStates.length) {
-				clearTimer();
-				setPlayButtonDisabled(true);
-				addResult(GAME_OVER);
-				setStarsCount(0);
-				setCandidateSum(0);
-				return;
+				gameOver();
 			} else {
 				playNextRound();
 			}
