@@ -33,7 +33,7 @@
 
 .star {
 	display: inline-block;
-  margin: 0 8px;
+  margin: 0 15px;
 }
 
 .star:after {
@@ -75,6 +75,11 @@
   color: darkgray;
 }
 
+.button-initial {
+  background-color: lightgray;
+  color: lightgray;
+}
+
 .result {
   display: block;
   margin-top: 5px;
@@ -83,24 +88,24 @@
   border: 2px dotted navy;
 }
 
-.result-GAME-OVER {
+.result-game-over {
   margin: 20px;
   font-size: 30px;
   background-color: black;
   color: wheat;
 }
 
-.result-PENDING {
+.result-pending {
   background-color: lightpink;
   color: navy;
 }
 
-.result-SUCCESS {
+.result-success {
   background-color: darkgreen;
   color: gold;
 }
 
-.result-FAILED {
+.result-failed {
   background-color: firebrick;
   color: lightgoldenrodyellow;
 }
