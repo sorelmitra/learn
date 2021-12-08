@@ -82,8 +82,17 @@ const useGameEngine = () => {
 		return Math.floor(successCount * 100 / results.length);
 	};
 
+	const getResultEvaluation = score => {
+		if (score < 10) return '😥';
+		if (score < 30) return '🙁';
+		if (score < 50) return '😐';
+		if (score < 70) return '🙂';
+		return '😁';
+	};
+
 	const createResultDetails = (value, number) => {
-		const message = value === GAME_OVER ? `Game Over!  Result ${computeGameScore()}%` : `Take ${number}: ${value.toUpperCase()}`;
+		const score = computeGameScore();
+		const message = value === GAME_OVER ? `Game Over!  Result ${score}% ${getResultEvaluation(score)}` : `Take ${number}: ${value.toUpperCase()}`;
 		return { number, message };
 	};
 
