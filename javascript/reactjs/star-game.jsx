@@ -4,6 +4,10 @@
  * Paste this as well as the associated CSS into https://jscomplete.com/playground
  */
 
+const featureFlags = {
+	showRoundBanner: false
+};
+
 const utils = {
 	range: (start, end) => Array.from({length: end - start + 1}, (_, i) => start + i)
 };
@@ -56,6 +60,8 @@ const Results = ( {items} ) => {
 
 const useGameEngine = () => {
 	const [playButtonDisabled, setPlayButtonDisabled] = useState(false);
+	const [roundBannerHidden, setRoundBannerHidden] = useState(true);
+	const wasRoundBannerShown = useRef();
 	const [starsCount, setStarsCount] = useState(0);
 	const [buttonStates, setButtonStates] = useState(utils.range(1, 9).map(() => INITIAL));
 	const [candidateSum, setCandidateSum] = useState(0);
@@ -91,7 +97,7 @@ const useGameEngine = () => {
 		setResults(results);
 	};
 
-	const playNextRound = () => {
+	const startRound = () => {
 		if (starsCount > 0) {
 			candidateSum === starsCount ? updateResult(SUCCESS) : updateResult(FAILED);
 		}
@@ -100,6 +106,26 @@ const useGameEngine = () => {
 		setCandidateSum(0);
 		addResult(PENDING);
 	};
+
+	const playNextRound = () => {
+		if (!featureFlags.showRoundBanner) {
+			startRound();
+			return;
+		}
+		setTimeout(() => {
+			setRoundBannerHidden(true);
+		}, 0.5 * 1000);
+		setRoundBannerHidden(false);
+		wasRoundBannerShown.current = true;
+	};
+
+	useEffect(() => wasRoundBannerShown.current = false, []);
+
+	useEffect(() => {
+		if (wasRoundBannerShown.current && roundBannerHidden) {
+			startRound();
+		}
+	}, [roundBannerHidden]);
 
 	const getCandidateButtonState = () => {
 		if (candidateSum < starsCount) return CANDIDATE;
@@ -126,7 +152,7 @@ const useGameEngine = () => {
 
 	const updateCandidateSum = index => {
 		const indexNum = parseInt(index);
-		if (buttonStates[indexNum] == USED) return;
+		if ([USED, INITIAL].find(state => state === buttonStates[indexNum])) return;
 		const increment = buttonStates[indexNum] === AVAILABLE ? indexNum + 1 : -indexNum - 1;
 		setCandidateSum(candidateSum + increment);
 	}
@@ -146,19 +172,18 @@ const useGameEngine = () => {
 		setUsedButtonsCount(newUsedButtonsCount);
 	};
 
-	const startNewRoundOnCandidateSumMatch = () => {
+	const newRoundOrGameOver = () => {
 		if (starsCount > 0 && candidateSum === starsCount) {
 			updateResult(SUCCESS);
-			playNextRound();
-		}
-	};
-
-	const gameOverOnAllButtonsUsed = () => {
-		if (usedButtonsCount === buttonStates.length - 7) {
-			setPlayButtonDisabled(true);
-			updateResult(GAME_OVER);
-			setStarsCount(0);
-			setCandidateSum(0);
+			if (usedButtonsCount === buttonStates.length) {
+				setPlayButtonDisabled(true);
+				addResult(GAME_OVER);
+				setStarsCount(0);
+				setCandidateSum(0);
+				return;
+			} else {
+				playNextRound();
+			}
 		}
 	};
 
@@ -167,8 +192,7 @@ const useGameEngine = () => {
 	}, [candidateSum]);
 
 	useEffect(() => {
-		startNewRoundOnCandidateSumMatch();
-		gameOverOnAllButtonsUsed();
+		newRoundOrGameOver();
 	}, [usedButtonsCount]);
 	
 	const changeStateOnClick = (e) => {
@@ -188,6 +212,7 @@ const useGameEngine = () => {
 	console.log('render game', starsCount, candidateSum, usedButtonsCount);
 	return {
 		playNextRound, resetGame, changeStateOnClick,
+		roundBannerHidden,
 		playButtonDisabled, buttonStates, starsCount, results
 	};
 }
@@ -195,11 +220,15 @@ const useGameEngine = () => {
 const Game = () => {
 	const {
 		playNextRound, resetGame, changeStateOnClick,
+		roundBannerHidden,
 		playButtonDisabled, buttonStates, starsCount, results
 	} = useGameEngine();
 	
 	return (
 		<div className='game'>
+			<div className='round-banner' hidden={roundBannerHidden}>
+				New Round!
+			</div>
 			<div className='control-buttons'>
 				<button onClick={playNextRound} disabled={playButtonDisabled}>Play</button>
 				<button onClick={resetGame}>Reset</button>
