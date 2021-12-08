@@ -138,12 +138,12 @@ const useGameEngine = () => {
 	};
 
 	const startRound = () => {
+		if (starsCount > 0) {
+			candidateSum === starsCount ? updateResult(SUCCESS) : updateResult(FAILED);
+		}
 		if (results.length > 49) {
 			gameOver();
 			return;
-		}
-		if (starsCount > 0) {
-			candidateSum === starsCount ? updateResult(SUCCESS) : updateResult(FAILED);
 		}
 		setStarsCount(Math.floor(1 + Math.random() * 9));
 		resetButtonStates();
