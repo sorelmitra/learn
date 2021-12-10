@@ -8,7 +8,7 @@ I've named it `verifit` as a contraction of `Verify It!`, i.e. "Make sure your s
 
 # Introduction
 
-System testing (or application-level testing) is a must for every project. In a big company this is usually done by a dedicated QA team. But what if you're an individual working on a project or, if for any reason, there's no QA in your project?
+System testing (or application-level testing) is a must for every project. In a big company this is usually done by a dedicated QA team or perhaps by company-wide automatic testing policies. But what if you're an individual working on a project or, if for any reason, there's no QA in your project?
 
 Automatic system testing comes to the rescue!
 
