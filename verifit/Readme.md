@@ -38,11 +38,10 @@ The frame will support only plain text data. See also non-goals below.
 
 ## Setting Up the Framework(s)
 
-The framework(s) I find need to be easily set-up in a new, time-constrained project.
+The framework will be easy to set up in a new, time-constrained project.
 
 Setting up the framework for that particular project needs to be somewhere along the lines of:
 
-- Adding contents from an existing package.json to the project's package.json and running `npm install`
 - Adding to a python's requirements.txt from an existing requirements.txt and running `pip install`
 - Creating a directory structure for the tests
 
