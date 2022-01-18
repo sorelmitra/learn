@@ -1,0 +1,17 @@
+@startuml
+class RootThing {
+    +myData: string
+}
+interface ITestThing {
+    +doStuff(): void
+    +checkThing(): void
+}
+class TestThingFactory {
+    +{static} getInstance(): ITestThing
+}
+class TestThing extends RootThing implements ITestThing {
+    +doStuff(): void
+    +checkThing(): void
+}
+TestThingFactory --> "1" ITestThing
+@enduml
