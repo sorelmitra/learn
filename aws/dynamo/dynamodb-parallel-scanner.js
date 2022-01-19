@@ -199,9 +199,9 @@ const forkToCheckStep1ItemSlice = async (index, slice) => new Promise(resolve =>
   })
 })
 
-const getWorkerResults = async (number, loanSlice) => new Promise(resolve => {
+const getWorkerResults = async (number, itemSlice) => new Promise(resolve => {
   let i = -1
-  let current = loanSlice
+  let current = itemSlice
   fs.createReadStream(getStep2Filename(number))
     .pipe(parse())
     .on("error", error => console.error(error))
@@ -213,27 +213,23 @@ const getWorkerResults = async (number, loanSlice) => new Promise(resolve => {
       current = current.next
     })
     .on("end", (rowCount) => {
-      // let s = ''
-      // for (current = loanSlice; current.next != null; current = current.next) {
-      //   s = `${s} ${current.value}`
-      // }
-      // console.log(s)
-      resolve(loanSlice)
+      resolve(itemSlice)
     })
 });
 
 const gatherAllResults = async slices => {
-  const stream = format({ headers: ["id", "expiresInDays", "events"] });
+  const stream = format({ headers: ['id', 'trips'] });
   stream.pipe(fs.createWriteStream(step2AllFilename));
-  const loanSlice = new LinkedList(null, null);
+  const itemSlice = new LinkedList(null, null);
   for (let i = 0; i < slices.length; i++) {
-    const results = await getWorkerResults(i + 1, loanSlice);
+    const results = await getWorkerResults(i + 1, itemSlice);
     for (let current = results; current.next != null; current = current.next) {
       stream.write(current.value)
     }
   }
   stream.end();
 };
+
 const getStep2Items = async (workersCount) => {
   const n = await getStep1ItemsCount()
 
