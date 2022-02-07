@@ -259,7 +259,7 @@ const getStep2Items = async (workersCount) => {
 |      64 |     38000 |       2 |       19000 |          69 |
 |     128 |     38000 |    1:21 |       29230 |          44 |
 |     256 |     38000 |    1:38 |       27140 |          48 |
-|     128 | 1,220,000 |    1:21 |       29230 |          17 |
+|     128 | 1,220,000 |      17 |       71700 |          17 |
 
  * The last row contains the ACTUAL result - incredibly fast.
 
@@ -268,6 +268,8 @@ const getStep2Items = async (workersCount) => {
  * Finally, it'll fork <workersCount> copies of itself, this time each child process will get and check secondary table items for its slice.
  * It waits for all child processes to end.
  * The result is put into ...-OUT.csv.
+ * 
+ * NOTE: I also attempted to do this with just NodeJS promises, based on the fact that requests are made in parallel by the Node engine.  It does run in parallel, but MUCH slower:  In the same env above, with 128 parallel promises, it does about 12800 per minute.
  */
 const main = async () => {
   if (process.argv.length < 3) {
