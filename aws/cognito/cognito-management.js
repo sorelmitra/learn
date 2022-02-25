@@ -76,7 +76,7 @@ const getUsersCount = async (filename) => {
 			.on('data', () => { })
 			.on("end", (rowCount) => {
 				let itemCount = rowCount - 1 // skip header row
-				console.log(`${itemCount} users`)
+				console.log(`${itemCount} users in ${filename}`)
 				resolve(itemCount)
 			})
 	})
@@ -107,16 +107,30 @@ const readUsers = async (filename, start, end) => new Promise(resolve => {
 		})
 })
 
+const getUser = async user => {
+	try {
+		const data = await cognito.adminGetUser({
+			UserPoolId: user[0],
+			Username: user[1]
+		}).promise()
+		return Promise.resolve(data.Username)
+	} catch (err) {
+		if (err.toString().search('UserNotFoundException' > -1)) {
+			return Promise.resolve()
+		} else {
+			throw err
+		}
+	}
+}
+
 const createUser = async user => {
 	console.log('START Create user', user[1])
-	let data = await cognito.adminGetUser({
-		UserPoolId: user[0],
-		Username: user[1]
-	}).promise()
-	if (data) {
+	let username = await getUser(user)
+	if (username) {
 		console.log(`User already exists`)
 	} else {
-		data = await cognito.adminCreateUser({
+		console.log('User does not exist, creating it')
+		const data = await cognito.adminCreateUser({
 			UserPoolId: user[0],
 			Username: user[1],
 			UserAttributes: [
@@ -126,6 +140,7 @@ const createUser = async user => {
 			],
 			TemporaryPassword: 'TiPsdwok1!'
 		}).promise()
+		username = data.User?.Username
 		console.log(`User created`)
 		await cognito.adminSetUserPassword({
 			UserPoolId: user[0],
@@ -134,17 +149,41 @@ const createUser = async user => {
 			Permanent: true,
 		}).promise()
 	}
-	console.log('DONE Create user', data.Username)
+	console.log('DONE Create user', username)
 	return Promise.resolve()
 }
 
-const createUsers = async filename => {
+const deleteUser = async user => {
+	console.log('START Delete user', user[1])
+	let username = await getUser(user)
+	if (username) {
+		console.log(`Deleting user`)
+		await cognito.adminDeleteUser({
+			UserPoolId: user[0],
+			Username: user[1]
+		}).promise()
+	} else {
+		console.log(`User does not exist, nothing to delete`)
+		username = ''
+	}
+	console.log('DONE Delete user', username)
+	return Promise.resolve()
+}
+
+const operateOnUsers = async (filename, opFunc, start=0, end=-1) => {
 	const count = await getUsersCount(filename)
-	const slice = { start: 0, end: count }
-	const users = await readUsers(filename, slice.start, slice.end)
+	if (Number.isNaN(start)) start = 0
+	if (start < 0) start = 0
+	if (start > count - 1) start = count - 1
+	if (Number.isNaN(end)) end = count
+	if (end == -1) end = count
+	if (end <= start) end = start + 1
+	if (end > count) end = count
+	console.log(`Operating on users in interval [${start}, ${end - 1}]`)
+	const users = await readUsers(filename, start, end)
 	for (let current = users; current.next != null; current = current.next) {
 		const user = current.value
-		await createUser(user)
+		await opFunc(user)
 	}
 	return Promise.resolve()
 }
@@ -173,9 +212,16 @@ Manage AWS Cognito Stuff.  WIP.`)
 		.description('Commands on users')
 		.argument('<users-file-path>', `CSV file with the users to operate on.`)
 		.option('-c, --create', 'Create the users.')
+		.option('-d, --delete', 'Delete the users.')
+		.option('-s, --start <number>', 'Index of first user to operate on, 0 based.')
+		.option('-e, --end <number>', 'Index of last user to operate on, 0 based.')
 		.action(async (filename, options) => {
+			const start = parseInt(options.start)
+			const end = parseInt(options.end)
 			if (options.create) {
-				await createUsers(filename)
+				await operateOnUsers(filename, createUser, start, end)
+			} else if (options.delete) {
+				await operateOnUsers(filename, deleteUser, start, end)
 			} else {
 				console.log(`Users file ${filename}, but not instructed what to do with it, use options for that.`)
 			}
