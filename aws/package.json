@@ -1,0 +1,13 @@
+{
+  "name": "aws-tools",
+  "version": "1.0.0",
+  "description": "Various tools and attempts on AWS",
+  "main": "",
+  "author": "Sorel Mitra",
+  "license": "MIT",
+  "dependencies": {
+    "@fast-csv/parse": "^4.3.6",
+    "aws-sdk": "^2.1081.0",
+    "commander": "^9.0.0"
+  }
+}
