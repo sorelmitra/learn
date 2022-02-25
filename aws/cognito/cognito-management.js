@@ -136,7 +136,8 @@ const createUser = async user => {
 			UserAttributes: [
 				{ Name: "given_name", Value: user[2] },
 				{ Name: "family_name", Value: user[3] },
-				{ Name: "email", Value: user[4] }
+				{ Name: "email", Value: user[4] },
+				{ Name: "custom:clientId", Value: user[6] }
 			],
 			TemporaryPassword: 'TiPsdwok1!'
 		}).promise()
