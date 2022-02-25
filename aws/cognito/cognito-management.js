@@ -108,32 +108,40 @@ const readUsers = async (filename, start, end) => new Promise(resolve => {
 })
 
 const createUser = async user => {
-	console.log('START Create user ', user)
-	if (await cognito.adminGetUser({
-			UserPoolId: user[0],
-			Username: user[1]
-		}).promise()) {
-		console.log(`User already exists`)
-		return Promise.resolve()
-	}
-	await cognito.adminCreateUser({
+	console.log('START Create user', user[1])
+	let data = await cognito.adminGetUser({
 		UserPoolId: user[0],
-		Username: user[1],
-		UserAttributes: [
-			{ Name: "given_name", Value: user[2] },
-			{ Name: "family_name", Value: user[3] },
-			{ Name: "email", Value: user[4] }
-		],
-		TemporaryPassword: 'TiPsdwok1!'
+		Username: user[1]
 	}).promise()
-	console.log('DONE Create user ', user)
+	if (data) {
+		console.log(`User already exists`)
+	} else {
+		data = await cognito.adminCreateUser({
+			UserPoolId: user[0],
+			Username: user[1],
+			UserAttributes: [
+				{ Name: "given_name", Value: user[2] },
+				{ Name: "family_name", Value: user[3] },
+				{ Name: "email", Value: user[4] }
+			],
+			TemporaryPassword: 'TiPsdwok1!'
+		}).promise()
+		console.log(`User created`)
+		await cognito.adminSetUserPassword({
+			UserPoolId: user[0],
+			Username: user[1],
+			Password: user[5],
+			Permanent: true,
+		}).promise()
+	}
+	console.log('DONE Create user', data.Username)
 	return Promise.resolve()
 }
 
 const createUsers = async filename => {
 	const count = await getUsersCount(filename)
 	const slice = { start: 0, end: count }
-	const users = await readUsers(filename)
+	const users = await readUsers(filename, slice.start, slice.end)
 	for (let current = users; current.next != null; current = current.next) {
 		const user = current.value
 		await createUser(user)
