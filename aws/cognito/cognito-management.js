@@ -115,7 +115,7 @@ const getUser = async user => {
 		}).promise()
 		return Promise.resolve(data.Username)
 	} catch (err) {
-		if (err.toString().search('UserNotFoundException' > -1)) {
+		if (err.toString().search('UserNotFoundException') > -1) {
 			return Promise.resolve()
 		} else {
 			throw err
