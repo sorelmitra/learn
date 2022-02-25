@@ -148,6 +148,7 @@ const createUser = async user => {
 			Password: user[5],
 			Permanent: true,
 		}).promise()
+    console.log(`User password updated`);
 	}
 	console.log('DONE Create user', username)
 	return Promise.resolve()
