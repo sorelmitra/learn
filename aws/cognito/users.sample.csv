@@ -1,2 +1,3 @@
-poolId,username,name,surname,email,password
-idblah,paganel@patagonia.com,Jacques,Paganel,paganel@patagonia.com,Password1!
+poolId,username,name,surname,email,password,clientId,groups
+idblah,paganel@patagonia.com,Jacques,Paganel,paganel@patagonia.com,Password1!,Duncan,science;languages
+idblah,glenarvan@scotland.com,Lord,glenarvan,glenarvan@scotland.com,Password1!,Duncan,(ALL)

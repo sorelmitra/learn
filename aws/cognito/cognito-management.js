@@ -124,32 +124,65 @@ const getUser = async user => {
 }
 
 const createUser = async user => {
+	console.log('User does not exist, creating it')
+	const data = await cognito.adminCreateUser({
+		UserPoolId: user[0],
+		Username: user[1],
+		UserAttributes: [
+			{ Name: "given_name", Value: user[2] },
+			{ Name: "family_name", Value: user[3] },
+			{ Name: "email", Value: user[4] },
+			{ Name: "custom:clientId", Value: user[6] }
+		],
+		TemporaryPassword: 'TiPsdwok1!'
+	}).promise()
+	console.log(`User created`)
+	return data.User?.Username
+}
+
+const setUserPassword = async user => {
+	await cognito.adminSetUserPassword({
+		UserPoolId: user[0],
+		Username: user[1],
+		Password: user[5],
+		Permanent: true,
+	}).promise()
+	console.log(`User password updated`)
+}
+
+const addUserToGroups = async user => {
+	let groupList = []
+	const groups = user[7]
+	if (groups.toLowerCase() === '(all)') {
+		const response = await cognito.listGroups({
+			UserPoolId: user[0],
+			Limit: 60
+		}).promise()
+		groupList = response.Groups.map(g => g.GroupName)
+	} else {
+		groupList = groups.split(';')
+	}
+	console.log('Adding user to groups', groupList)
+	const promises = []
+	groupList.map(g => {
+		promises.push(cognito.adminAddUserToGroup({
+			UserPoolId: user[0],
+			Username: user[1],
+			GroupName: g
+		}).promise())
+	})
+	return Promise.all(promises)
+}
+
+const configureUser = async user => {
 	console.log('START Create user', user[1])
 	let username = await getUser(user)
 	if (username) {
 		console.log(`User already exists`)
 	} else {
-		console.log('User does not exist, creating it')
-		const data = await cognito.adminCreateUser({
-			UserPoolId: user[0],
-			Username: user[1],
-			UserAttributes: [
-				{ Name: "given_name", Value: user[2] },
-				{ Name: "family_name", Value: user[3] },
-				{ Name: "email", Value: user[4] },
-				{ Name: "custom:clientId", Value: user[6] }
-			],
-			TemporaryPassword: 'TiPsdwok1!'
-		}).promise()
-		username = data.User?.Username
-		console.log(`User created`)
-		await cognito.adminSetUserPassword({
-			UserPoolId: user[0],
-			Username: user[1],
-			Password: user[5],
-			Permanent: true,
-		}).promise()
-    console.log(`User password updated`);
+		username = await createUser(user)
+		await setUserPassword(user)
+		await addUserToGroups(user)
 	}
 	console.log('DONE Create user', username)
 	return Promise.resolve()
@@ -221,7 +254,7 @@ Manage AWS Cognito Stuff.  WIP.`)
 			const start = parseInt(options.start)
 			const end = parseInt(options.end)
 			if (options.create) {
-				await operateOnUsers(filename, createUser, start, end)
+				await operateOnUsers(filename, configureUser, start, end)
 			} else if (options.delete) {
 				await operateOnUsers(filename, deleteUser, start, end)
 			} else {
