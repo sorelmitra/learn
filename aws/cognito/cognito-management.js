@@ -134,7 +134,8 @@ const createUser = async user => {
 			{ Name: "email", Value: user[4] },
 			{ Name: "custom:clientId", Value: user[6] }
 		],
-		TemporaryPassword: 'TiPsdwok1!'
+		TemporaryPassword: 'TiPsdwok1!',
+		MessageAction: 'SUPPRESS'
 	}).promise()
 	console.log(`User created`)
 	return data.User?.Username
