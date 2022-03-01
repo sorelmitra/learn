@@ -3,6 +3,7 @@
 
 const fs = require('fs')
 const { CognitoIdentityServiceProvider } = require('aws-sdk');
+const { CognitoUserPool, CognitoUser, AuthenticationDetails } = require('amazon-cognito-identity-js');
 const { parse } = require('@fast-csv/parse')
 const { Command } = require('commander');
 
@@ -206,6 +207,43 @@ const deleteUser = async user => {
 	return Promise.resolve()
 }
 
+let cognitoClientId = null
+
+const loginUser = async user => new Promise((reject, resolve) => {
+	if (!cognitoClientId) {
+		throw new Error('Missing client ID!')
+	}
+	console.log('START Login user', user[1])
+	getUser(user)
+		.then(username => {
+			if (username) {
+				console.log(`Logging in user`)
+				const userPool = new CognitoUserPool({
+					UserPoolId: user[0],
+					ClientId: cognitoClientId
+				})
+				const cognitoUser = new CognitoUser({
+					Username: user[1],
+					Pool: userPool
+				})
+				cognitoUser.authenticateUser(new AuthenticationDetails({
+					Username: user[1],
+					Password: user[5]
+				}), {
+					onSuccess: result => {
+						console.log(`Logged in user`, result)
+						console.log('DONE Login user', username)
+					},
+					onFailure: err => { throw new Error(err) }
+				})
+			} else {
+				console.log(`User does not exist, nothing to login`)
+				username = ''
+				resolve()
+			}
+		})
+})
+
 const operateOnUsers = async (filename, opFunc, start=0, end=-1) => {
 	const count = await getUsersCount(filename)
 	if (Number.isNaN(start)) start = 0
@@ -249,8 +287,10 @@ Manage AWS Cognito Stuff.  WIP.`)
 		.argument('<users-file-path>', `CSV file with the users to operate on.`)
 		.option('-c, --create', 'Create the users.')
 		.option('-d, --delete', 'Delete the users.')
+		.option('-l, --login', 'Login the users.')
 		.option('-s, --start <number>', 'Index of first user to operate on, 0 based.')
 		.option('-e, --end <number>', 'Index of last user to operate on, 0 based.')
+		.option('-i, --client-id <string>', 'Client ID to use with Cognito.')
 		.action(async (filename, options) => {
 			const start = parseInt(options.start)
 			const end = parseInt(options.end)
@@ -258,6 +298,9 @@ Manage AWS Cognito Stuff.  WIP.`)
 				await operateOnUsers(filename, configureUser, start, end)
 			} else if (options.delete) {
 				await operateOnUsers(filename, deleteUser, start, end)
+			} else if (options.login) {
+				cognitoClientId = options.clientId
+				await operateOnUsers(filename, loginUser, start, end)
 			} else {
 				console.log(`Users file ${filename}, but not instructed what to do with it, use options for that.`)
 			}

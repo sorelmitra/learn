@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@fast-csv/parse": "^4.3.6",
+    "amazon-cognito-identity-js": "^5.2.7",
     "aws-sdk": "^2.1081.0",
     "commander": "^9.0.0"
   }
