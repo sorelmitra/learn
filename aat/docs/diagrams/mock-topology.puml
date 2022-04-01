@@ -1,0 +1,28 @@
+@startuml mock-topology
+
+skinparam DefaultFontName Chalkduster
+skinparam DefaultMonospacedFontName Monaco
+
+package comp as "Local Computer" {
+    collections "Test" as test
+    artifact "Navigation Service" as system
+    boundary "DNS Resolver" as resolver
+    artifact mockServer [
+    AAT Mock Server
+      ""127.0.0.1:443""
+    ]
+    collections "Boat Service Mock" as boatMock
+    control "Mocks Controller" as mocksController
+}
+
+node "Real Boat Service" as boatService
+
+test <-> system: Do Boat actions
+system <-> resolver: Reach Boat Service domain
+resolver <-[dotted]> boatService: <size:24><color:red>    X   </color></size>
+resolver <--> mockServer: Configured \n  ""Boat Service: 127.0.0.1""
+mockServer <--> boatMock
+mocksController <-> mockServer
+test <..> mocksController: Control Boat mock
+
+@enduml
