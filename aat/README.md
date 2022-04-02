@@ -10,7 +10,6 @@ Definitions:
 
 <!-- toc -->
 
-- [Mocking Framework](#mocking-framework)
 - [Running AATs](#running-aats)
 - [AAT with Mocking](#aat-with-mocking)
   * [1. Write the Test](#1-write-the-test)
@@ -28,7 +27,7 @@ Definitions:
 
 # AAT with Mocking
 
-We will be mocking the pencil dependency without touching the drawing service code.
+We will be mocking the pencil dependency without touching the drawing service code (except for telling it to disable certificate validation).
 
 ## 1. Write the Test
 
