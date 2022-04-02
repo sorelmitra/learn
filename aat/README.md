@@ -36,7 +36,7 @@ Add a new file to the `aat/features` directory.  Name it `Pencil.feature`.
   ```gherkin
   Feature: Pencil
     Scenario Outline: Lines
-      Given I have a pencil of <color>
+      Given I have a <color> pencil
       When I draw a line
       Then the line should appear in <color>
     Examples:
@@ -53,12 +53,12 @@ Suppose the drawing service calls to this endpoint in order to set the pencil's 
 
 ## 3. Write the Test that calls to the Mock
 
-Now write your test.  Notice how we just call to the DSL here, and that's the recommended course of action.  Add a file `pencil.ts` into `aat/step-definitions`.
+Now write your test.  Add a file `pencil.ts` into `aat/step-definitions`.
 
 ```typescript
 const { tellMock } = coolMocksCommunicator();
 
-Given(/^I have a pencil of (\w+)$/, async (color: PencilColor) => {
+Given(/^I have a (\w+) pencil$/, async (color: PencilColor) => {
     await tellMock(pencilMockName(), CoolOperationName.SET_EXPECTED_INPUT, {
       payload: { color }
     });
@@ -68,7 +68,7 @@ When(/^I draw a line$/, async (action: PencilAction) => {
   // ... tell drawing service to draw here
 });
 
-Then(/^the line should appear in (\w+)$/, async (result: PencilResult) => {
+Then(/^the line should appear in (\w+)$/, async (color: PencilColor) => {
   // ... check the line result
 });
 ```
@@ -124,9 +124,7 @@ const defaultpencilMock = () => {
     if (error) {
       return error;
     }
-    const response = JSON.parse(fixture('setColorMockResponse')) as Record<string, any>;
-    response.id = expectedColor;
-    return { body: JSON.stringify(response) };
+    return { body: fixture('setColorMockResponse') };
   };
 
   const routes = [
