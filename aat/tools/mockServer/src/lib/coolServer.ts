@@ -4,7 +4,7 @@ import * as Hapi from '@hapi/hapi';
 import * as Inert from '@hapi/inert';
 import { aatServiceLog } from '../../../../lib/coolLog';
 
-export const aatServer = (
+export const coolServer = (
   host: string,
   port: string,
   name?: string,

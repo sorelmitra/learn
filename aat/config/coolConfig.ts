@@ -1,4 +1,4 @@
-export const aatConfig = () => {
+export const coolConfig = () => {
   const getConfiguredLogChannel = () => {
     if (process.env.LOG_TO_CONSOLE) {
       return 'console';

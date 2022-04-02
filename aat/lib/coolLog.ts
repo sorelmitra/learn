@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { aatConfig } from '../config/aatConfig';
+import { coolConfig } from '../config/coolConfig';
 
-const { getConfiguredLogChannel, getConfiguredLogFilename } = aatConfig();
+const { getConfiguredLogChannel, getConfiguredLogFilename } = coolConfig();
 
 export enum LogLevels {
   ERROR = 0,

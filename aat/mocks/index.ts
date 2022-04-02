@@ -1,3 +1,3 @@
-import { boatMock } from './boatMock';
+import { pencilMock } from './pencilMock';
 
-export const mocks = [boatMock];
+export const mocks = [pencilMock];

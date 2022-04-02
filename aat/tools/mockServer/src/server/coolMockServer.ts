@@ -1,7 +1,7 @@
-import { aatServer } from '../lib/aatServer';
-import { mocksConfig } from '../config/aatToolsConfig';
+import { coolServer } from '../lib/coolServer';
+import { mocksConfig } from '../config/coolToolsConfig';
 import { useFixtures } from '../../../../lib/fixture';
-import { addCoolMockOpTarget } from '../controller/coolMocksOperationRunner';
+import { addCoolMockOpTarget } from '../controller/coolMocksCommunicator';
 
 import { mocks } from '../../../../mocks';
 
@@ -12,7 +12,7 @@ export const coolMockServer = () => {
     server,
     start: startService,
     stop: stopService
-  } = aatServer(config.host, config.port, 'Mock Server', {
+  } = coolServer(config.host, config.port, 'Mock Server', {
     key: fixture('server.key'),
     cert: fixture('server.crt')
   });

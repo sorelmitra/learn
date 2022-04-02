@@ -1,5 +1,5 @@
 import { aatServiceLog } from '../../../lib/coolLog';
-import { mocksConfig } from './config/aatToolsConfig';
+import { mocksConfig } from './config/coolToolsConfig';
 import { coolMocksController } from './controller/coolMocksController';
 import { coolMockServer } from './server/coolMockServer';
 

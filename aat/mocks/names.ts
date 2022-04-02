@@ -1,1 +1,1 @@
-export const boatMockName = () => 'Boat Mock';
+export const pencilMockName = () => 'Pencil Mock';

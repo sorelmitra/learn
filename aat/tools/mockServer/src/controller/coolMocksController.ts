@@ -1,16 +1,16 @@
 import * as Nes from '@hapi/nes';
 import { aatServiceLog } from '../../../../lib/coolLog';
-import { aatServer } from '../lib/aatServer';
+import { coolServer } from '../lib/coolServer';
 import {
   CoolMockOperation,
   CoolMockOpStatus,
   knownOperations,
   knownTargets
-} from './coolMocksOperationRunner';
+} from './coolMocksCommunicator';
 
 export const coolMocksController = async (host: string, port: string, name = 'Mocks Controller') => {
   const LOG = aatServiceLog(name);
-  const { server, start: startService, stop: stopService } = aatServer(host, port, name);
+  const { server, start: startService, stop: stopService } = coolServer(host, port, name);
   const start = () => startService();
   const stop = () => stopService();
 

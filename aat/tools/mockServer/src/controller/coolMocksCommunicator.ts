@@ -1,7 +1,7 @@
 import { client as WebSocketClient, connection } from 'websocket';
 import Hapi from '@hapi/hapi';
 import { aatDefaultLog } from '../../../../lib/coolLog';
-import { mocksConfig } from '../config/aatToolsConfig';
+import { mocksConfig } from '../config/coolToolsConfig';
 
 export enum CoolMockOpName {
   SET_EXPECTED_INPUT = 'SET_EXPECTED_INPUT',
@@ -69,7 +69,7 @@ const operationConfig = {
 };
 const operationUrl = `ws://${operationConfig.host}:${operationConfig.port}`;
 
-export const runMockOp = (target: string, name: CoolMockOpName, input: CoolMockOpInput = {}) =>
+export const tellMock = (target: string, name: CoolMockOpName, input: CoolMockOpInput = {}) =>
   new Promise<CoolMockOperation>((resolve, reject) => {
     const prefix = `[Operation ${target} ${name}]`;
 

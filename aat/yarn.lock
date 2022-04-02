@@ -402,6 +402,13 @@
     "@types/node" "*"
     joi "^17.3.0"
 
+"@types/hapi__inert@^5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@types/hapi__inert/-/hapi__inert-5.2.3.tgz#f586eb240d5997c9968d1b4e8b37679517045ca1"
+  integrity sha512-I1mWQrEc7oMqGtofT0rwBgRBCBurz0wNzbq8QZsHWR+aXM0bk1j9GA6zwyGIeO53PNl2C1c2kpXlc084xCV+Tg==
+  dependencies:
+    "@types/hapi__hapi" "*"
+
 "@types/hapi__mimos@*":
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@types/hapi__mimos/-/hapi__mimos-4.1.4.tgz#4f8a1c58345fc468553708d3cb508724aa081bd9"
@@ -1160,11 +1167,6 @@ graceful-fs@^4.1.2, graceful-fs@^4.2.4, graceful-fs@^4.2.9:
   version "4.2.9"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.9.tgz#041b05df45755e587a24942279b9d113146e1c96"
   integrity sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==
-
-graphql@^16.3.0:
-  version "16.3.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.3.0.tgz#a91e24d10babf9e60c706919bb182b53ccdffc05"
-  integrity sha512-xm+ANmA16BzCT5pLjuXySbQVFwH3oJctUVdy81w1sV0vBU0KgDdBGtxQOUd5zqOBk/JayAFeG8Dlmeq74rjm/A==
 
 has-flag@^4.0.0:
   version "4.0.0"
