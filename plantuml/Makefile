@@ -4,6 +4,7 @@ VPATH=..
 TPLANT=/usr/local/bin/tplant
 
 PLANTUML=/usr/local/bin/plantuml
+# This is the ImageMagick converter
 CONVERT=/usr/local/bin/convert
 
 PLANTUMLS:= \
@@ -20,12 +21,16 @@ dist: $(PLANTUML_PNGS)
 	${PLANTUML} -tsvg $< $@
 
 %.png: %.svg
-	${CONVERT} $< $@
+	${CONVERT} -size 3000 $< $@
 
 class-hierarchy:
 	${TPLANT} --associations \
 		--input src/**/*.ts \
 		--output generated-class-hierarchy.puml
+
+# It'll show all the available fonts to PlantUML
+show-fonts:
+	${PLANTUML} -tsvg fonts.puml
 
 clean: distclean
 	rm -fv $(PLANTUML_SVGS)
