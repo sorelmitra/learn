@@ -142,7 +142,10 @@ def get_output_filename():
     return script_path(f"{name}-answer.json")
 
 
-def get_expected_output_filename(name):
+def get_expected_output_filename():
+    global stack_number
+    global stack_function_index
+    name = inspect.stack()[stack_number][stack_function_index]
     return script_path(f"{name}-expected.json")
 
 
