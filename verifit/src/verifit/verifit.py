@@ -96,15 +96,51 @@ def script_path(filename):
     return os.path.join(current_dir, filename)
 
 
-def load_file_as_string(filepath, format=False):
+class VerifitException(Exception):
+    pass
+
+
+def sort_dict_lists(filepath, dict_content, lists_to_sort):
+    sorted_dict = copy.deepcopy(dict_content)
+    for list_dict in lists_to_sort:
+        # print("XXXXXXXX", 1, list_dict)
+        list_name = list_dict['list']
+        field = list_dict['field']
+        keys = list_name.split('.')
+        # print("XXXXXXXX", 2, "field", field, "keys", keys)
+        inner_dict = sorted_dict
+        key = None
+        for i in range(len(keys) - 1):
+            # print("XXXXXXXX", '2b', i)
+            key = keys[i]
+            try:
+                inner_dict = inner_dict.get(key)
+                # print("XXXXXXXX", 3, "key", key, "inner_dict", inner_dict)
+            except KeyError:
+                # print("XXXXXXXX", 4, key)
+                raise VerifitException(f"Could not find list {list_name} in {filepath}: missing key <{key}>")
+        key = keys[i + 1]
+        try:
+            # print("XXXXXXXX", 5, "key", key)
+            inner_dict[key] = sorted(inner_dict[key], key=lambda x: x[field])
+        except KeyError as e:
+            raise VerifitException(f"Could not sort list {list_name} in {filepath}: missing field <{field}> in list")
+    # print("XXXXXXXX", 8, sorted_dict)
+    return sorted_dict
+
+
+def load_file_as_string(filepath, format=False, sort=None):
     with open(filepath) as f:
         content = f.read()
     if format:
         try:
-            formatted_content = json.dumps(json.loads(content), indent=2)
+            dict_content = json.loads(content)
+            if sort is not None:
+                dict_content = sort_dict_lists(filepath, dict_content, sort)
+            formatted_content = json.dumps(dict_content, indent=2)
             content = formatted_content
-        except:
-            pass
+        except VerifitException as e:
+            raise e
     return content
 
 
@@ -149,15 +185,15 @@ def get_expected_output_filename():
     return script_path(f"{name}-expected.json")
 
 
-def get_test_results(expected_output_filename, output_filename, update_snapshot):
-    actual = load_file_as_string(output_filename, format=True)
+def get_test_results(expected_output_filename, output_filename, update_snapshot, sort):
+    actual = load_file_as_string(output_filename, format=True, sort=sort)
     update_file_content(actual, output_filename)
     maybe_update_snapshot(output_filename, expected_output_filename, update_snapshot)
     expected = load_file_as_string(expected_output_filename)
     return expected, actual
 
 
-def run_test(command, update_snapshot=False):
+def run_test(command, update_snapshot=False, sort=None):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
@@ -168,7 +204,7 @@ def run_test(command, update_snapshot=False):
     except FileNotFoundError:
         pass
     run_command(command)
-    return get_test_results(expected_output_filename, output_filename, update_snapshot)
+    return get_test_results(expected_output_filename, output_filename, update_snapshot, sort)
 
 
 def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False):
