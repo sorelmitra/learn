@@ -129,9 +129,17 @@ def sort_dict_lists(filepath, dict_content, lists_to_sort):
     return sorted_dict
 
 
-def load_file_as_string(filepath, format=False, sort=None):
+def strip_regex(string, regexes):
+    for regex in regexes:
+        string = re.sub(regex, '', string)
+    return string
+
+
+def load_file_as_string(filepath, format=False, strip=None, sort=None):
     with open(filepath) as f:
         content = f.read()
+    if strip is not None:
+        content = strip_regex(content, strip)
     if format and len(content) > 1:
         try:
             dict_content = json.loads(content)
@@ -187,15 +195,15 @@ def get_expected_output_filename():
     return script_path(f"{name}-expected.json")
 
 
-def get_test_results(expected_output_filename, output_filename, update_snapshot, sort):
-    actual = load_file_as_string(output_filename, format=True, sort=sort)
+def get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort):
+    actual = load_file_as_string(output_filename, format=True, strip=strip, sort=sort)
     update_file_content(actual, output_filename)
     maybe_update_snapshot(output_filename, expected_output_filename, update_snapshot)
     expected = load_file_as_string(expected_output_filename)
     return expected, actual
 
 
-def run_test(command, update_snapshot=False, sort=None):
+def run_test(command, update_snapshot=False, strip=None, sort=None):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
@@ -206,7 +214,7 @@ def run_test(command, update_snapshot=False, sort=None):
     except FileNotFoundError:
         pass
     run_command(command)
-    return get_test_results(expected_output_filename, output_filename, update_snapshot, sort)
+    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort)
 
 
 def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False):
