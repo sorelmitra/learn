@@ -141,6 +141,8 @@ def load_file_as_string(filepath, format=False, sort=None):
             content = formatted_content
         except VerifitException as e:
             raise e
+        except json.decoder.JSONDecodeError as e:
+            pass
     return content
 
 
