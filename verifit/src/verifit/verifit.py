@@ -132,7 +132,7 @@ def sort_dict_lists(filepath, dict_content, lists_to_sort):
 def load_file_as_string(filepath, format=False, sort=None):
     with open(filepath) as f:
         content = f.read()
-    if format:
+    if format and len(content) > 1:
         try:
             dict_content = json.loads(content)
             if sort is not None:
