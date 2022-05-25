@@ -2,8 +2,8 @@ from verifit import *
 
 
 def test_websockets_1():
-	token = r'oCdCMcMPQpbvNjUIzqtvF1d2X2okWpDQj4AwARJuAgtjhzKxVEjQU6IdCjwm&notify_self'
-	server = f"wss://demo.piesocket.com/v3/channel_1?api_key={token}"
+	token = r'VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV'
+	server = f"wss://demo.piesocket.com/v3/channel_1?api_key={token}&notify_self"
 
 	trigger_command = [
 		"vitwss", "send",

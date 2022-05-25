@@ -229,7 +229,7 @@ def run_test(command, update_snapshot=False, strip=None, sort=None, use_expected
     return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output)
 
 
-def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False):
+def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False, strip=None, sort=None, use_expected_output=True):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
@@ -242,7 +242,7 @@ def run_triggered_background_test(background_test_command, trigger_command, upda
     background_test = start_command(background_test_command)
     run_command(trigger_command)
     background_test.wait()
-    return get_test_results(expected_output_filename, output_filename, update_snapshot)
+    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output)
 
 
 def update_file_content(content, filename):

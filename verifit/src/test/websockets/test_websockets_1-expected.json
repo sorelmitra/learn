@@ -1,1 +1,4 @@
-{"info":"You are using a test api key"}
+{
+  "user": "test-websocketin-1",
+  "message": "Hi from the tests!"
+}
