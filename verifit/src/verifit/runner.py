@@ -1,7 +1,6 @@
 from dotenv import dotenv_values
 
 from verifit import *
-from verifit import get_input_filename, get_output_filename
 
 
 class Runner:
