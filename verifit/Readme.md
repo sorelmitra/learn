@@ -125,11 +125,12 @@ The directory structure can be inspected in `src/test` and has the following key
 
 To run your tests:
 
-	pytest .
+	cd <path-to-verifit-framework>
+	ENV=dev pytest .
 
 To run your tests while updating snapshots:
 
-	UPDATE_SNAPSHOT=1 pytest .
+	UPDATE_SNAPSHOT=1 ENV=dev pytest .
 
 ## Binary Data Support
 
@@ -158,6 +159,8 @@ Have your `test_*.py` do the following:
 ### Example
 
 See example in `test/rest_api/test_rest_api_post_1.py`. The example sends to an online dummy API.
+
+The example shows you how to wrap your runner in a class, `Runner`, that will simplify your test writing while providing flexibility.
 
 **Note**: The example intentionally fails to show you how it looks when it does so.
 

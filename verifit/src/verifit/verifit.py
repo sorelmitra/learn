@@ -73,6 +73,8 @@ stack_number = 1
 stack_file_index = 1
 stack_function_index = 3
 
+data_file_type = 'json'
+
 def get_stack_number():
     global stack_number
     return stack_number
@@ -80,6 +82,14 @@ def get_stack_number():
 def set_stack_number(number):
     global stack_number
     stack_number = number
+
+def get_data_file_type():
+    global data_file_type
+    return data_file_type
+
+def set_data_file_type(new_data_file_type):
+    global data_file_type
+    data_file_type = new_data_file_type
 
 def script_path(filename):
     global stack_number
@@ -178,21 +188,21 @@ def get_input_filename():
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
-    return script_path(f"{name}.json")
+    return script_path(f"{name}.{data_file_type}")
 
 
 def get_output_filename():
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
-    return script_path(f"{name}-answer.json")
+    return script_path(f"{name}-answer.{data_file_type}")
 
 
 def get_expected_output_filename():
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
-    return script_path(f"{name}-expected.json")
+    return script_path(f"{name}-expected.{data_file_type}")
 
 
 def get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort):
@@ -207,8 +217,8 @@ def run_test(command, update_snapshot=False, strip=None, sort=None):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
-    output_filename = script_path(f"{name}-answer.json")
-    expected_output_filename = script_path(f"{name}-expected.json")
+    output_filename = script_path(f"{name}-answer.{data_file_type}")
+    expected_output_filename = script_path(f"{name}-expected.{data_file_type}")
     try:
         os.unlink(output_filename)
     except FileNotFoundError:
@@ -221,8 +231,8 @@ def run_triggered_background_test(background_test_command, trigger_command, upda
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
-    output_filename = script_path(f"{name}-answer.json")
-    expected_output_filename = script_path(f"{name}-expected.json")
+    output_filename = script_path(f"{name}-answer.{data_file_type}")
+    expected_output_filename = script_path(f"{name}-expected.{data_file_type}")
     try:
         os.unlink(output_filename)
     except FileNotFoundError:
