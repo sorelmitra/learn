@@ -18,22 +18,15 @@ class Runner:
         }
         self._token = ''
 
-    def login(self, username, password, tenant):
-        path = f'/account/login/custom' \
-               f'?tenant={tenant}' \
-               f'&tenantType=partner'
+    def login(self, path, username, password):
         return self.rest(path=path, method="POST",
                          use_input_file=False, use_expected_output=False,
                          input_data_raw={"username": username,
                                          "password": password},
                          use_token=False, check_token=True)
 
-    def login_graphql(self, username, password, tenant):
-        self._create_vars(get_input_filename(), {
-            "USERNAME": username,
-            "PASSWORD": password,
-            "TENANT": tenant,
-        })
+    def login_graphql(self, vars):
+        self._create_vars(get_input_filename(), vars)
         return self.graphql(use_token=False, check_token=True, use_expected_output=False)
 
     def rest(self,
