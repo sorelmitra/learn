@@ -205,15 +205,17 @@ def get_expected_output_filename():
     return script_path(f"{name}-expected.{data_file_type}")
 
 
-def get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort):
+def get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output):
     actual = load_file_as_string(output_filename, format=True, strip=strip, sort=sort)
     update_file_content(actual, output_filename)
     maybe_update_snapshot(output_filename, expected_output_filename, update_snapshot)
-    expected = load_file_as_string(expected_output_filename)
+    expected = None
+    if use_expected_output:
+        expected = load_file_as_string(expected_output_filename)
     return expected, actual
 
 
-def run_test(command, update_snapshot=False, strip=None, sort=None):
+def run_test(command, update_snapshot=False, strip=None, sort=None, use_expected_output=True):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
@@ -224,7 +226,7 @@ def run_test(command, update_snapshot=False, strip=None, sort=None):
     except FileNotFoundError:
         pass
     run_command(command)
-    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort)
+    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output)
 
 
 def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False):
