@@ -25,8 +25,11 @@ class Runner:
                          use_token=False, check_token=True)
 
     def login_graphql(self, vars):
-        self._create_vars(get_input_filename(), vars)
-        return self.graphql(use_token=False, check_token=True, use_expected_output=False)
+        self._stack_number += 1
+        self._create_vars(vars)
+        expected, actual = self.graphql(use_token=False, check_token=True, use_expected_output=False)
+        self._stack_number -= 1
+        return expected, actual
 
     def rest(self,
              path='',
@@ -157,9 +160,9 @@ class Runner:
         set_stack_number(self._old_stack_number)
         set_data_file_type(self._old_filetype)
 
-    @staticmethod
-    def _create_vars(input_filename, vars):
-        filename_no_ext, _ = os.path.splitext(input_filename)
+    def _create_vars(self, vars):
+        self._prepare_for_test("json")
+        filename_no_ext, _ = os.path.splitext(get_input_filename())
         vars_filename = f"{filename_no_ext}.vars.json"
         vars_template_filename = f"{filename_no_ext}.vars.template.json"
         with open(vars_template_filename) as f_vars_template:
@@ -168,6 +171,7 @@ class Runner:
                 graphql_vars = graphql_vars.replace(f"${{{key}}}", value)
             with open(vars_filename, "wt") as f_vars:
                 f_vars.write(graphql_vars)
+        self._cleanup_after_test()
 
 
 runner = Runner()
