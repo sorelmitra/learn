@@ -168,7 +168,7 @@ Have your `test_*.py` do the following:
 
 See example in `test/rest_api/test_rest_api_post_1.py`. The example sends to an online dummy API.
 
-The example shows you how to wrap your runner in a class, `Runner`, that will simplify your test writing while providing flexibility.
+The example uses the `Runner` class, that will simplify your test writing while providing flexibility.  While the `Runner` class is not required, it's recommended to use it.
 
 **Note**: The example intentionally fails to show you how it looks when it does so.
 
@@ -201,6 +201,8 @@ Have your `test_*.py` do the following:
 ### Example
 
 See example in `test/websockets/test_websockets_1.py`. The example connects to an online WebSocket test server.
+
+Checkout again the usage of the `Runner` class.
 
 **Note**: The demo API key is rotated every week, so you need to update that in `.dev.env` before running the test.
 
@@ -240,6 +242,8 @@ For GraphQL, the input data looks like that:
 ### Example
 
 See example in `test/graphql/test_graphql_1.py`. The example connects to an online GraphQL test server.
+
+Checkout again the usage of the `Runner` class.
 
 **Note**: The example intentionally updates snapshot to showcase that.
 
