@@ -125,6 +125,14 @@ The directory structure can be inspected in `src/test` and has the following key
 
 To run your tests:
 
+First, create a file `.dev.env` in the root directory of this project:
+
+	REST_SERVER=https://jsonplaceholder.typicode.com
+	GRAPHQL_SERVER_PRIVATE=https://graphqlzero.almansi.me/api
+	WEBSOCKETS_SERVER_URL=wss://demo.piesocket.com/v3/channel_1?notify_self&api_key=<your-api-key from https://www.piesocket.com/websocket-tester#>
+
+Then run the tests:
+
 	cd <path-to-verifit-framework>
 	ENV=dev pytest .
 
@@ -193,6 +201,8 @@ Have your `test_*.py` do the following:
 ### Example
 
 See example in `test/websockets/test_websockets_1.py`. The example connects to an online WebSocket test server.
+
+**Note**: The demo API key is rotated every week, so you need to update that in `.dev.env` before running the test.
 
 ## GraphQL Support
 

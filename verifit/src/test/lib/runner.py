@@ -98,6 +98,28 @@ class Runner:
             ]
         return self._run_test_command(command, sort, check_token, use_expected_output)
 
+    def websocket(self, use_expected_output=True, sort=None):
+        self._prepare_for_test("json")
+
+        server = runner._config['WEBSOCKETS_SERVER_URL']
+
+        trigger_command = [
+            "vitwss", "send",
+            "--input-file", get_input_filename(),
+            server
+        ]
+
+        background_test_command = [
+            "vitwss", "receive",
+            "--packets-to-receive", "1",
+            "--wait-ms", "10000",
+            "--output-file", get_output_filename(),
+            server
+        ]
+
+        return run_triggered_background_test(
+            background_test_command, trigger_command, use_expected_output=use_expected_output, sort=sort)
+
     def _run_test_command(self, command, sort, check_token, use_expected_output=True):
         set_stack_number(self._stack_number)
         output_filename = get_output_filename()
