@@ -51,7 +51,7 @@ class Runner:
         ]
         if use_token:
             command += [
-                "--header", f"Authentication: Bearer {self._token}",
+                "--header", f"Authorization: Bearer {self._token}",
             ]
         if use_input_file:
             command += [
