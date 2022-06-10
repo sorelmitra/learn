@@ -121,7 +121,7 @@ class Runner:
         try:
             print(f"Running command: {' '.join(command)}")
             self._expected, self._actual = run_test(command,
-                                                    strip=[r'\nDate:[^\n]*'], sort=sort,
+                                                    strip_regex=[r'\nDate:[^\n]*'], sort=sort,
                                                     use_expected_output=use_expected_output)
         except Exception as e:
             _had_exception = True

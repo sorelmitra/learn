@@ -139,22 +139,47 @@ def sort_dict_lists(filepath, dict_content, lists_to_sort):
     return sorted_dict
 
 
-def strip_regex(string, regexes):
+def do_strip_regex(string, regexes):
     for regex in regexes:
         string = re.sub(regex, '', string)
     return string
 
 
-def load_file_as_string(filepath, format=False, strip=None, sort=None):
+stripped_values = []
+
+
+def do_strip_keys(dict_content, strip_keys):
+    global stripped_values
+    stripped_values = []
+    for compound_key in strip_keys:
+        keys = compound_key.split('.')
+        inner_dict = dict_content
+        for i in range(len(keys) - 1):
+            key = keys[i]
+            inner_dict = inner_dict.get(key)
+        last_key = keys[i + 1]
+        stripped_values.append(inner_dict[last_key])
+        del inner_dict[last_key]
+    return dict_content
+
+
+def get_stripped_values():
+    global stripped_values
+    return stripped_values
+
+
+def load_file_as_string(filepath, format=False, strip_regex=None, strip_keys=None, sort=None):
     with open(filepath) as f:
         content = f.read()
-    if strip is not None:
-        content = strip_regex(content, strip)
+    if strip_regex is not None:
+        content = do_strip_regex(content, strip_regex)
     if format and len(content) > 1:
         try:
             dict_content = json.loads(content)
             if sort is not None:
                 dict_content = sort_dict_lists(filepath, dict_content, sort)
+            if strip_keys is not None:
+                dict_content = do_strip_keys(dict_content, strip_keys)
             formatted_content = json.dumps(dict_content, indent=2)
             content = formatted_content
         except VerifitException as e:
@@ -205,8 +230,8 @@ def get_expected_output_filename():
     return script_path(f"{name}-expected.{data_file_type}")
 
 
-def get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output):
-    actual = load_file_as_string(output_filename, format=True, strip=strip, sort=sort)
+def get_test_results(expected_output_filename, output_filename, update_snapshot, strip_regex, strip_keys, sort, use_expected_output):
+    actual = load_file_as_string(output_filename, format=True, strip_regex=strip_regex, strip_keys=strip_keys, sort=sort)
     update_file_content(actual, output_filename)
     maybe_update_snapshot(output_filename, expected_output_filename, update_snapshot)
     expected = None
@@ -215,7 +240,7 @@ def get_test_results(expected_output_filename, output_filename, update_snapshot,
     return expected, actual
 
 
-def run_test(command, update_snapshot=False, strip=None, sort=None, use_expected_output=True):
+def run_test(command, update_snapshot=False, strip_regex=None, strip_keys=None, sort=None, use_expected_output=True):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
@@ -226,10 +251,10 @@ def run_test(command, update_snapshot=False, strip=None, sort=None, use_expected
     except FileNotFoundError:
         pass
     run_command(command)
-    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output)
+    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip_regex, strip_keys, sort, use_expected_output)
 
 
-def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False, strip=None, sort=None, use_expected_output=True):
+def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False, strip_keys=None, strip_regex=None, sort=None, use_expected_output=True):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]
@@ -242,7 +267,7 @@ def run_triggered_background_test(background_test_command, trigger_command, upda
     background_test = start_command(background_test_command)
     run_command(trigger_command)
     background_test.wait()
-    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip, sort, use_expected_output)
+    return get_test_results(expected_output_filename, output_filename, update_snapshot, strip_regex, strip_keys, sort, use_expected_output)
 
 
 def update_file_content(content, filename):
