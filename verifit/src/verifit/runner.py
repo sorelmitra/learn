@@ -32,6 +32,7 @@ class Runner:
         return expected, actual
 
     def rest(self,
+             server=None,
              path='',
              method="GET",
              filetype=None,
@@ -43,10 +44,14 @@ class Runner:
              use_expected_output=True,
              retrieve_headers=False,
              follow_redirects=False,
+             strip_regex=None,
+             strip_keys=None,
              sort=None):
         self._prepare_for_test(filetype)
+        if server is None:
+            server = self._config["REST_SERVER"]
         command = [
-            "curl", "-X", method, f'{self._config["REST_SERVER"]}{path}',
+            "curl", "-X", method, f'{server}{path}',
             "--header", "Content-Type: application/json; charset=UTF-8",
         ]
         if use_token:
@@ -73,10 +78,22 @@ class Runner:
             command += [
                 "--location",
             ]
-        return self._run_test_command(command, sort, check_token, use_expected_output)
+        return self._run_test_command(command, strip_regex, strip_keys, sort, check_token, use_expected_output)
 
-    def graphql(self, use_token=True, check_token=False, use_expected_output=True, sort=None):
+    def graphql(self,
+                server_public=None,
+                server_private=None,
+                use_token=True,
+                check_token=False,
+                use_expected_output=True,
+                strip_regex=None,
+                strip_keys=None,
+                sort=None):
         self._prepare_for_test("json")
+        if server_public is None:
+            server_public = self._config["GRAPHQL_SERVER_PUBLIC"]
+        if server_private is None:
+            server_private = self._config["GRAPHQL_SERVER_PRIVATE"]
         command = [
             "vitgql", "send",
             "--input-file", get_input_filename(),
@@ -84,19 +101,25 @@ class Runner:
         ]
         if use_token:
             command += [
-                "--server", self._config["GRAPHQL_SERVER_PRIVATE"],
+                "--server", server_private,
                 "--token", self._token,
             ]
         else:
             command += [
-                "--server", self._config["GRAPHQL_SERVER_PUBLIC"],
+                "--server", server_public,
             ]
-        return self._run_test_command(command, sort, check_token, use_expected_output)
+        return self._run_test_command(command, strip_regex, strip_keys, sort, check_token, use_expected_output)
 
-    def websocket(self, use_expected_output=True, sort=None):
+    def websocket(self,
+                  server=None,
+                  use_expected_output=True,
+                  strip_regex=None,
+                  strip_keys=None,
+                  sort=None):
         self._prepare_for_test("json")
 
-        server = runner._config['WEBSOCKETS_SERVER_URL']
+        if server is None:
+            server = runner._config['WEBSOCKETS_SERVER_URL']
 
         trigger_command = [
             "vitwss", "send",
@@ -113,15 +136,16 @@ class Runner:
         ]
 
         return run_triggered_background_test(
-            background_test_command, trigger_command, use_expected_output=use_expected_output, sort=sort)
+            background_test_command, trigger_command, use_expected_output=use_expected_output, strip_regex=strip_regex, strip_keys=strip_keys, sort=sort)
 
-    def _run_test_command(self, command, sort, check_token, use_expected_output=True):
+    def _run_test_command(self, command, strip_regex, strip_keys, sort, check_token, use_expected_output=True):
         set_stack_number(self._stack_number)
         output_filename = get_output_filename()
         try:
             print(f"Running command: {' '.join(command)}")
             self._expected, self._actual = run_test(command,
-                                                    strip_regex=[r'\nDate:[^\n]*'], sort=sort,
+                                                    strip_regex=strip_regex, strip_keys=strip_keys,
+                                                    sort=sort,
                                                     use_expected_output=use_expected_output)
         except Exception as e:
             _had_exception = True
