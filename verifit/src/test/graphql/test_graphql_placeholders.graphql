@@ -1,0 +1,7 @@
+query GET_POST($id: ID!) {
+  post(id: $id) {
+    id
+    title
+    body
+  }
+}

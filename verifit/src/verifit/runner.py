@@ -24,9 +24,9 @@ class Runner:
                                          "password": password},
                          use_token=False, check_token=True)
 
-    def login_graphql(self, vars):
+    def login_graphql(self, input_filename, variables):
         self._stack_number += 1
-        self._create_vars(vars)
+        self._create_vars(input_filename, variables)
         expected, actual = self.graphql(use_token=False, check_token=True, use_expected_output=False)
         self._stack_number -= 1
         return expected, actual
@@ -83,6 +83,7 @@ class Runner:
     def graphql(self,
                 server_public=None,
                 server_private=None,
+                variables=None,
                 use_token=True,
                 check_token=False,
                 use_expected_output=True,
@@ -108,6 +109,8 @@ class Runner:
             command += [
                 "--server", server_public,
             ]
+        if variables is not None:
+            self._create_vars(get_input_filename(), variables)
         return self._run_test_command(command, strip_regex, strip_keys, sort, check_token, use_expected_output)
 
     def websocket(self,
@@ -189,14 +192,13 @@ class Runner:
         set_stack_number(self._old_stack_number)
         set_data_file_type(self._old_filetype)
 
-    def _create_vars(self, vars):
-        self._prepare_for_test("json")
-        filename_no_ext, _ = os.path.splitext(get_input_filename())
+    def _create_vars(self, input_filename, variables):
+        filename_no_ext, _ = os.path.splitext(input_filename)
         vars_filename = f"{filename_no_ext}.vars.json"
         vars_template_filename = f"{filename_no_ext}.vars.template.json"
         with open(vars_template_filename) as f_vars_template:
             graphql_vars = f_vars_template.read()
-            for key, value in vars.items():
+            for key, value in variables.items():
                 graphql_vars = graphql_vars.replace(f"${{{key}}}", value)
             with open(vars_filename, "wt") as f_vars:
                 f_vars.write(graphql_vars)

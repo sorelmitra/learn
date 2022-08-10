@@ -149,6 +149,7 @@ Whenever the input or output files are used, their names are inferred from the t
 - `.json`: Input file (just the extension).  For GraphQL, this is the operation name
 - `.graphql`: GraphQL query (where applicable)
 - `.vars.json`: GraphQL variables (where applicable)
+- `.vars.template.json`: GraphQL variables with placeholders of the form `${ID}` (where applicable)
 - `-answer.json`: Output file
 - `-expected.json`: Expected output file
 
@@ -188,6 +189,7 @@ The functions:
 
     - `server_public`: If present, the Public (unauthenticated) GraphQL server to use. If not present, it is read from the `.dev.env` file, from the `GRAPHQL_SERVER_PUBLIC` variable.
     - `server_private`: If present, the Private (authenticated) GraphQL server to use. If not present, it is read from the `.dev.env` file, from the `GRAPHQL_SERVER_PRIVATE` variable.
+    - `variables`: Placeholder replacements for your GraphQL variables. If you pass this in, then you need to create a `.vars.template.json` and in there you can use placeholders like `${ID}`. Then pass `variables={"ID": "1"}` to the `graphql` function.
     - `use_token`: Same as for the `rest` function.
     - `check_token`: Same as for the `rest` function.
     - `use_expected_output`: Same as for the `rest` function.

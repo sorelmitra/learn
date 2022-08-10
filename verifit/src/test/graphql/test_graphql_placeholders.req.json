@@ -1,0 +1,1 @@
+{"operationName": "GET_POST", "query": "query GET_POST($id: ID!) {\n  post(id: $id) {\n    id\n    title\n    body\n  }\n}\n", "variables": "{\n  \"id\": \"7\"\n}\n"}
