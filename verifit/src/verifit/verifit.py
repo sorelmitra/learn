@@ -120,6 +120,7 @@ def sort_dict_lists(filepath, dict_content, lists_to_sort):
         # print("XXXXXXXX", 2, "field", field, "keys", keys)
         inner_dict = sorted_dict
         key = None
+        i = None
         for i in range(len(keys) - 1):
             # print("XXXXXXXX", '2b', i)
             key = keys[i]
@@ -129,10 +130,16 @@ def sort_dict_lists(filepath, dict_content, lists_to_sort):
             except KeyError:
                 # print("XXXXXXXX", 4, key)
                 raise VerifitException(f"Could not find list {list_name} in {filepath}: missing key <{key}>")
-        key = keys[i + 1]
+        if i is not None:
+            key = keys[i + 1]
         try:
-            # print("XXXXXXXX", 5, "key", key)
-            inner_dict[key] = sorted(inner_dict[key], key=lambda x: x[field])
+            # print("XXXXXXXX", 5, "key", key, "inner_dict", inner_dict)
+            if key is None:
+                inner_dict = sorted(inner_dict, key=lambda x: x[field])
+                sorted_dict = inner_dict
+            else:
+                inner_dict[key] = sorted(inner_dict[key], key=lambda x: x[field])
+            # print("XXXXXXXX", 6, "inner_dict", inner_dict)
         except KeyError as e:
             raise VerifitException(f"Could not sort list {list_name} in {filepath}: missing field <{field}> in list")
     # print("XXXXXXXX", 8, sorted_dict)
@@ -151,15 +158,23 @@ stripped_values = []
 def do_strip_keys(dict_content, strip_keys):
     global stripped_values
     stripped_values = []
+    # print("XXXXXXXX", 1, strip_keys)
     for compound_key in strip_keys:
         keys = compound_key.split('.')
+        # print("XXXXXXXX", 2, keys)
         inner_dict = dict_content
+        i = None
         for i in range(len(keys) - 1):
             key = keys[i]
             inner_dict = inner_dict.get(key)
-        last_key = keys[i + 1]
+        if i is None:
+            last_key = keys[0]
+        else:
+            last_key = keys[i + 1]
+        # print("XXXXXXXX", 3, last_key)
         stripped_values.append(inner_dict[last_key])
         del inner_dict[last_key]
+        # print("XXXXXXXX", 4, stripped_values)
     return dict_content
 
 
@@ -254,7 +269,7 @@ def run_test(command, update_snapshot=False, strip_regex=None, strip_keys=None, 
     return get_test_results(expected_output_filename, output_filename, update_snapshot, strip_regex, strip_keys, sort, use_expected_output)
 
 
-def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False, strip_keys=None, strip_regex=None, sort=None, use_expected_output=True):
+def run_triggered_background_test(background_test_command, trigger_command, update_snapshot=False, strip_regex=None, strip_keys=None, sort=None, use_expected_output=True):
     global stack_number
     global stack_function_index
     name = inspect.stack()[stack_number][stack_function_index]

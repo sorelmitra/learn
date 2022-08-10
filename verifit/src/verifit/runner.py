@@ -113,6 +113,7 @@ class Runner:
     def websocket(self,
                   server=None,
                   use_expected_output=True,
+                  ignore_messages=None,
                   strip_regex=None,
                   strip_keys=None,
                   sort=None):
@@ -132,8 +133,12 @@ class Runner:
             "--packets-to-receive", "1",
             "--wait-ms", "10000",
             "--output-file", get_output_filename(),
-            server
         ]
+        if ignore_messages is not None:
+            for message in ignore_messages:
+                background_test_command += ["--ignore", message]
+        background_test_command += [server]
+        print(background_test_command)
 
         return run_triggered_background_test(
             background_test_command, trigger_command, use_expected_output=use_expected_output, strip_regex=strip_regex, strip_keys=strip_keys, sort=sort)
