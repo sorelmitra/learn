@@ -5,8 +5,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 
 from login import *
+from verifit import *
 
 
+@pytest.mark.skip(reason="Outdated")
 def go_to_your_content(driver, wait):
 	# Login
 	link_text_content = "Your Content"
@@ -16,6 +18,7 @@ def go_to_your_content(driver, wait):
 	driver.find_element_by_link_text(link_text_content).click()
 
 
+@pytest.mark.skip(reason="Outdated")
 def do_add_content(driver, wait):
 	# Go to Add Content
 	link_text_add_content = "Add Content"
@@ -30,6 +33,7 @@ def do_add_content(driver, wait):
 	wait.until(presence_of_element_located((By.LINK_TEXT, link_text_title)))
 
 
+@pytest.mark.skip(reason="Outdated")
 def do_update_content(driver, wait):
 	# Go to Update Content
 	link_text_title = "Briz briz"
@@ -48,6 +52,7 @@ def do_update_content(driver, wait):
 	wait.until(presence_of_element_located((By.LINK_TEXT, link_text_title)))
 
 
+@pytest.mark.skip(reason="Outdated")
 def test_content():
 	with webdriver.Chrome() as driver:
 		wait = WebDriverWait(driver, 10)
@@ -57,6 +62,7 @@ def test_content():
 		do_update_content(driver, wait)
 
 
+@pytest.mark.skip(reason="Outdated")
 def test_content_wrong():
 	with webdriver.Chrome() as driver:
 		wait = WebDriverWait(driver, 10)

@@ -1,6 +1,6 @@
 # Overview
 
-This project aims to put together a schema that would simplify setting up and using automatic system testing frameworks for several types of projects.
+This is a Python library that simplifies setting up and using automatic system testing for several types of projects.
 
 I've named it `verifit` as a contraction of `Verify It!`, i.e. "Make sure your system works fine!'
 
@@ -18,371 +18,199 @@ Also, on small projects or where you're time constrained, having an automatic sy
 
 
 
-# Goals
+# Supported Apps and Data Types
 
-## Types of Projects
-
-I need to set up a frame that would help me with automatic system testing of the following project types:
+This library can be used for apps that expose the following interfaces:
 
 1. REST API
-2. SOAP API
-3. WebSockets API
-4. GraphQL API
-5. Micro-services (via one of the supported APIs above)
-6. Web UI
-7. Mobile UI, both iOS and Android, ideally cross-platform
+2. WebSockets API
+3. GraphQL API
+4. Anything that can expose one of the supported APIs above
+5. Anything that has a Command Line Interface (CLI)
+6. Web UI (outdated)
+7. Mobile UI (outdated)
 
-## Types of Data
+This library is designed for simplicity and ease of use.  Therefore, it doesn't support any of the following:
 
-The frame will support only plain text data. See also non-goals below.
+- _No database verification or changing of data_. Doing this would require a large amount of work. Moreover, DB should be internal to the app you're testing, and instead you verify the _results_ that the app produces. Normally any change in the DB should be somehow reflected in the app's behavior. Unless this is a weird app that interfaces with the world via a DB, in which case an _adapter should be written in the app's language_.
+- _No message queues sending or reading_. This would also require a large amount of work, so better write an adapter in the app's language. The adapter can either expose a CLI or a REST API, that the test can use.
+- _No binary data_. While it could technically be fitted in, it would pose some challenges especially with finding the differences between expected and actual data. If the app you're testing does move around binary data, better write an adapter in the app's language.
 
-## Setting Up the Framework(s)
 
-The framework will be easy to set up in a new, time-constrained project.
 
-Setting up the framework for that particular project needs to be somewhere along the lines of:
+# Quick Start
 
-- Adding to a python's requirements.txt from an existing requirements.txt and running `pip install`
-- Creating a directory structure for the tests
+## Setup
 
-## Framework Language
+- Install Python 3.6 or higher
+- Add library to `PYTHONPATH`: `export PYTHONPATH=<verifit repo>/src/verifit:$PYTHONPATH`
+- Install `dotenv`: `pip3 install python-dotenv`
+- Install `appium`: `pip3 install Appium-Python-Client`
 
-Ideally I want all my testing for the required project types to be in a single language, preferably Python.
+## Write a Hello World Test
 
+Writing a test is as easy as:
 
+1. Create a file `test.py`, like this:
 
-# Non-Goals
+        from verifit import *
+        def test_hello():
+            expected, actual = run_test(["cp", "-v", get_input_filename(), get_output_filename()])
+            assert actual == expected
 
-## No Database Verification
+2. Create a data file with the same name as the test function, `test_hello.json`:
 
-I am specifically proposing that the framework does NOT support database verification, i.e. you do an action in the tested app and then check in the database the results of that action.
+        {
+          "hello": "world"
+        }
 
-One reason is there are many database engines, each with its quirks and API specifics. Another reason - even if you just consider a single DB engine, there is still a lot of work to connect to the DB and do the verification. The project "Messaging Router" has taught me that.
+3. Run the test:
 
-Instead, I am proposing that the DB is internal to the app I'm testing, and instead I verify the **results** that the app produces. Normally any change in the DB should be somehow reflected in the app's behavior.
+        ENV=dev pytest .
 
-## No Database Changing
+    It will complain that there's no `expected` file.
 
-Similarly to the previous item, I am proposing that the framework does NOT support changing the database of an app to alter the latter's behavior for testing purposes.
+4. Since our app, `cp`, probably did its job correctly, just copy `test_hello-answer.json` to `test_hello-expected.json`.
 
-The reasons are similar - mostly complexity of writing such testing code.
+5. Run the test again:
 
-Instead, I maintain that the DB is internal to the app I'm testing, and if I need to alter the app's behavior I should have some API exposed for that. If that's not the case, then either that DB change is a hidden setting that the user will never see thus no need to test it, either I can expose a simple REST API from within the app just for testing purposes and this will be much simpler to implement.
+        ENV=dev pytest .
 
-## No Message Queues Sending or Reading
+    This time it will pass.
 
-Similarly to the DB non goals, I do NOT want the framework to verify message queues directly.
+Congrats! You wrote your first test!
 
-Micro-services do use message queues as a means of communications, and I might need to use this some day. I think what I really need is a way to verify that a micro-service processes a message I send to it and/or writes an output message I expect.
+## Write a REST Test
 
-Based on my previous experience (such as for "Message Router" project), the simplest way to achieve this in both cases is to expose a REST (or maybe WebSockets) API from within the project (either as a separate tool, either part of the actual app) that allows sending a message and retrieving of an output message of the micro-service.
+We will be testing a publicly available dummy REST server. It is basically as simple as the Hello World test above:
 
-The reason for this is that there are multiple, very different types of messaging queues (e.g. RabbitMQ, AWS SQS, Kafka - to name just a few), all with different APIs and not all of them supporting all languages. So on one hand I might not be able to access that particular message queue from my automated testing language of choice. On the other hand, setting up access to the messaging queue from the testing language can mean significant effort, as the "Message Router" has taught me. As opposed to this, the micro-service I need to test already uses the message queue, so it should be much simpler to expose a REST API from it to allow automated testing.
+1. Create a file `.dev.env`. Add this line to it:
 
-## No Binary Data
+        REST_SERVER=https://jsonplaceholder.typicode.com
 
-I want to stick to plain text and a tool to show me differences when comparing output (same as I did years ago for the automation framework developed for the "Tailored Software Development Process" project).
+2. Create a file `test.py`, like this:
 
-If the apps I want to test do move around binary data, I'd probably better write a JSON adapter inside the app and expose it via REST or WebSockets (for reasons similar to what I put in the Non-Goals section).
+        from runner import *
+        def test_placeholder():
+            expected, actual = runner.rest(path='/posts', method='POST')
+            assert actual == expected
 
+3. Create a data file, `test_placeholder.json`, like this:
 
+        {
+            "title": "foo",
+            "body": "bar",
+            "userId": 1
+        }
 
-# The Framework
+4. Run the test:
 
-## Overall Status: PUBLISHED
+        ENV=dev pytest .
 
-## Overview
+    It will complain that there's no `expected` file. 
 
-The framework uses Python to implement test cases and Pytest to drive discovery and execution of the tests.
+5. Look at `test_placeholder-answer.json`. It contains the answer from our dummy server. If you're happy with the answer, you can go ahead and update the snapshot.
 
-According to [their page](https://docs.pytest.org/en/latest/getting-started.html), Pytest uses [standard test discovery practices](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery).
-For Pytest, test cases are Python file named `test_blah.py`, in an arbitrary directory tree.
+6. Update the snapshot:
 
-For this framework, we have a few essential items:
+        UPDATE_SNAPSHOT=1 ENV=dev pytest .
 
-1. A helper Python module, `verifit.py`, that executes a command with input (either parameters or file), reads its output (either from `stdin` or file), and offers back the expected and the received output.
-2. A directory structure that allows for grouping test cases with their input and expected output data.
-3. We run the tests by changing directory to the parent folder of the test cases and typing `pytest .`
+7. Run the test again:
 
-The helper module resides in `src/verifit/verifit.py`.
+        ENV=dev pytest .
 
-The directory structure can be inspected in `src/test` and has the following key items:
+    It will still pass.
 
-- A subdirectory for each test suite or sub-suite, or whatever grouping makes sense for the project you're working on. E.g. `test/rest_api`.
-- In this subdirectory the following items are **required**:
-    - `test_blah.py`: Test file containing at least one test _function_.
-		- `test_*()` _function_ inside the test file.  The test case itself.  It defines a name for the test, and the actual test code.
-    - For some types of tests, that's all we need.  E.g. Web UI or Mobile don't usually use test input files.
-- For tests that require input and output data, we **may** add other files:
-    - `test_*.json` is the file to input for the commands in the test case. It will be created manually based on the test requirements.
-    - `test_*-expected.json` is the expected output, or **snapshot**, of the test command.  It will be created manually based on the test requirements. The easiest way is to actually execute the test, verify the result, and once you're sure it's good, *update the snapshot*.
-    - `test_*-answer.json` is the output got during running. Once you verified it's correct, you can overwrite `test_*-expected.json` with it.
-    - Any other file a test case might need.
-	- To *update the snapshot* do one of:
-		- Manually copy `test_*-answer.json` over `test_*-expected.json`
-		- Pass `updateSnapshot=True` to the `run_test()` function
-		- Set environment variable `UPDATE_SNAPSHOT` to `1` or `True` before executing `pytest`.
+## More Examples
 
-To run your tests:
+You can explore more examples like these in the `src/tests` directory:
 
-First, create a file `.dev.env` in the root directory of this project:
+- `graphql`: A test for a GraphQL server. It uses a publicly available GraphQL server.
+- `hello`: Similar to the Hello World test above.
+- `localhost8201`: Web UI test. Unmaintained.
+- `mobiledemo`: Mobile UI test. Unmaintained.
+- `rest_api`: Similar to the REST test above. The example in this directory intentionally fails to show you how it looks when it does so.
+- `websockets`: The demo API key is rotated every week, so you need to update that in `.dev.env` before running the test.
 
-	REST_SERVER=https://jsonplaceholder.typicode.com
-	GRAPHQL_SERVER_PRIVATE=https://graphqlzero.almansi.me/api
-	WEBSOCKETS_SERVER_URL=wss://demo.piesocket.com/v3/channel_1?notify_self&api_key=<your-api-key from https://www.piesocket.com/websocket-tester#>
+## Further Steps
 
-Then run the tests:
+The above examples are really what you'll be doing to create tests most of the time. 
 
-	cd <path-to-verifit-framework>
-	ENV=dev pytest .
+They show two ways of doing this:
 
-To run your tests while updating snapshots:
+- Via the `run_test` function, which is the basic way of doing it. It offers all you need in order to write your tests.
+- Via the `runner` module, which is a wrapper around the `run_test` function. It offers some specialized functions that make it easier to test popular APIs: REST, GraphQL, WebSockets.
 
-	UPDATE_SNAPSHOT=1 ENV=dev pytest .
+Once you wrote the first test, just start writing more tests for your app. As you're doing this, you'll discover whether you're happy with the simple way, or you need to write more testing code (such as managing test data or organizing common test code into lib functions specific to your project).
 
-## Binary Data Support
+# UI Tests (outdated)
 
-### Status: PUBLISHED.
+It is technically possible to write tests for Web UI and Mobile UI, too.
 
-Write your own tool to convert that binary data to JSON using libraries from the project you're testing. Call that tool as part of the test command of `test_*.py`.
+**Note**: UI tests weren't maintained, so some things might need adjustments. We are listing here the setup that worked last time we checked.
 
-## REST Support
-
-### Status: PUBLISHED
-
-### Installation
-
-Install `curl`. How do you do that depends on your OS.
-
-### Test Creation
-
-Have your `test_*.py` do the following:
-
-- Import `verifit`: `from verifit import *`.
-- Define at least a `test_*()` function. In the function:
-	- Define `command` to run `curl` with the needed parameters for the service you're testing.
-	- Run the actual test: `expected, actual = run_test(command, name)`. 
-	- Assert the result: `assert expected == actual`.
-
-### Example
-
-See example in `test/rest_api/test_rest_api_post_1.py`. The example sends to an online dummy API.
-
-The example uses the `Runner` class, that will simplify your test writing while providing flexibility.  While the `Runner` class is not required, it's recommended to use it.
-
-**Note**: The example intentionally fails to show you how it looks when it does so.
-
-## SOAP Support
-
-Do the same as for REST.
-
-## WebSockets Support
-
-### Status: PUBLISHED
-
-### Installation
-
-Install `vitwss`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
-It can do one of the following:
-- Send message to web socket and exit.
-- Wait for message on web socket for given timeout, then write the response and exit.
-
-### Test Creation
-
-Have your `test_*.py` do the following:
-
-- Import `verifit`: `from verifit import *`.
-- Define at least a `test_*()` function. In the function:
-	- Define `trigger_command` to run the command that triggers WebSocket output, e.g. `vitwss` for sending data.
-	- Define `background_test_command` to run the command that expects WebSocket output, e.g. `vitwss` for receiving data.
-	- Run the actual test: `expected, actual = run_triggered_background_test(background_test_command, trigger_command, name)`. 
-	- Assert the result: `assert expected == actual`.
-
-### Example
-
-See example in `test/websockets/test_websockets_1.py`. The example connects to an online WebSocket test server.
-
-Checkout again the usage of the `Runner` class.
-
-**Note**: The demo API key is rotated every week, so you need to update that in `.dev.env` before running the test.
-
-## GraphQL Support
-
-### Status: PUBLISHED
-
-### Installation
-
-### Installation
-
-Install `curl`. How do you do that depends on your OS.
-
-Install `vitgql`: add `src/verifit/` to your PATH and restart your terminal. ("vit" comes from "Verify It".)
-It takes a GraphQl template file and produces and launches a cURL request to the specified endpoint.
-
-### Test Creation
-
-Have your `test_*.py` do the following:
-
-- Import `verifit`: `from verifit import *`.
-- Define at least a `test_*()` function. In the function:
-    - Define `command` to run `vitgql` with the needed parameters for the service you're testing.
-    - Define your input data.
-    - Run the actual test: `expected, actual = run_test(command, name)`.
-    - Assert the result: `assert expected == actual`.
-
-For GraphQL, the input data looks like that:
-
-- `test_*.graphql`: This is your actual query.  You can use variables in it.
-- `test_*.json`: Put the GraphQL operation name in here.
-- `test_*.vars.json`: Define any GraphQL variables here.
-- `test_*-expected.json`: Your snapshot.  Update it once you get confident the response is correct.
-- `test_*.req.json`: This is the actual GraphQL request, generated by the framework.  It is ignored in GIT.
-- `test_*-answer.json`: The answer obtained after launching the request.  The framework compares it to the snapshot and fails if there are differences.
-
-### Example
-
-See example in `test/graphql/test_graphql_1.py`. The example connects to an online GraphQL test server.
-
-Checkout again the usage of the `Runner` class.
-
-**Note**: The example intentionally updates snapshot to showcase that.
-
-## Micro-Services Support
-
-This is done via one of the supported APIs above, or by creating a tool similar to `vitwss` that adapts to whatever the micro-service uses for input/output.
-
-## Web UI Support
-
-### Status: PUBLISHED
-
-### Installation
+## Web UI Testing
 
 Install Selenium: 
 - `Selenium` library: `pip install selenium`.
 - `WebDriver` binaries: download `chromedriver` from https://selenium.dev/documentation/en/webdriver/driver_requirements/#quick-reference and place them in PATH.
 
-### Test Creation
+In your test file you essentially write Selenium code.
 
-Have your `test_*.py` run Selenium WebDriver code. Tips:
+## Mobile UI Testing
 
-- The `verifit` library is not used in this case. 
-- Create a `login.py` with a common login function to call from your tests. Import it with `from login import *` as `pytest` adds your current test directory to `sys.path`.
-- Extract duplicates in variables to make it easier to change them in case the UI changes.
-- Group common functionality into a single test case to minimize the number of browser restarts and logins.
-- As the UI allows it, have the test delete what it creates to avoid the need for a manual cleanup.
-- Don't fall in the trap of implementing complex logic to do a cleanup that the UI does not support - if it doesn't, it's not important, and it's pretty easy to clean an entire table or so.
+1. Install Appium and Dependencies
 
-**Note**: You can't easily map UI testing on the "run command and check output" paradigm. After writing the sample I mention below, I believe Selenium is easy enough and worth the extra effort to test your Web UI app automatically. It gives you peace of mind when changing things.
+    - Get the latest Android Studio. Start the installer. Select "Custom". Check the tick box to have it create a simulator device for you.
+    - Add Android tools to path. Make sure you respect the order in PATH!
+    
+        ```shell
+        export ANDROID_HOME=/Users/sorel/Library/Android/sdk
+        export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:${PATH}
+        ```
+    
+    - Install the latest XCode and open it to do post-installation steps.
+    - Install Carthage: `brew install carthage`
+    - Appium server: `npm install -g appium`.
+    - Appium Python Client: `pip install Appium-Python-Client`
+    - Pytest Sauce Client: `pip install SauceClient`
+    
+2. Start the Android Simulator
 
-### Example
+    - Start ADB server for debugging: `adb start-server`.
+    - List available simulator devices: `emulator -list-avds`.
+    - Start simulator: `emulator @Nexus_5X_API_29_x86 &!`.
 
-See example in `test/localhost8201/test_localhost8201_content.py`.
-- The example connects to `http://localhost:8201`. You need to have some sort of web app there.
-- The example expects the web app to provide a login button, a login form with email and password; after login it expects a couple of links "Add Content" and "Your Content".
-- In the "Add Content" page it expects a form that asks for Url, Title, Description and a submit button.
-- In the "Your Content" page it expects links to the existing contents, each link having the name put in the Title field of the form. Clicking that links takes you to the "Edit Content" page.
+3. Start the iOS Simulator
 
-**Note**: The example intentionally fails to show you how it looks when it does so.
+    - Check the simulators you have: `xcrun simctl list`.
+    - Boot your desired simulator: `xcrun simctl boot "iPhone 8"`.
+    - Show your simulator on screen: Run the "Simulator" app on your Mac
 
-## Mobile UI Support
+4. Install the Test Apps in the Simulators
 
-### Status: PUBLISHED
+    - In the Android Simulator: `adb install /path/to/apk`
+    - In the iOS simulator: `xcrun simctl install "iPhone 8" /path/to/ios/app`.
+    - If you don't have Android or iOS apps to test and just want to play with this framework, you can find some test apps at https://github.com/appium/appium.git: `sample-code/apps/ApiDemos-debug.apk` and `sample-code/apps/TestApp.app`.
 
-There are some quirks, see at the end of this section.
+5. Start Appium
 
-### Installation and Setup
+    - Run `appium` in your terminal.
 
-#### 1. Install Appium and Dependencies
+In your `test_*()` methods, use the `driver_android` or `driver_ios` fixtures from `verifit`, depending on whether you're in a test for Android or iOS. Add test code in your `test_*()` methods, using Appium Python Client.
 
-- Get the latest Android Studio. Start the installer. Select "Custom". Check the tick box to have it create a simulator device for you.
-- Add Android tools to path. Make sure you respect the order in PATH!
-
-	```shell
-	export ANDROID_HOME=/Users/sorel/Library/Android/sdk
-	export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:${PATH}
-	```
-
-- Install the latest XCode and open it to do post-installation steps.
-- Install Carthage: `brew install carthage`
-- Appium server: `npm install -g appium`.
-- Appium Python Client: `pip install Appium-Python-Client`
-- Pytest Sauce Client: `pip install SauceClient`
-
-#### 2. Start the Android Simulator
-
-- Start ADB server for debugging: `adb start-server`.
-- List available simulator devices: `emulator -list-avds`.
-- Start simulator: `emulator @Nexus_5X_API_29_x86 &!`.
-
-#### 3. Start the iOS Simulator
-
-- Check the simulators you have: `xcrun simctl list`.
-- Boot your desired simulator: `xcrun simctl boot "iPhone 8"`.
-- Show your simulator on screen: Run the "Simulator" app on your Mac
-
-#### 4. Install the Test Apps in the Simulators
-
-- In the Android Simulator: `adb install /path/to/apk`
-- In the iOS simulator: `xcrun simctl install "iPhone 8" /path/to/ios/app`.
-- If you don't have Android or iOS apps to test and just want to play with this framework, you can find some test apps at https://github.com/appium/appium.git: `sample-code/apps/ApiDemos-debug.apk` and `sample-code/apps/TestApp.app`.
-
-#### 5. Start Appium
-
-Run `appium` in your terminal.
-
-### Test Creation
-
-#### Create the Test Directory Configuration
-
-Create a `conftest.py` file in each test directory, with a contents like this:
-
-```python
-import os
-from verifit import configure_logging_and_screenshots
-def pytest_configure(config):
-	configure_logging_and_screenshots(config)
-	config.ANDROID_APP = os.path.abspath('/path/to/apk')
-	config.ANDROID_APP_ACTIVITY = '.your.app.activity'
-	config.IOS_APP = os.path.abspath('/path/to/ios/app')
-```
-
-The file `conftest.py` is automatically discovered by Pytest. We import `verifit`, configure logging and screenshots, and define the app details for each platform. The fixtures in `verifit` pick those up when running the tests.
-
-#### Create the Test Files
-
-Have each of your `test_*.py` do the following:
-
-- Import `verifit`: `from verifit import *`.
-- Create a test class.
-- Add `test_*()` methods to your class.
-- In your `test_*()` methods, use the `driver_android` or `driver_ios` fixtures from `verifit`, depending on whether you're in a test for Android or iOS.
-- Add test code in your `test_*()` methods, using Appium Python Client.
-
-### Example
-
-See examples in `test/websockets/`:
-
-- For Android: `test_mobiledemo_android`. The example connects to Appium's sample Android `ApiDemos-debug.apk`.
-- For iOS: `test_mobiledemo_ios`. The example connects to Appium's sample iOS `TestApp.app`.
-
-**Note**: These examples don't fail intentionally, because I just copied and adapted the official Appium sample code.
-
-### Quirks
+Quirks:
 
 - Android doesn't work well with Java 11 and I did not bother to ruin my Java setup by trying to activate Java 8 temporarily. At least some tools don't work with Java 11: SDK Manager, UI Automator Viewer. The latter is the tool that's supposed to show you element IDs and other stuff used in automation.
 - My Mac's Accessibility Inspector does not seem to work well with my "iPhone 8" simulator. So I couldn't see any label or ID on the Appium Test app.
 - So I can't inspect mobile app's elements for automation, neither on Android nor iOS.
 - The Python Client for Appium may not be that well documented.
 
-#### Solutions
-
-- For Android, I need a Java 8 setup until further notice. I need to research how to have Java 8 and 11 working interchangeably on Mac.
-- I need to do some more research on getting the element ID inspection work both on Android and iOS. The alternative is to know what IDs I put in the app I develop. 
-- I need to study how does the official JavaScript Appium API maps to the Python Client.
 
 
+# Side Notes
 
-# Other Investigated Options
+Some options investigated for automatic testing:
 
 - WebSockets: Couldn't find a tool that supports it out-of-the-box. Some suggest Katalon could support it via Java: https://forum.katalon.com/t/hi-can-we-make-automated-cases-for-web-socket-api-in-katalon-studio/25537.
 

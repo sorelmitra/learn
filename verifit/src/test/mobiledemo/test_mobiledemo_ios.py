@@ -1,6 +1,7 @@
 from verifit import *
 
 
+@pytest.mark.skip(reason="Outdated")
 class TestIOSBasicInteractions():
 
 	def test_should_send_keys_to_inputs(self, driver_ios):
