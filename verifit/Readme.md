@@ -43,7 +43,8 @@ This library is designed for simplicity and ease of use.  Therefore, it doesn't 
 ## Setup
 
 - Install Python 3.6 or higher
-- Add library to `PYTHONPATH`: `export PYTHONPATH=<verifit repo>/src/verifit:$PYTHONPATH`
+- Add library to `PYTHONPATH`: `export PYTHONPATH=<verifit repo>/src/lib:$PYTHONPATH`
+- Add executables to `PATH`: `export PATH=<verifit repo>/src/lib:$PATH`
 - Install `dotenv`: `pip3 install python-dotenv`
 - Install `appium`: `pip3 install Appium-Python-Client`
 
