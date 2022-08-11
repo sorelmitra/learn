@@ -1,6 +1,7 @@
 from dotenv import dotenv_values
 
 from verifit import *
+from websockets_tool import WebsocketsTool
 
 
 class Runner:
@@ -137,42 +138,28 @@ class Runner:
                   strip_keys=None,
                   sort=None):
         self._prepare_for_test("json")
-
-        if server is None:
-            server = runner._config['WEBSOCKETS_SERVER_URL']
-
-        trigger_command = [
-            "vitwss", "send",
-            "--input-file", get_input_filename(),
-            server
-        ]
-
-        background_test_command = [
-            "vitwss", "receive",
-            "--packets-to-receive", "1",
-            "--wait-ms", "10000",
-            "--output-file", get_output_filename(),
-        ]
-        if ignore_messages is not None:
-            for message in ignore_messages:
-                background_test_command += ["--ignore", message]
-        background_test_command += [server]
-        print(background_test_command)
-
         if variables is not None:
             self._create_vars(get_input_filename(), variables)
-        return run_triggered_background_test(
-            background_test_command, trigger_command, use_expected_output=use_expected_output, strip_regex=strip_regex, strip_keys=strip_keys, sort=sort)
+        ws_tool = WebsocketsTool(server=server,
+                                 input_filename=get_input_filename(),
+                                 output_filename=get_output_filename(),
+                                 ignore_list=ignore_messages)
+        return run_test(func=ws_tool.run,
+                        use_expected_output=use_expected_output,
+                        strip_regex=strip_regex,
+                        strip_keys=strip_keys,
+                        sort=sort)
 
     def _run_test_command(self, command, strip_regex, strip_keys, sort, check_token, use_expected_output=True):
         set_stack_number(self._stack_number)
         output_filename = get_output_filename()
         try:
             print(f"Running command: {' '.join(command)}")
-            self._expected, self._actual = run_test(command,
-                                                    strip_regex=strip_regex, strip_keys=strip_keys,
-                                                    sort=sort,
-                                                    use_expected_output=use_expected_output)
+            self._expected, self._actual = run_test(command=command,
+                                                    use_expected_output=use_expected_output,
+                                                    strip_regex=strip_regex,
+                                                    strip_keys=strip_keys,
+                                                    sort=sort)
         except Exception as e:
             _had_exception = True
             self._actual = e

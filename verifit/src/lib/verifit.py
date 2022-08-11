@@ -255,9 +255,13 @@ def get_test_results(expected_output_filename, output_filename, update_snapshot,
     return expected, actual
 
 
-def run_test(command, update_snapshot=False, strip_regex=None, strip_keys=None, sort=None, use_expected_output=True):
+def run_test(command=None, func=None, update_snapshot=False, strip_regex=None, strip_keys=None, sort=None, use_expected_output=True):
     global stack_number
     global stack_function_index
+    if command is None and func is None:
+        raise VerifitException("Either command or func must be specified")
+    elif command is not None and func is not None:
+        raise VerifitException("Only one of command or func must be specified")
     name = inspect.stack()[stack_number][stack_function_index]
     output_filename = script_path(f"{name}-answer.{data_file_type}")
     expected_output_filename = script_path(f"{name}-expected.{data_file_type}")
@@ -265,7 +269,10 @@ def run_test(command, update_snapshot=False, strip_regex=None, strip_keys=None, 
         os.unlink(output_filename)
     except FileNotFoundError:
         pass
-    run_command(command)
+    if command is None:
+        func()
+    else:
+        run_command(command)
     return get_test_results(expected_output_filename, output_filename, update_snapshot, strip_regex, strip_keys, sort, use_expected_output)
 
 
