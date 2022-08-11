@@ -54,9 +54,9 @@ Writing a test is as easy as:
 
 1. Create a file `test.py`, like this:
 
-        from verifit import *
+        from runner import *
         def test_hello():
-            expected, actual = run_test(["cp", "-v", get_input_filename(), get_output_filename()])
+            expected, actual = runner.cli(["cp", "-v", get_input_filename(), get_output_filename()])
             assert actual == expected
 
 2. Create a data file with the same name as the test function, `test_hello.json`:
@@ -143,7 +143,10 @@ Once you wrote the first test, just start writing more tests for your app. As yo
 
 # Reference
 
-There's only one object you care about: `runner`.  It exposes several functions you can use to run tests.  All of them return a tuple of `expected, actual`, which represents the expected and actual results of the test.
+There's only one object you care about: `runner`.  It exposes several _functions_ you can use to run tests.  All of them functions do two things:
+
+- Execute the test.
+- Return a tuple of `expected, actual`, which represents the expected and actual results of the test.
 
 Whenever the input or output files are used, their names are inferred from the test function name, of the form `<test_func><SUFFIX>`, where `SUFFIX` can be:
 
@@ -154,7 +157,22 @@ Whenever the input or output files are used, their names are inferred from the t
 - `-answer.json`: Output file
 - `-expected.json`: Expected output file
 
-The functions:
+The test functions:
+
+
+- `cli`: Basic test runner that runs a command and returns the expected and actual output. Parameters:
+
+    - `command`: The command to run.
+    - `variables`: Placeholder replacements for your GraphQL variables. If you pass this in, then you need to create a `.vars.template.json` and in there you can use placeholders like `${ID}`. Then pass `variables={"ID": "1"}` to the `graphql` function.
+    - `use_expected_output`: Whether to require the expected output file to be present.  If set to `False`, the value of `expected` from the returned tuple is `None`.
+    - `strip_regex`: Strip the response body of content matching these regexes. This treats the response body as a string. The regexes are passed in as an array, e.g. `[r"a.*b", r"c.+d"]`.
+    - `strip_keys`: Strip the response body of keys matching this regex. This treats the response body as a dictionary (JSON). The regexes are passed in as an array, e.g. `["data.posts", "data.indexes"]`.
+    - `sort`: Sort the response body. This treats the response body as a list of dictionaries (JSON). The value of this parameter is an array of objects with the following fields:
+        - `list`: The compound key to sort on. An empty list (`''`) name means sort the top list, otherwise it's a field designation, such as `'data.posts'`.
+        - `field`: The field to sort on, e.g. `id`.
+       
+      Example: `[{"list": "data.posts", "field": "id"}]`
+    - `sort`: 
 
 
 - `login`: Wrapper over the `rest` function that uses the given `path`, `username`, `password` to log in to the REST server.
@@ -174,45 +192,24 @@ The functions:
     - `use_input_file`: Whether to use the input file as payload for the request.
     - `input_data_raw`: Inline payload for the request.
     - `use_output_file`: Whether to save the response to the output file.  If set to `False`, the result of the request is ignored.
-    - `use_expected_output`: Whether to require the expected output file to be present.  If set to `False`, the value of `expected` from the returned tuple is `None`.
     - `retrieve_headers`: Whether to retrieve the headers from the response.
     - `follow_redirects`: Whether to follow redirects.
-    - `strip_regex`: Strip the response body of content matching these regexes. This treats the response body as a string. The regexes are passed in as an array, e.g. `[r"a.*b", r"c.+d"]`.
-    - `strip_keys`: Strip the response body of keys matching this regex. This treats the response body as a dictionary (JSON). The regexes are passed in as an array, e.g. `["data.posts", "data.indexes"]`.
-    - `sort`: Sort the response body. This treats the response body as a list of dictionaries (JSON). The value of this parameter is an array of objects with the following fields:
-        - `list`: The compound key to sort on, e.g. `data.posts`.
-        - `field`: The field to sort on, e.g. `id`.
-       
-      Example: `[{"list": "data.posts", "field": "id"}]`
+    - `variables`, `use_expected_output`, `strip_regex`, `strip_keys`, `sort`: Same as for the `cli` function.
 
 
 - `graphql`: 
 
     - `server_public`: If present, the Public (unauthenticated) GraphQL server to use. If not present, it is read from the `.dev.env` file, from the `GRAPHQL_SERVER_PUBLIC` variable.
     - `server_private`: If present, the Private (authenticated) GraphQL server to use. If not present, it is read from the `.dev.env` file, from the `GRAPHQL_SERVER_PRIVATE` variable.
-    - `variables`: Placeholder replacements for your GraphQL variables. If you pass this in, then you need to create a `.vars.template.json` and in there you can use placeholders like `${ID}`. Then pass `variables={"ID": "1"}` to the `graphql` function.
-    - `use_token`: Same as for the `rest` function.
-    - `check_token`: Same as for the `rest` function.
-    - `use_expected_output`: Same as for the `rest` function.
-    - `strip_regex`: Same as for the `rest` function.
-    - `strip_keys`: Same as for the `rest` function.
-    - `sort`: Same as for the `rest` function.
+    - `use_token` , `check_token`: Same as for the `rest` function.
+    - `variables`, `use_expected_output`, `strip_regex`, `strip_keys`, `sort`: Same as for the `cli` function.
 
 
 - `websocket`: 
 
     - `server`: If present, the WebSocket server to use. If not present, it is read from the `.dev.env` file, from the `WEBSOCKETS_SERVER_URL` variable.
-    - `use_expected_output`: Same as for the `rest` function.
     - `ignore_messages`: An array of WebSocket response messages to ignore. (Useful with some servers that send periodic messages.)
-    - `strip_regex`: Same as for the `rest` function.
-    - `strip_keys`: Same as for the `rest` function.
-    - `sort`: Same as for the `rest` function.
-
-
-- `cli`: Basic test runner that runs a command and returns the expected and actual output. Parameters:
-
-    - TBD
-    - `sort`: empty list name means top list, otherwise it's a field designation, such as `data.posts`
+    - `variables`, `use_expected_output`, `strip_regex`, `strip_keys`, `sort`: Same as for the `cli` function.
 
 
 

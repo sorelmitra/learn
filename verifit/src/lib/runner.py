@@ -17,6 +17,18 @@ class Runner:
         }
         self._token = ''
 
+    def cli(self,
+            command,
+            variables=None,
+            use_expected_output=True,
+            strip_regex=None,
+            strip_keys=None,
+            sort=None):
+        self._prepare_for_test("json")
+        if variables is not None:
+            self._create_vars(get_input_filename(), variables)
+        return self._run_test_command(command, strip_regex, strip_keys, sort, False, use_expected_output)
+
     def login(self, path, username, password):
         return self.rest(path=path, method="POST",
                          use_input_file=False, use_expected_output=False,
@@ -35,6 +47,7 @@ class Runner:
              server=None,
              path='',
              method="GET",
+             variables=None,
              filetype=None,
              use_token=True,
              check_token=False,
@@ -78,6 +91,8 @@ class Runner:
             command += [
                 "--location",
             ]
+        if variables is not None:
+            self._create_vars(get_input_filename(), variables)
         return self._run_test_command(command, strip_regex, strip_keys, sort, check_token, use_expected_output)
 
     def graphql(self,
@@ -115,6 +130,7 @@ class Runner:
 
     def websocket(self,
                   server=None,
+                  variables=None,
                   use_expected_output=True,
                   ignore_messages=None,
                   strip_regex=None,
@@ -143,6 +159,8 @@ class Runner:
         background_test_command += [server]
         print(background_test_command)
 
+        if variables is not None:
+            self._create_vars(get_input_filename(), variables)
         return run_triggered_background_test(
             background_test_command, trigger_command, use_expected_output=use_expected_output, strip_regex=strip_regex, strip_keys=strip_keys, sort=sort)
 
