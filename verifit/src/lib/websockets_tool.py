@@ -1,9 +1,9 @@
 import asyncio
+import re
 
 import websockets
-from dotenv import dotenv_values
 
-from verifit import *
+from config_tool import *
 
 
 class WebsocketsTool:
@@ -14,21 +14,17 @@ class WebsocketsTool:
                  wait_ms=None,
                  ignore_list=None):
         self.LOG = print
-        self._ENV = os.environ['ENV']
-        self._config = {
-            **dotenv_values(f".{self._ENV}.env")
-        }
 
         self._server = server
         if server is None:
-            self._server = self._config['WEBSOCKETS_SERVER_URL']
+            self._server = Config.value['WEBSOCKETS_SERVER_URL']
 
         self._input_filename = input_filename
         self._output_filename = output_filename
 
         self._wait_ms = wait_ms
         if wait_ms is None:
-            self._wait_ms = int(self._config['WEBSOCKETS_WAIT_MS'])
+            self._wait_ms = int(Config.value['WEBSOCKETS_WAIT_MS'])
 
         self._ignore_list = ignore_list
 

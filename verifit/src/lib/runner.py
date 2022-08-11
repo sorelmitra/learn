@@ -1,6 +1,6 @@
-from dotenv import dotenv_values
-
 from verifit import *
+from config_tool import *
+from graphql_tool import GraphQLTool
 from websockets_tool import WebsocketsTool
 
 
@@ -12,10 +12,6 @@ class Runner:
         self._expected = None
         self._old_stack_number = None
         self._old_filetype = None
-        self._ENV = os.environ['ENV']
-        self._config = {
-            **dotenv_values(f".{self._ENV}.env")
-        }
         self._token = ''
 
     def cli(self,
@@ -63,7 +59,7 @@ class Runner:
              sort=None):
         self._prepare_for_test(filetype)
         if server is None:
-            server = self._config["REST_SERVER"]
+            server = Config.value["REST_SERVER"]
         command = [
             "curl", "-X", method, f'{server}{path}',
             "--header", "Content-Type: application/json; charset=UTF-8",
@@ -107,27 +103,17 @@ class Runner:
                 strip_keys=None,
                 sort=None):
         self._prepare_for_test("json")
-        if server_public is None:
-            server_public = self._config["GRAPHQL_SERVER_PUBLIC"]
-        if server_private is None:
-            server_private = self._config["GRAPHQL_SERVER_PRIVATE"]
-        command = [
-            "vitgql", "send",
-            "--input-file", get_input_filename(),
-            "--output-file", get_output_filename(),
-        ]
-        if use_token:
-            command += [
-                "--server", server_private,
-                "--token", self._token,
-            ]
-        else:
-            command += [
-                "--server", server_public,
-            ]
+        gql_tool = GraphQLTool(
+            server_public=server_public,
+            server_private=server_private,
+            input_filename=get_input_filename(),
+            use_token=use_token,
+            token=self._token)
         if variables is not None:
             self._create_vars(get_input_filename(), variables)
-        return self._run_test_command(command, strip_regex, strip_keys, sort, check_token, use_expected_output)
+        return self._run_test_command(gql_tool.prepare_query_and_command(),
+                                      strip_regex, strip_keys, sort,
+                                      check_token, use_expected_output)
 
     def websocket(self,
                   server=None,
