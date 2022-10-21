@@ -54,4 +54,13 @@ Testing everything:
 - To logout, open `http://localhost:8080/logout` in the browser.
 - To see the user's profile information, open `http://localhost:8080/profile`.  If you're logged in, you'll see the profile information as returned by Okta.  (NOTE: For some reason, the name and nickname are empty, although I've set them on my user in Okta Trial.  But the user ID matches.)  If you're not logged in, you'll be redirected to the login page.
 
+## Resources
+
+[Configure Okta as OAuth2 Identity Provider](https://auth0.com/docs/authenticate/identity-providers/social-identity-providers/configure-okta-as-oauth2-identity-provider)
+
+[OIDC app not on dashboard](https://support.okta.com/help/s/article/OIDC-app-not-on-dashboard?language=en_US)
+
+[Cannot create access token with custom scopes using private_key_jwt](https://devforum.okta.com/t/cannot-create-access-token-with-custom-scopes-using-private-key-jwt/13539)
+
+[Okta error One or more scopes are not configured for the authorization server resource](https://support.okta.com/help/s/question/0D54z00007JYLaqCAH/one-or-more-scopes-are-not-configured-for-the-authorization-server-resource?language=en_US)
 
