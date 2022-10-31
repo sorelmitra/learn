@@ -1,23 +1,28 @@
 import express from "express";
-
 import oidc from "express-openid-connect";
+import * as dotenv from "dotenv";
+
 import {LOG} from "./log.js";
+
+dotenv.config({path: '.trial.env'});
+
+console.log(process.env);
 
 const {auth, requiresAuth} = oidc;
 
 const app = express();
 
-const config = {
+const auth0_config = {
   authRequired: false,
   auth0Logout: true,
-  secret: '4c8fe981070519ed4cbd6b4d80f373536ef1f253fc1da9625f2a91a3663baa5e',
-  baseURL: 'http://localhost:8080',
-  clientID: '<your-client-id>',
-  issuerBaseURL: 'https://<your-auth0-tenant>.auth0.com'
+  secret: process.env.GENERATED_SECRET,
+  baseURL: process.env.BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: process.env.ISSUER_BASE_URL
 };
 
 // auth router attaches /login, /logout, and /callback routes to the baseURL
-app.use(auth(config));
+app.use(auth(auth0_config));
 
 // req.isAuthenticated is provided from the auth router
 app.get('/', (req, res) => {
