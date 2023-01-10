@@ -1,0 +1,24 @@
+variable "network_interface_id" {
+  type = string
+  default = "network_id_from_aws"
+}
+
+variable "ami" {
+    type = string
+    default = "ami-03f8756d29f0b5f21"  # Ubuntu 22.04 as of 2023-01-10, go to AWS -> EC2 -> AMI catalog for more
+}
+
+variable "instance_type" {
+    type = string
+    default = "t2.micro"
+}
+
+variable "aws_region" {
+  type = string
+  default = "us-west-2"
+}
+
+variable "aws_profile" {
+  type = string
+  default = "dev-profile"
+}
