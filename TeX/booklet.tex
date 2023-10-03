@@ -1,0 +1,27 @@
+\documentclass[a4paper]{article}
+
+\usepackage{pdfpages}
+
+\begin{document}
+
+% This code will take book.pdf and produce a booklet version of it.
+% It assumes the book.pdf page size is small enough so that it fits the layout 
+% that we're using.
+
+% pdfpages options:
+
+% pages=- include all original pages
+% nup=2x1 place two pages on a row
+% noautoscale keep original page dimensions, otherwise they will scale to fit new page
+% frame draw a frame around every original page
+% signature*=8 organize pages in 8 pages booklets
+% landscape new page will be landscape
+% angle=180 not sure what it means, but works.
+% delta=0 1cm introduces some separation between pages. If you don't need it, delete it.
+
+% This assumes that you will use double side printing.
+
+\includepdf[pages=-, nup=2x1, noautoscale, 
+            frame, signature*=8, landscape, 
+            angle=180, delta=0 1cm]{book}
+\end{document}

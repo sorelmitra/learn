@@ -4,6 +4,8 @@ XELATEX=/Library/TeX/texbin/xelatex
 
 TEXES:= \
 	test.tex \
+	book.tex \
+	booklet.tex \
 
 PDFS:=$(TEXES:.tex=.pdf)
 
