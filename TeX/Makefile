@@ -19,6 +19,8 @@ all: $(PDFS)
 
 .DELETE_ON_ERROR:
 
+booklet.pdf: book.tex
+
 %.pdf %.aux %.idx: %.tex
 	${XELATEX} $<
 	@while grep 'Rerun to get ' $*.log ; do ${XELATEX} $< ; done

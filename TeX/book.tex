@@ -1,16 +1,50 @@
 \documentclass{article}
-\usepackage{lipsum}
-\usepackage[papersize={10cm,8cm}]{geometry}
-\usepackage[placement=center,angle=0,color=blue!95,scale=7]{background}
-\backgroundsetup{contents={-\thepage-}}
+\usepackage{graphicx}
+\usepackage[papersize={10cm,16cm}, margin=1.5cm]{geometry}
+\usepackage[
+	contents={},
+	opacity=1,
+	scale=1,
+	color=blue!90
+	]{background}
+\usepackage{ifthen}
 \usepackage{pgffor}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+
+\AddEverypageHook{%
+	\ifthenelse{\isodd{\value{page}}}%
+		{\backgroundsetup{
+			angle=0,
+			position={0,0},
+			contents={
+				\begin{tikzpicture}[remember picture,overlay,shift={(current page.south west)}]
+					\draw [draw=red!30!white,fill=red!30!white] (9,0) rectangle +(1,16);
+					\draw [draw=red!30!white,fill=red!30!white] (0,15) rectangle +(10,1);
+				\end{tikzpicture}
+			}
+		}}
+		{\backgroundsetup{
+		angle=0,
+		position={0,0},%
+		contents={
+			\begin{tikzpicture}[remember picture,overlay,shift={(current page.south west)}]
+				\draw [draw=red!30!white,fill=red!30!white] (0,0) rectangle +(1,16);
+				\draw [draw=red!30!white,fill=red!30!white] (0,15) rectangle +(10,1);
+			\end{tikzpicture}
+		}
+		}}
+	\BgMaterial}
 
 \begin{document}
 
-\foreach \i in {1,...,24}
+\foreach \i in {1,...,8}
 {
-    ABC
-    \newpage
+	A phony target is one that is not really the name of a file; rather it is just a name for a recipe to be executed when you make an explicit request. \\ There are two reasons to use a phony target: to avoid a conflict with a file of the same name, and to improve performance.
+
+	To help you get started with TikZ, instead of a long installation and configuration section, this manual starts with tutorials. They explain all the basic and some of the more advanced features of the system, without going into all the details. This part also contains some guidelines on how you should proceed when creating graphics using TikZ.
+
+	\newpage
 }
 
 \end{document}
