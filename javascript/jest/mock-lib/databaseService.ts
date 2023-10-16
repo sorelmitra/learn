@@ -1,10 +1,6 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
-interface IDatabaseService {
-  getKey2(key1: string): Promise<string>;
-}
-
-class DatabaseService implements IDatabaseService {
+class DatabaseService {
   private ddb: DocumentClient = new DocumentClient();
 
   async getKey2(key1: string): Promise<string> {
@@ -27,4 +23,4 @@ class DatabaseService implements IDatabaseService {
   }
 }
 
-export const databaseService: IDatabaseService = new DatabaseService();
+export const databaseService = new DatabaseService();
