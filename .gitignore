@@ -69,3 +69,4 @@ verifit/venv
 **/*.vcxproj.user
 **/*.class
 
+*.synctex.gz
