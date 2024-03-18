@@ -1,4 +1,5 @@
 import random
+import subprocess
 
 import matplotlib.pyplot as plot
 import matplotlib.patches as pc
@@ -32,6 +33,29 @@ def semidiurnal_tide(neap_level=0, centered_on_hw=True):
 			return (height_variation + neap_variation + moon_amplitude * constituent(moon_speed) + solar_amplitude * constituent(solar_speed)) / total_amplitude
 		return compute
 	return with_height_variation
+
+
+def is_dark_mode():
+	"""Checks DARK/LIGHT mode of macos."""
+	cmd = 'defaults read -g AppleInterfaceStyle'
+	p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+						 stderr=subprocess.PIPE, shell=True)
+	return bool(p.communicate()[0])
+
+
+def get_plot_colors():
+	color_back = 'white'
+	color_fore = 'black'
+	color_labels = 'darkgreen'
+	color_springs = 'firebrick'
+	color_neaps = 'dodgerblue'
+	if is_dark_mode():
+		color_back = '#303030'
+		color_fore = 'tan'
+		color_labels = 'palegreen'
+		color_springs = 'lightcoral'
+		color_neaps = 'lightskyblue'
+	return (color_back, color_fore, color_labels, color_springs, color_neaps)
 
 
 def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mean=0, size_inches=(14, 7), max_low_water=9, max_high_water=15.3):
@@ -70,9 +94,10 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 			intersection.append(adjust + tide_hour)
 		return intersection
 
+	(color_back, color_fore, color_labels, color_springs, color_neaps) = get_plot_colors()
 	time_range_hours = 12
 	time = np.linspace(0, time_range_hours, 1000)
-	fig = plot.figure(figsize=size_inches)
+	fig = plot.figure(figsize=size_inches, facecolor=color_back)
 	hour_step = 1 / 6
 	ax = fig.add_subplot(1, 1, 1)
 	ax.margins(x=0, y=0)
@@ -90,42 +115,43 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 	curve_start = max_low_water * water_height_factor + 0.8
 	if max_high_water > 10:
 		curve_start += 0.5
-	ax.vlines(water_height_factor * np.arange(0, max_low_water + water_height_step, water_height_step), 0, .015, linewidth=.5, colors='black')
-	ax.vlines(water_height_factor * np.arange(0, max_high_water + water_height_step, water_height_step), 1, 1 - .015, linewidth=.5, colors='black')
+	ax.vlines(water_height_factor * np.arange(0, max_low_water + water_height_step, water_height_step), 0, .015, linewidth=.5, colors=color_fore)
+	ax.vlines(water_height_factor * np.arange(0, max_high_water + water_height_step, water_height_step), 1, 1 - .015, linewidth=.5, colors=color_fore)
 	for i in range(0, int(max_low_water) + 1):
-		plot.text(water_height_factor * i - 0.08, -0.03, str(i), color='darkgreen')
+		plot.text(water_height_factor * i - 0.08, -0.03, str(i), color=color_labels)
 	for i in range(0, int(max_high_water) + 1):
-		plot.text(water_height_factor * i - 0.08, 1 + 0.01, str(i), color='darkgreen')
+		plot.text(water_height_factor * i - 0.08, 1 + 0.01, str(i), color=color_labels)
 	h_lines_y = [n / 10.0 + 0.001 for n in range(0, 11)]
-	ax.hlines(h_lines_y, 0, compute_ebb_intersection(heights=h_lines_y, adjust=curve_start + hour_step), colors='black')
+	ax.hlines(h_lines_y, 0, compute_ebb_intersection(heights=h_lines_y, adjust=curve_start + hour_step), colors=color_fore)
 	for i in range(1, 10):
 		text_y = h_lines_y[i]
-		plot.text(curve_start + 6 + 0.05, text_y + 0.005, format(i / 10.0, '.1f'), color='darkgreen')
+		plot.text(curve_start + 6 + 0.05, text_y + 0.005, format(i / 10.0, '.1f'), color=color_labels)
 	v_lines_x = [n * water_height_factor for n in range(1, int(max_high_water) + 1)]
-	ax.vlines(0.02, 0, 1, linewidth=1.5, colors='black')
-	ax.vlines(v_lines_x, compute_flood_intersection(x_axis=v_lines_x, lw_start=curve_start), 1, linewidth=1.5, colors='black')
+	ax.vlines(0.02, 0, 1, linewidth=1.5, colors=color_fore)
+	ax.vlines(v_lines_x, compute_flood_intersection(x_axis=v_lines_x, lw_start=curve_start), 1, linewidth=1.5, colors=color_fore)
 	v_lines_x = [(n + 0.5) * water_height_factor for n in range(0, int(max_high_water))]
-	ax.vlines(v_lines_x, compute_flood_intersection(x_axis=v_lines_x, lw_start=curve_start), 1, linewidth=.5, colors='black')
-	ax.vlines(curve_start + np.arange(hour_step, 12 - hour_step, hour_step), 0, .015, linewidth=.5, colors='black')
-	plot.text(0 - .06, 1 + .05, 'H.W. heights m', color='darkgreen')
-	plot.text(0 + .1, 0.59, 'CHART DATUM', rotation=270, rotation_mode='anchor', color='darkgreen')
-	plot.text(0 - .06, 0 - .07, 'L.W. heights m', color='darkgreen')
+	ax.vlines(v_lines_x, compute_flood_intersection(x_axis=v_lines_x, lw_start=curve_start), 1, linewidth=.5, colors=color_fore)
+	ax.vlines(curve_start + np.arange(hour_step, 12 - hour_step, hour_step), 0, .015, linewidth=.5, colors=color_fore)
+	plot.text(0 - .06, 1 + .05, 'H.W. heights m', color=color_labels)
+	plot.text(0 + .1, 0.59, 'CHART DATUM', rotation=270, rotation_mode='anchor', color=color_labels)
+	plot.text(0 - .06, 0 - .07, 'L.W. heights m', color=color_labels)
 	labels = ['LW', '-5h', '-4h', '-3h', '-2h', '-1h', 'HW', '+1h', '+2h', '+3h', '+4h', '+5h', 'LW']
 	box_width = 1
 	box_height = 0.06
 	for i in range(0, 13):
-		plot.text(curve_start + i - 0.3, -0.03, labels[i], color='darkgreen')
-		ax.add_patch(pc.Rectangle((curve_start + i - box_width / 1.7, -box_height - 0.05), box_width, box_height, edgecolor='black', fill=False))
-	plot.text(curve_start + 6 + .6, 0.54, 'Factor', rotation=270, rotation_mode='anchor', color='darkgreen')
-	ax.vlines(curve_start + np.arange(1, 12 + hour_step, 6 * hour_step), 0, [h(x) for x in range(1, 13)], linewidth=1.5, colors='black')
-	ax.vlines(curve_start + np.arange(1 + 3 * hour_step, 11 + 3 * hour_step, 6 * hour_step), 0, [h(x + 3 * hour_step) for x in range(1, 11)], linewidth=.5, colors='black')
+		plot.text(curve_start + i - 0.3, -0.03, labels[i], color=color_labels)
+		ax.add_patch(pc.Rectangle((curve_start + i - box_width / 1.7, -box_height - 0.05), box_width, box_height, edgecolor=color_fore, fill=False))
+	plot.text(curve_start + 6 + .6, 0.54, 'Factor', rotation=270, rotation_mode='anchor', color=color_labels)
+	ax.vlines(curve_start + np.arange(1, 12 + hour_step, 6 * hour_step), 0, [h(x) for x in range(1, 13)], linewidth=1.5, colors=color_fore)
+	ax.vlines(curve_start + np.arange(1 + 3 * hour_step, 11 + 3 * hour_step, 6 * hour_step), 0, [h(x + 3 * hour_step) for x in range(1, 11)], linewidth=.5, colors=color_fore)
 	if neaps_tide_func is not None:
 		neaps_tide = neaps_tide_func(time)
-		ax.plot(curve_start + time, neaps_tide, label=f"Neaps {format(neaps_mean, '.1f')}m", color='dodgerblue', linestyle='dashed')
+		ax.plot(curve_start + time, neaps_tide, label=f"Neaps {format(neaps_mean, '.1f')}m", color=color_neaps, linestyle='dashed')
 	springs_tide = springs_tide_func(time)
-	ax.plot(curve_start + time, springs_tide, label=f"Springs {format(springs_mean, '.1f')}m", color='firebrick')
+	ax.plot(curve_start + time, springs_tide, label=f"Springs {format(springs_mean, '.1f')}m", color=color_springs)
+	ax.set_facecolor(color_back)
 	# plot.title('Fictional Port Tidal Curve')
-	plot.legend()
+	plot.legend(facecolor=color_back, labelcolor=color_fore)
 	plot.show()
 
 
@@ -152,7 +178,8 @@ springs_lw = springs_height(0)
 print(f"HW={format(springs_hw, '.1f')}")
 print(f"LW={format(springs_lw, '.1f')}")
 
-a_tide_hour = 1 + 11 * random.random()
+# a_tide_hour = 1 + 11 * random.random()
+a_tide_hour = 6
 tide_hour_per_hw = a_tide_hour - 6
 print(f"Tide height at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(springs_height(a_tide_hour), '.1f')} m")
 
