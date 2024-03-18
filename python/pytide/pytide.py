@@ -155,33 +155,31 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 	plot.show()
 
 
-def get_height_variation():
-	return 1
+make_springs = semidiurnal_tide()
+make_neaps = semidiurnal_tide(neap_level=5)
 
+springs_curve = make_springs(0)
+neaps_curve = make_neaps(0)
 
-springs = semidiurnal_tide()
-springs_curve = springs(0)
-springs_height = springs(get_height_variation())
-neaps = semidiurnal_tide(neap_level=5)
-neaps_curve = neaps(0)
-neaps_height = neaps(get_height_variation())
+height_variation = 1
+compute_springs_height = make_springs(height_variation)
+compute_neaps_height = make_neaps(height_variation)
 
-print('Neaps')
-neaps_hw = neaps_height(6)
-neaps_lw = neaps_height(0)
+print('Neaps for this lunar cycle')
+neaps_hw = compute_neaps_height(6)
+neaps_lw = compute_neaps_height(0)
 print(f"HW={format(neaps_hw, '.1f')}")
 print(f"LW={format(neaps_lw, '.1f')}")
 
-print('Springs')
-springs_hw = springs_height(6)
-springs_lw = springs_height(0)
+print('Springs for this lunar cycle')
+springs_hw = compute_springs_height(6)
+springs_lw = compute_springs_height(0)
 print(f"HW={format(springs_hw, '.1f')}")
 print(f"LW={format(springs_lw, '.1f')}")
 
-# a_tide_hour = 1 + 11 * random.random()
-a_tide_hour = 6
+a_tide_hour = 1 + 11 * random.random()
 tide_hour_per_hw = a_tide_hour - 6
-print(f"Tide height at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(springs_height(a_tide_hour), '.1f')} m")
+print(f"Tide height at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(compute_springs_height(a_tide_hour), '.1f')} m")
 
 plot_tide(
 	springs_tide_func=springs_curve,
