@@ -7,7 +7,7 @@ import numpy as np
 
 
 # Source https://www.vims.edu/research/units/labgroups/tc_tutorial/tide_analysis.php
-def semidiurnal_tide(neap_level=0, centered_on_hw=True):
+def semidiurnal_tide(neap_level=0.0, centered_on_hw=True):
 	def with_height_variation(height_variation=0):
 		def compute(tide_time):
 			my_neap_level = neap_level  # Python stupidity
@@ -155,15 +155,10 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 	plot.show()
 
 
-make_springs = semidiurnal_tide()
-make_neaps = semidiurnal_tide(neap_level=5)
-
-springs_curve = make_springs(0)
-neaps_curve = make_neaps(0)
-
-height_variation = 1
-compute_springs_height = make_springs(height_variation)
-compute_neaps_height = make_neaps(height_variation)
+current_height_variation = 1
+neaps_neap_level = 5.0
+compute_springs_height = semidiurnal_tide()(current_height_variation)
+compute_neaps_height = semidiurnal_tide(neap_level=neaps_neap_level)(current_height_variation)
 
 print('Neaps for this lunar cycle')
 neaps_hw = compute_neaps_height(6)
@@ -176,16 +171,31 @@ springs_hw = compute_springs_height(6)
 springs_lw = compute_springs_height(0)
 print(f"HW={format(springs_hw, '.1f')}")
 print(f"LW={format(springs_lw, '.1f')}")
+print()
+
+# TODO: Fill in a dictionary accessible by day
+# TODO: Use a nonlinear function, that decreases step size as we approach springs
+lunar_length = 27
+step = neaps_neap_level / lunar_length
+for i in range(0, lunar_length + 1):
+	current_neap_level = neaps_neap_level - i * step
+	compute_current_height = semidiurnal_tide(neap_level=current_neap_level)(current_height_variation)
+	current_hw = compute_current_height(6)
+	current_lw = compute_current_height(0)
+	print(f"Day {i+1}, neap level {format(current_neap_level, '.2f')}")
+	print(f"HW={format(current_hw, '.1f')}")
+	print(f"LW={format(current_lw, '.1f')}")
+	print()
 
 a_tide_hour = 1 + 11 * random.random()
 tide_hour_per_hw = a_tide_hour - 6
-print(f"Tide height at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(compute_springs_height(a_tide_hour), '.1f')} m")
+print(f"Springs tide height at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(compute_springs_height(a_tide_hour), '.1f')} m")
 
 plot_tide(
-	springs_tide_func=springs_curve,
+	springs_tide_func=(semidiurnal_tide()(0)),
 	springs_mean=springs_hw - springs_lw,
 	max_high_water=springs_hw + 1,
-	neaps_tide_func=neaps_curve,
+	neaps_tide_func=(semidiurnal_tide(neap_level=5)(0)),
 	neaps_mean=neaps_hw - neaps_lw,
 	max_low_water=springs_lw + 1
 )
