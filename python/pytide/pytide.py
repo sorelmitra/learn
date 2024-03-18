@@ -173,23 +173,35 @@ print(f"HW={format(springs_hw, '.1f')}")
 print(f"LW={format(springs_lw, '.1f')}")
 print()
 
-# TODO: Fill in a dictionary accessible by day
+class TideHeight:
+	def __init__(self, *, day, hw_height, lw_height, compute_func):
+		self.day = day
+		self.hw_height = hw_height
+		self.lw_height = lw_height
+		self.compute_func = compute_func
+
+
+tide_heights = []
 # TODO: Use a nonlinear function, that decreases step size as we approach springs
 lunar_length = 27
 step = neaps_neap_level / lunar_length
-for i in range(0, lunar_length + 1):
-	current_neap_level = neaps_neap_level - i * step
+for k in range(0, lunar_length + 1):
+	current_neap_level = neaps_neap_level - k * step
 	compute_current_height = semidiurnal_tide(neap_level=current_neap_level)(current_height_variation)
 	current_hw = compute_current_height(6)
 	current_lw = compute_current_height(0)
-	print(f"Day {i+1}, neap level {format(current_neap_level, '.2f')}")
-	print(f"HW={format(current_hw, '.1f')}")
-	print(f"LW={format(current_lw, '.1f')}")
+	tide = TideHeight(day=k + 1, hw_height=current_hw, lw_height=current_lw, compute_func=compute_current_height)
+	tide_heights.append(tide)
+	print(f"Day {tide.day}, neap level {format(current_neap_level, '.2f')}")
+	print(f"HW={format(tide.hw_height, '.1f')}")
+	print(f"LW={format(tide.lw_height, '.1f')}")
 	print()
 
 a_tide_hour = 1 + 11 * random.random()
 tide_hour_per_hw = a_tide_hour - 6
-print(f"Springs tide height at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(compute_springs_height(a_tide_hour), '.1f')} m")
+current_day = 7
+current_tide = tide_heights[current_day]
+print(f"Tide height for day {current_day} at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(current_tide.compute_func(a_tide_hour), '.1f')} m")
 
 plot_tide(
 	springs_tide_func=(semidiurnal_tide()(0)),
