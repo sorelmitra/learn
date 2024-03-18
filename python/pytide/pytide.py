@@ -55,7 +55,7 @@ def get_plot_colors():
 		color_labels = 'palegreen'
 		color_springs = 'lightcoral'
 		color_neaps = 'lightskyblue'
-	return (color_back, color_fore, color_labels, color_springs, color_neaps)
+	return color_back, color_fore, color_labels, color_springs, color_neaps
 
 
 def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mean=0, size_inches=(14, 7), max_low_water=9, max_high_water=15.3):
@@ -94,7 +94,7 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 			intersection.append(adjust + tide_hour)
 		return intersection
 
-	(color_back, color_fore, color_labels, color_springs, color_neaps) = get_plot_colors()
+	color_back, color_fore, color_labels, color_springs, color_neaps = get_plot_colors()
 	time_range_hours = 12
 	time = np.linspace(0, time_range_hours, 1000)
 	fig = plot.figure(figsize=size_inches, facecolor=color_back)
