@@ -7,32 +7,29 @@ import numpy as np
 
 
 # Source https://www.vims.edu/research/units/labgroups/tc_tutorial/tide_analysis.php
-def semidiurnal_tide(neap_level=0.0, centered_on_hw=True):
-	def with_height_variation(height_variation=0):
-		def compute(tide_time):
-			my_neap_level = neap_level  # Python stupidity
+def semidiurnal_tide(*, min_water_factor=0, max_water_factor=0, neap_factor=0, centered_on_hw=True):
+	def compute(tide_time):
+		nonlocal min_water_factor, max_water_factor
+		def constituent(speed_degrees):
+			interval_between_hw_and_lw = 6.1
+			half_amplitude = 0.5
+			constituent_phase = interval_between_hw_and_lw / 2 if centered_on_hw else 0
+			speed_radians = speed_degrees * np.pi / 180
+			return half_amplitude + half_amplitude * np.cos(speed_radians * tide_time - constituent_phase)
 
-			def constituent(speed_degrees):
-				interval_between_hw_and_lw = 6.1
-				half_amplitude = 0.5
-				constituent_phase = interval_between_hw_and_lw / 2 if centered_on_hw else 0
-				speed_radians = speed_degrees * np.pi / 180
-				return half_amplitude + half_amplitude * np.cos(speed_radians * tide_time - constituent_phase)
-
-			max_neap_level = 5
-			if my_neap_level > max_neap_level:
-				my_neap_level = max_neap_level
-			if my_neap_level < 0:
-				my_neap_level = 0
-			moon_amplitude = 3.2
-			solar_amplitude = (0.3 + 0.15 * my_neap_level) * (-1 if my_neap_level > 0 else 1)
-			moon_speed = 28.9
-			solar_speed = 30.0
-			total_amplitude = moon_amplitude + solar_amplitude if height_variation == 0 else 1
-			neap_variation = 0 if height_variation == 0 else -0.09 * my_neap_level + (0.2 * my_neap_level if tide_time == 0 else 0)
-			return (height_variation + neap_variation + moon_amplitude * constituent(moon_speed) + solar_amplitude * constituent(solar_speed)) / total_amplitude
-		return compute
-	return with_height_variation
+		moon_amplitude = 3.2 + 0.1 * neap_factor
+		solar_amplitude = 0.3 + 0.05 * neap_factor
+		moon_speed = 28.9
+		solar_speed = 30.0
+		total_amplitude = moon_amplitude + solar_amplitude
+		base_height = 0
+		if min_water_factor > max_water_factor:
+			min_water_factor = max_water_factor
+		if max_water_factor > 0:
+			total_amplitude *= (2.5 + 0.2 * neap_factor)/(max_water_factor + min_water_factor)
+			base_height = min_water_factor + 0.5 * neap_factor
+		return (base_height + moon_amplitude * constituent(moon_speed) + solar_amplitude * constituent(solar_speed)) / total_amplitude
+	return compute
 
 
 def is_dark_mode():
@@ -59,7 +56,7 @@ def get_plot_colors():
 
 
 def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mean=0, size_inches=(14, 7), max_low_water=9, max_high_water=15.3):
-	h = lambda t: max(springs_tide_func(t), neaps_tide_func(t))
+	h = lambda t: springs_tide_func(t) if neaps_tide_func is None else max(springs_tide_func(t), neaps_tide_func(t))
 
 	def compute_flood_intersection(x_axis, lw_start=0.0):
 		intersection = []
@@ -85,7 +82,7 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 		tide_hour = 12.3
 		increment = 1/10.0
 		for line_height in heights:
-			while True:
+			while tide_hour > 6:
 				tide_hour -= increment
 				y = h(tide_hour)
 				if y > line_height:
@@ -112,9 +109,11 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 	# set up grid
 	water_height_step = 1 / 10.0
 	water_height_factor = 1.3
-	if max_high_water > 5:
+	if max_high_water > 8:
 		water_height_step = 1 / 5.0
-		water_height_factor = 1
+		water_height_factor = 0.8
+		if max_high_water > 11:
+			water_height_factor = 0.5
 	curve_start = max_low_water * water_height_factor + 0.8
 	if max_high_water > 10:
 		curve_start += 0.5
@@ -132,6 +131,7 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 
 	# draw grid horizontal lines
 	h_lines_y = [n / 10.0 + 0.001 for n in range(0, 11)]
+	h_lines_y[10] -= 0.0025
 	ax.hlines(h_lines_y, 0, compute_ebb_intersection(heights=h_lines_y, adjust=curve_start + hour_step), colors=color_fore)
 
 	# plot factor labels
@@ -189,12 +189,11 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 	plot.show()
 
 
-current_height_variation = 1
-neaps_neap_level = 5.0
-compute_springs_height = semidiurnal_tide()(current_height_variation)
-compute_neaps_height = semidiurnal_tide(neap_level=neaps_neap_level)(current_height_variation)
+tide_factors = dict(min_water_factor=2, max_water_factor=5)
+neap_level = 5
+compute_springs_height = semidiurnal_tide(**tide_factors)
+compute_neaps_height = semidiurnal_tide(**tide_factors, neap_factor=neap_level)
 
-# TODO: Fix computing tide for neaps 7-12 hours
 print('Neaps for this tide cycle')
 neaps_lw = compute_neaps_height(0)
 neaps_hw = compute_neaps_height(6)
@@ -202,10 +201,11 @@ neaps_lw2 = compute_neaps_height(12)
 print(f"LW={format(neaps_lw, '.1f')}")
 print(f"HW={format(neaps_hw, '.1f')}")
 print(f"LW={format(neaps_lw2, '.1f')}")
-
+print('All neaps hours')
 for i2 in range(0, 13):
 	ht = compute_neaps_height(i2)
 	print(f"{i2}h={format(ht, '.1f')}")
+print()
 
 print('Springs for this tide cycle')
 springs_lw = compute_springs_height(0)
@@ -214,6 +214,7 @@ springs_lw2 = compute_springs_height(12)
 print(f"LW={format(springs_lw, '.1f')}")
 print(f"HW={format(springs_hw, '.1f')}")
 print(f"LW={format(springs_lw2, '.1f')}")
+print('All springs hours')
 for i3 in range(0, 13):
 	ht = compute_springs_height(i3)
 	print(f"{i3}h={format(ht, '.1f')}")
@@ -230,11 +231,11 @@ class TideHeight:
 # TODO: Make a generative function that goes both ways neaps <-> springs
 tide_heights = []
 tide_cycle_length = random.randint(7, 9)
-step = neaps_neap_level / (tide_cycle_length - 1)
-current_neap_level = neaps_neap_level
+step = neap_level / (tide_cycle_length - 1)
+current_neap_level = neap_level
 for k in range(0, tide_cycle_length):
 	# compute tide height based on neap level
-	compute_current_height = semidiurnal_tide(neap_level=current_neap_level)(current_height_variation)
+	compute_current_height = semidiurnal_tide(**tide_factors, neap_factor=current_neap_level)
 
 	# store tide height and function
 	tide = TideHeight(
@@ -267,10 +268,10 @@ tide_height_string = format(current_tide.compute_func(a_tide_hour), '.1f')
 print(f"Tide height for day {current_day + 1} at HW{hw_string}: {tide_height_string} m")
 
 plot_tide(
-	springs_tide_func=(semidiurnal_tide()(0)),
+	springs_tide_func=(semidiurnal_tide()),
 	springs_mean=springs_hw - springs_lw,
 	max_high_water=springs_hw + 1,
-	neaps_tide_func=(semidiurnal_tide(neap_level=neaps_neap_level)(0)),
+	neaps_tide_func=(semidiurnal_tide(neap_factor=neap_level)),
 	neaps_mean=neaps_hw - neaps_lw,
 	max_low_water=springs_lw + 1
 )
