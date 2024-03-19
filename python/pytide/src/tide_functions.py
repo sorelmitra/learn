@@ -1,8 +1,9 @@
 import numpy as np
 
+NEAP_MAX = 5.0
 
 # Source https://www.vims.edu/research/units/labgroups/tc_tutorial/tide_analysis.php
-def semidiurnal_tide(*, min_water_factor=0, max_water_factor=0, neap_factor=0, centered_on_hw=True):
+def semidiurnal_tide(*, min_water_factor=0, max_water_factor=0, neap_factor=0.0, centered_on_hw=True):
 	def compute(tide_time):
 		nonlocal min_water_factor, max_water_factor
 		def constituent(speed_degrees):

@@ -1,10 +1,10 @@
 import random
 
-from src.tide_functions import semidiurnal_tide
+from src.tide_functions import semidiurnal_tide, NEAP_MAX
 from src.tide_plot import plot_tide
 
 tide_factors = dict(min_water_factor=2, max_water_factor=5)
-neap_level = 5
+neap_level = NEAP_MAX
 compute_springs_height = semidiurnal_tide(**tide_factors)
 compute_neaps_height = semidiurnal_tide(**tide_factors, neap_factor=neap_level)
 
