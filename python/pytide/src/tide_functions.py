@@ -15,7 +15,7 @@ def semidiurnal_tide(*, min_water_factor=0, max_water_factor=0, neap_factor=0.0,
 
 		moon_amplitude = 3.2 + 0.1 * neap_factor
 		solar_amplitude = 0.3 + 0.05 * neap_factor
-		moon_speed = 28.9
+		moon_speed = 28.9 + 0.2 * neap_factor
 		solar_speed = 30.0
 		total_amplitude = moon_amplitude + solar_amplitude
 		base_height = 0
