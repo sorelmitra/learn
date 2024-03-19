@@ -194,6 +194,7 @@ neaps_neap_level = 5.0
 compute_springs_height = semidiurnal_tide()(current_height_variation)
 compute_neaps_height = semidiurnal_tide(neap_level=neaps_neap_level)(current_height_variation)
 
+# TODO: Fix computing tide for neaps 7-12 hours
 print('Neaps for this tide cycle')
 neaps_lw = compute_neaps_height(0)
 neaps_hw = compute_neaps_height(6)
@@ -202,6 +203,10 @@ print(f"LW={format(neaps_lw, '.1f')}")
 print(f"HW={format(neaps_hw, '.1f')}")
 print(f"LW={format(neaps_lw2, '.1f')}")
 
+for i2 in range(0, 13):
+	ht = compute_neaps_height(i2)
+	print(f"{i2}h={format(ht, '.1f')}")
+
 print('Springs for this tide cycle')
 springs_lw = compute_springs_height(0)
 springs_hw = compute_springs_height(6)
@@ -209,6 +214,9 @@ springs_lw2 = compute_springs_height(12)
 print(f"LW={format(springs_lw, '.1f')}")
 print(f"HW={format(springs_hw, '.1f')}")
 print(f"LW={format(springs_lw2, '.1f')}")
+for i3 in range(0, 13):
+	ht = compute_springs_height(i3)
+	print(f"{i3}h={format(ht, '.1f')}")
 print()
 
 class TideHeight:
@@ -219,6 +227,7 @@ class TideHeight:
 		self.compute_func = compute_func
 
 
+# TODO: Make a generative function that goes both ways neaps <-> springs
 tide_heights = []
 tide_cycle_length = random.randint(7, 9)
 step = neaps_neap_level / (tide_cycle_length - 1)
@@ -261,7 +270,7 @@ plot_tide(
 	springs_tide_func=(semidiurnal_tide()(0)),
 	springs_mean=springs_hw - springs_lw,
 	max_high_water=springs_hw + 1,
-	neaps_tide_func=(semidiurnal_tide(neap_level=5)(0)),
+	neaps_tide_func=(semidiurnal_tide(neap_level=neaps_neap_level)(0)),
 	neaps_mean=neaps_hw - neaps_lw,
 	max_low_water=springs_lw + 1
 )
