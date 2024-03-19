@@ -1,4 +1,4 @@
-from pytide import semidiurnal_tide
+from src.tide_functions import semidiurnal_tide
 
 
 def truncate(value):
