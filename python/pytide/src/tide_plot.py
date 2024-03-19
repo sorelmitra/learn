@@ -155,8 +155,9 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 
 	# draw legend and title
 	ax.set_facecolor(color_back)
-	plot.title('Fictional Port Tidal Curve', y=1.1, fontsize=14, fontweight='bold')
-	plot.legend(title='MEAN RANGES', title_fontsize=12, facecolor=color_back, labelcolor=color_fore)
+	plot.title('Fictional Port Tidal Curve', y=1.1, fontsize=14, fontweight='bold', color=color_fore)
+	legend = plot.legend(title='MEAN RANGES', title_fontsize=12, facecolor=color_back, labelcolor=color_fore)
+	plot.setp(legend.get_title(), color=color_fore)
 
 	# show the whole plot
 	plot.show()
