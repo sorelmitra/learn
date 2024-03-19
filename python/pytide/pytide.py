@@ -183,7 +183,7 @@ def plot_tide(springs_tide_func, neaps_tide_func=None, springs_mean=0, neaps_mea
 	# draw legend and title
 	ax.set_facecolor(color_back)
 	plot.title('Fictional Port Tidal Curve', y=1.1, fontsize=14, fontweight='bold')
-	plot.legend(facecolor=color_back, labelcolor=color_fore)
+	plot.legend(title='MEAN RANGES', title_fontsize=12, facecolor=color_back, labelcolor=color_fore)
 
 	# show the whole plot
 	plot.show()
@@ -194,17 +194,21 @@ neaps_neap_level = 5.0
 compute_springs_height = semidiurnal_tide()(current_height_variation)
 compute_neaps_height = semidiurnal_tide(neap_level=neaps_neap_level)(current_height_variation)
 
-print('Neaps for this lunar cycle')
-neaps_hw = compute_neaps_height(6)
+print('Neaps for this tide cycle')
 neaps_lw = compute_neaps_height(0)
-print(f"HW={format(neaps_hw, '.1f')}")
+neaps_hw = compute_neaps_height(6)
+neaps_lw2 = compute_neaps_height(12)
 print(f"LW={format(neaps_lw, '.1f')}")
+print(f"HW={format(neaps_hw, '.1f')}")
+print(f"LW={format(neaps_lw2, '.1f')}")
 
-print('Springs for this lunar cycle')
-springs_hw = compute_springs_height(6)
+print('Springs for this tide cycle')
 springs_lw = compute_springs_height(0)
-print(f"HW={format(springs_hw, '.1f')}")
+springs_hw = compute_springs_height(6)
+springs_lw2 = compute_springs_height(12)
 print(f"LW={format(springs_lw, '.1f')}")
+print(f"HW={format(springs_hw, '.1f')}")
+print(f"LW={format(springs_lw2, '.1f')}")
 print()
 
 class TideHeight:
@@ -216,26 +220,42 @@ class TideHeight:
 
 
 tide_heights = []
-# TODO: Use a nonlinear function, that decreases step size as we approach springs
-lunar_length = 27
-step = neaps_neap_level / lunar_length
-for k in range(0, lunar_length + 1):
-	current_neap_level = neaps_neap_level - k * step
+tide_cycle_length = random.randint(7, 9)
+step = neaps_neap_level / (tide_cycle_length - 1)
+current_neap_level = neaps_neap_level
+for k in range(0, tide_cycle_length):
+	# compute tide height based on neap level
 	compute_current_height = semidiurnal_tide(neap_level=current_neap_level)(current_height_variation)
-	current_hw = compute_current_height(6)
-	current_lw = compute_current_height(0)
-	tide = TideHeight(day=k + 1, hw_height=current_hw, lw_height=current_lw, compute_func=compute_current_height)
+
+	# store tide height and function
+	tide = TideHeight(
+		day=k + 1,
+		hw_height=(compute_current_height(6)),
+		lw_height=(compute_current_height(0)),
+		compute_func=compute_current_height)
 	tide_heights.append(tide)
-	print(f"Day {tide.day}, neap level {format(current_neap_level, '.2f')}")
+
+	# print tide height for the day
+	print(
+		f"Day {tide.day}, neap level {format(current_neap_level, '.2f')}, step {format(step, '.2f')}")
 	print(f"HW={format(tide.hw_height, '.1f')}")
 	print(f"LW={format(tide.lw_height, '.1f')}")
 	print()
 
+	# next neap level
+	current_neap_level = current_neap_level - step
+	# adjust very small neap levels to 0, to make sure we hit Springs
+	if current_neap_level < 0.05:
+		current_neap_level = 0.0
+
 a_tide_hour = 1 + 11 * random.random()
 tide_hour_per_hw = a_tide_hour - 6
-current_day = 7
+current_day = random.randint(0, len(tide_heights) - 1)
 current_tide = tide_heights[current_day]
-print(f"Tide height for day {current_day} at HW{'' if tide_hour_per_hw < 0 else '+'}{format(tide_hour_per_hw, '.1f')}: {format(current_tide.compute_func(a_tide_hour), '.1f')} m")
+hw_sign = '' if tide_hour_per_hw < 0 else '+'
+hw_string = f"{hw_sign}{format(tide_hour_per_hw, '.1f')}" if abs(tide_hour_per_hw) >= 0.1 else ''
+tide_height_string = format(current_tide.compute_func(a_tide_hour), '.1f')
+print(f"Tide height for day {current_day + 1} at HW{hw_string}: {tide_height_string} m")
 
 plot_tide(
 	springs_tide_func=(semidiurnal_tide()(0)),
