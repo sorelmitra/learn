@@ -105,7 +105,7 @@ def test_generate_one_cycle_from_neaps_to_springs():
 				if prev_tide_value is None:
 					prev_tide_value = tide_value
 				else:
-					print(f"HW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.1f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.1f')}")
+					print(f"HW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.2f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.2f')}")
 					assert tide_value.height > prev_tide_value.height + 0.01
 					prev_tide_value = tide_value
 
@@ -116,7 +116,7 @@ def test_generate_one_cycle_from_neaps_to_springs():
 				if prev_tide_value is None:
 					prev_tide_value = tide_value
 				else:
-					print(f"LW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.1f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.1f')}")
+					print(f"LW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.2f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.2f')}")
 					assert tide_value.height < prev_tide_value.height - 0.01
 					prev_tide_value = tide_value
 		print()
