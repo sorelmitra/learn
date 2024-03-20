@@ -132,3 +132,12 @@ def test_generate_one_cycle_from_neaps_to_springs():
 	assert abs(compute_springs_mean(tide_days) - (tide_day_7_hw.height - tide_day_7_lw.height)) < 0.1
 	assert abs(compute_neaps_mean(tide_days) - (tide_day_0_hw.height - tide_day_0_lw.height)) < 0.1
 
+
+def test_generate_one_cycle_various_water_height_factors():
+	delta = datetime.timedelta(hours=6, minutes=20)
+	common_params = dict(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=0, cycle_length=8, delta=delta)
+
+	tide_days = generate_tide_days(**common_params, min_water_factor=2, max_water_factor=5)
+	[t.print() for t in tide_days]
+	assert compute_max_hw(tide_days) > compute_max_lw(tide_days) + 1
+	assert compute_springs_mean(tide_days) > compute_neaps_mean(tide_days) + 0.5

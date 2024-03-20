@@ -56,11 +56,15 @@ class TideDay:
 # @param delta: the time difference between heights
 # @param life_cycle: the type of tide height (high or low water)
 def generate_tide_days(start_date=datetime.datetime.now(), heights_count=1, cycle_length=0,
-					   delta=datetime.timedelta(hours=6, minutes=0), life_cycle=TideHeight.HW):
+					   delta=datetime.timedelta(hours=6, minutes=0), life_cycle=TideHeight.HW,
+					   min_water_factor=2, max_water_factor=5):
 
 	neap_level = NEAP_MAX
 	compute_current_height = semidiurnal_tide(
-		min_water_factor=2, max_water_factor=5, neap_factor=neap_level)
+		min_water_factor=min_water_factor,
+		max_water_factor=max_water_factor,
+		neap_factor=neap_level
+	)
 
 	tide_days = []
 	tide_heights = []
@@ -145,8 +149,9 @@ def compute_springs_mean(tide_days):
 	springs_mean_values = []
 	for tide_day in tide_days:
 		if tide_day.neap_level == 0:
-			height1 = tide_day.heights[0].height
-			height2 = tide_day.heights[1].height
+			n = len(tide_day.heights)
+			height1 = tide_day.heights[n - 1].height
+			height2 = tide_day.heights[n - 2].height
 			springs_mean_values.append(abs(height1 - height2))
 			break
 	return sum(springs_mean_values) / len(springs_mean_values)
