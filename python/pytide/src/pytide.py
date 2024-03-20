@@ -7,9 +7,6 @@ from src.tide_tables import generate_tide_days, reset_day, compute_springs_mean,
 	compute_max_lw
 
 if __name__ == '__main__':
-	tide_hour = 1 + 11 * random.random()
-	tide_hour_per_hw = tide_hour - 6
-
 	cycle_length = random.randint(7, 9)
 	start_date = reset_day() + datetime.timedelta(hours=3, minutes=10)
 	tide_days = generate_tide_days(
@@ -24,6 +21,9 @@ if __name__ == '__main__':
 
 	day = random.randint(0, len(tide_days) - 1)
 	tide = tide_days[day]
+
+	tide_hour = 1 + 11 * random.random()
+	tide_hour_per_hw = tide_hour - 6
 
 	hw_sign = '' if tide_hour_per_hw < 0 else '+'
 	hw_string = f"{hw_sign}{format(tide_hour_per_hw, '.1f')}" if abs(tide_hour_per_hw) >= 0.1 else ''
