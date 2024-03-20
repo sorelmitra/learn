@@ -49,28 +49,13 @@ class TideDay:
 		print()
 
 
-# Adds a day to the list of tide days
-# @param a_date: the date of the tide, a datetime object
-# @param compute_current_height: the function that computes the tide height
-# @param tide_days: the list of tide days to append to
-# @param tide_heights: the tide heights for the day
-def add_heights_to_day(a_date, compute_current_height, neap_level, tide_days, tide_heights):
-	tide_day = TideDay(
-		compute_height=compute_current_height,
-		tide_date=a_date.date(),
-		neap_level=neap_level,
-		heights=tide_heights
-	)
-	tide_days.append(tide_day)
-
-
 # Generates a list of tide days
 # @param a_date: the date of the tide, a datetime object
 # @param heights_count: the number of heights to generate
 # @param cycle_length: the number of days in a neaps - springs cycle; if present, it overrides heights_count and generates a full cycle
 # @param delta: the time difference between heights
 # @param life_cycle: the type of tide height (high or low water)
-def generate_tide_days(a_date=datetime.datetime.now(), heights_count=1, cycle_length=0,
+def generate_tide_days(start_date=datetime.datetime.now(), heights_count=1, cycle_length=0,
 					   delta=datetime.timedelta(hours=6, minutes=0), life_cycle=TideHeight.HW):
 
 	neap_level = NEAP_MAX
@@ -79,40 +64,61 @@ def generate_tide_days(a_date=datetime.datetime.now(), heights_count=1, cycle_le
 
 	tide_days = []
 	tide_heights = []
-	old_a_date = a_date
+	old_a_date = start_date
 	current_life_cycle = life_cycle
 
 	step = 0
 	if cycle_length > 1:
-		step = neap_level / (cycle_length - 1)
+		step = neap_level / (cycle_length * 2 - 1)
 	if cycle_length > 0:
 		heights_count = cycle_length * 4
 
-	for k in range(0, heights_count):
+	neaps_cycle_count = 0
+	old_neap_level = neap_level
+	for _ in range(0, heights_count):
 		tide_hour = 6 if current_life_cycle == TideHeight.HW else 0
 		tide_height = TideHeight(
-			time=a_date.time(),
+			time=start_date.time(),
 			height=compute_current_height(tide_hour),
 			life_cycle=current_life_cycle
 		)
 		tide_heights.append(tide_height)
 		current_life_cycle = TideHeight.HW if current_life_cycle == TideHeight.LW else TideHeight.LW
 
-		a_date = a_date + delta
-
-		new_date_delta = a_date - old_a_date
-		if new_date_delta.days > 0:
-			add_heights_to_day(old_a_date, compute_current_height, neap_level, tide_days, tide_heights)
-			tide_heights = []
-			old_a_date = a_date
+		neaps_cycle_count += 1
+		if neaps_cycle_count == 2:
 			neap_level = neap_level - step
 			if neap_level < 0.05:
 				neap_level = 0.0
 			compute_current_height = semidiurnal_tide(
 				min_water_factor=2, max_water_factor=5, neap_factor=neap_level)
+			neaps_cycle_count = 0
 
-	if len(tide_heights) > 0:
-		add_heights_to_day(a_date, compute_current_height, neap_level, tide_days, tide_heights)
+		start_date = start_date + delta
+
+		if start_date.day != old_a_date.day:
+			day_neap_level = neap_level
+			if len(tide_days) < 1:
+				day_neap_level = old_neap_level
+				old_neap_level = neap_level
+			tide_day = TideDay(
+				compute_height=compute_current_height,
+				tide_date=old_a_date.date(),
+				neap_level=day_neap_level,
+				heights=tide_heights
+			)
+			tide_days.append(tide_day)
+			tide_heights = []
+			old_a_date = start_date
+
+	if (cycle_length == 0 or len(tide_days) < cycle_length) and len(tide_heights) > 0:
+		tide_day = TideDay(
+			compute_height=compute_current_height,
+			tide_date=start_date.date(),
+			neap_level=neap_level,
+			heights=tide_heights
+		)
+		tide_days.append(tide_day)
 
 	return tide_days
 

@@ -10,12 +10,16 @@ if __name__ == '__main__':
 	tide_hour = 1 + 11 * random.random()
 	tide_hour_per_hw = tide_hour - 6
 
+	cycle_length = random.randint(7, 9)
+	start_date = reset_day() + datetime.timedelta(hours=3, minutes=10)
 	tide_days = generate_tide_days(
-		a_date=reset_day() + datetime.timedelta(hours=3, minutes=10),
-		cycle_length=(random.randint(7, 9)),
+		start_date=start_date,
+		cycle_length=cycle_length,
 		delta=datetime.timedelta(hours=6, minutes=20)
 	)
 
+	print(f"Month: {start_date.strftime('%B')}, generating a full cycle of {cycle_length} days length")
+	print()
 	[tide.print() for tide in tide_days]
 
 	day = random.randint(0, len(tide_days) - 1)

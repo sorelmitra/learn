@@ -6,7 +6,7 @@ from src.tide_tables import reset_day, TideHeight, generate_tide_days, compute_m
 
 
 def test_generate_one_height():
-	tide_days = generate_tide_days(a_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=1)
+	tide_days = generate_tide_days(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=1)
 	assert len(tide_days) == 1
 
 	tide_day = tide_days[0]
@@ -23,7 +23,7 @@ def test_generate_one_height():
 
 def test_generate_one_day():
 	delta = datetime.timedelta(hours=6, minutes=20)
-	tide_days = generate_tide_days(a_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=4, delta=delta)
+	tide_days = generate_tide_days(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=4, delta=delta)
 	assert len(tide_days) == 1
 
 	tide_day = tide_days[0]
@@ -61,7 +61,7 @@ def test_generate_one_day():
 
 def test_generate_one_day_from_lw():
 	delta = datetime.timedelta(hours=6, minutes=20)
-	tide_days = generate_tide_days(a_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=2, delta=delta, life_cycle=TideHeight.LW)
+	tide_days = generate_tide_days(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=2, delta=delta, life_cycle=TideHeight.LW)
 	assert len(tide_days) == 1
 
 	tide_day = tide_days[0]
@@ -85,7 +85,7 @@ def test_generate_one_day_from_lw():
 
 def test_generate_one_cycle_from_neaps_to_springs():
 	delta = datetime.timedelta(hours=6, minutes=20)
-	tide_days = generate_tide_days(a_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=0, cycle_length=8, delta=delta)
+	tide_days = generate_tide_days(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=0, cycle_length=8, delta=delta)
 	assert len(tide_days) == 8
 
 	assert tide_days[0].neap_level == NEAP_MAX
@@ -134,8 +134,47 @@ def test_generate_one_cycle_from_neaps_to_springs():
 	assert tide_day_7_hw.height > tide_day_6_hw.height
 	assert tide_day_7_lw.height < tide_day_6_lw.height
 
+	old_neap_level = None
+	for tide in tide_days:
+		# check that neap levels are decreasing
+		print(f"Neap level for day {tide.date.day} is {tide.neap_level}")
+		if old_neap_level is None:
+			assert tide.neap_level == NEAP_MAX
+			old_neap_level = tide.neap_level
+		else:
+			assert tide.neap_level < old_neap_level
+
+		# check that high water levels are increasing
+		prev_tide_value = None
+		for tide_value in tide.heights:
+			if tide_value.type == TideHeight.HW:
+				if prev_tide_value is None:
+					prev_tide_value = tide_value
+				else:
+					print(f"HW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.1f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.1f')}")
+					assert tide_value.height > prev_tide_value.height
+					prev_tide_value = tide_value
+
+		# check that low water levels are decreasing
+		prev_tide_value = None
+		for tide_value in tide.heights:
+			if tide_value.type == TideHeight.LW:
+				if prev_tide_value is None:
+					prev_tide_value = tide_value
+				else:
+					print(f"LW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.1f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.1f')}")
+					assert tide_value.height < prev_tide_value.height
+					prev_tide_value = tide_value
+		print()
+
+	high_waters = [t for t in tide_days[7].heights if t.type == TideHeight.HW]
+	tide_day_7_hw = high_waters[len(high_waters) - 1]
+	low_waters = [t for t in tide_days[7].heights if t.type == TideHeight.LW]
+	tide_day_7_lw = low_waters[len(low_waters) - 1]
+	tide_day_0_hw = [t for t in tide_days[0].heights if t.type == TideHeight.HW][0]
+	tide_day_0_lw = [t for t in tide_days[0].heights if t.type == TideHeight.LW][0]
 	assert compute_max_hw(tide_days) == tide_day_7_hw.height
 	assert compute_max_lw(tide_days) == tide_day_0_lw.height
-	assert compute_springs_mean(tide_days) == tide_day_7_hw.height - tide_day_7_lw.height
-	assert compute_neaps_mean(tide_days) == tide_day_0_hw.height - tide_day_0_lw.height
+	assert abs(compute_springs_mean(tide_days) - (tide_day_7_hw.height - tide_day_7_lw.height)) < 0.1
+	assert abs(compute_neaps_mean(tide_days) - (tide_day_0_hw.height - tide_day_0_lw.height)) < 0.1
 
