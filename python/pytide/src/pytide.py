@@ -12,7 +12,9 @@ if __name__ == '__main__':
 	tide_days = generate_tide_days(
 		start_date=start_date,
 		cycle_length=cycle_length,
-		delta=datetime.timedelta(hours=6, minutes=20)
+		delta=datetime.timedelta(hours=6, minutes=20),
+		min_water_factor=2,
+		max_water_factor=5
 	)
 
 	print(f"Month: {start_date.strftime('%B')}, generating a full cycle of {cycle_length} days length")

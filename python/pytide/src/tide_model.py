@@ -22,7 +22,7 @@ def semidiurnal_tide(*, min_water_factor=0, max_water_factor=0, neap_factor=0.0,
 		if min_water_factor > max_water_factor:
 			min_water_factor = max_water_factor
 		if max_water_factor > 0:
-			total_amplitude *= (2.5 + 0.2 * neap_factor)/(max_water_factor + min_water_factor)
-			base_height = min_water_factor + 0.5 * neap_factor
+			total_amplitude *= (1.7 + 0.2 * neap_factor)/(max_water_factor + min_water_factor)
+			base_height = min_water_factor + 0.6 * neap_factor
 		return (base_height + moon_amplitude * constituent(moon_speed) + solar_amplitude * constituent(solar_speed)) / total_amplitude
 	return compute

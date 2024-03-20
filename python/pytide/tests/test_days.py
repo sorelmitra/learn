@@ -108,7 +108,7 @@ def test_generate_one_cycle_from_neaps_to_springs():
 					prev_tide_value = tide_value
 				else:
 					print(f"HW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.2f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.2f')}")
-					assert tide_value.height > prev_tide_value.height + 0.01
+					assert tide_value.height > prev_tide_value.height + 0.04
 					prev_tide_value = tide_value
 
 		# check that low water levels are decreasing
@@ -139,7 +139,23 @@ def test_generate_one_cycle_various_water_height_factors():
 	delta = datetime.timedelta(hours=6, minutes=20)
 	common_params = dict(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=0, cycle_length=8, delta=delta)
 
-	tide_days = generate_tide_days(**common_params)
+	print(f"Tide days with min_water_factor=2, max_water_factor=5")
+	tide_days = generate_tide_days(**common_params, min_water_factor=2, max_water_factor=5)
 	[t.print() for t in tide_days]
 	assert compute_max_hw(tide_days) > compute_max_lw(tide_days) + 1
 	assert compute_springs_mean(tide_days) > compute_neaps_mean(tide_days) + 0.5
+	print()
+
+	print(f"Tide days with min_water_factor=3, max_water_factor=9")
+	tide_days = generate_tide_days(**common_params, min_water_factor=3, max_water_factor=9)
+	[t.print() for t in tide_days]
+	assert compute_max_hw(tide_days) > compute_max_lw(tide_days) + 1
+	assert compute_springs_mean(tide_days) > compute_neaps_mean(tide_days) + 0.5
+	print()
+
+	print(f"Tide days with min_water_factor=4, max_water_factor=11")
+	tide_days = generate_tide_days(**common_params, min_water_factor=4, max_water_factor=11)
+	[t.print() for t in tide_days]
+	assert compute_max_hw(tide_days) > compute_max_lw(tide_days) + 1
+	assert compute_springs_mean(tide_days) > compute_neaps_mean(tide_days) + 0.5
+	print()
