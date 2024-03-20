@@ -27,6 +27,8 @@ def test_generate_one_day():
 	assert len(tide_days) == 1
 
 	tide_day = tide_days[0]
+	tide_day.print()
+
 	assert tide_day.date.day == 1
 	assert tide_day.neap_level == NEAP_MAX
 	assert len(tide_day.heights) == 4
@@ -137,7 +139,7 @@ def test_generate_one_cycle_various_water_height_factors():
 	delta = datetime.timedelta(hours=6, minutes=20)
 	common_params = dict(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=0, cycle_length=8, delta=delta)
 
-	tide_days = generate_tide_days(**common_params, min_water_factor=2, max_water_factor=5)
+	tide_days = generate_tide_days(**common_params)
 	[t.print() for t in tide_days]
 	assert compute_max_hw(tide_days) > compute_max_lw(tide_days) + 1
 	assert compute_springs_mean(tide_days) > compute_neaps_mean(tide_days) + 0.5

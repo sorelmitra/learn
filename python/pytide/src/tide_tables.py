@@ -56,13 +56,12 @@ class TideDay:
 # @param delta: the time difference between heights
 # @param life_cycle: the type of tide height (high or low water)
 def generate_tide_days(start_date=datetime.datetime.now(), heights_count=1, cycle_length=0,
-					   delta=datetime.timedelta(hours=6, minutes=0), life_cycle=TideHeight.HW,
-					   min_water_factor=2, max_water_factor=5):
+					   delta=datetime.timedelta(hours=6, minutes=0), life_cycle=TideHeight.HW):
 
 	neap_level = NEAP_MAX
 	compute_current_height = semidiurnal_tide(
-		min_water_factor=min_water_factor,
-		max_water_factor=max_water_factor,
+		min_water_factor=2,
+		max_water_factor=5,
 		neap_factor=neap_level
 	)
 
@@ -79,8 +78,9 @@ def generate_tide_days(start_date=datetime.datetime.now(), heights_count=1, cycl
 
 	neaps_cycle_count = 0
 	old_neap_level = neap_level
+	tide_hour = 6 if current_life_cycle == TideHeight.HW else 0
+	old_low_tide_hour = 12 if tide_hour == 6 else 0
 	for _ in range(0, heights_count):
-		tide_hour = 6 if current_life_cycle == TideHeight.HW else 0
 		tide_height = TideHeight(
 			time=start_date.time(),
 			height=compute_current_height(tide_hour),
@@ -88,6 +88,14 @@ def generate_tide_days(start_date=datetime.datetime.now(), heights_count=1, cycl
 		)
 		tide_heights.append(tide_height)
 		current_life_cycle = TideHeight.HW if current_life_cycle == TideHeight.LW else TideHeight.LW
+
+		if tide_hour == 0:
+			tide_hour = 6
+		elif tide_hour == 6:
+			tide_hour = 12 if old_low_tide_hour == 0 else 0
+			old_low_tide_hour = tide_hour
+		else:
+			tide_hour = 6
 
 		neaps_cycle_count += 1
 		if neaps_cycle_count == 2:
