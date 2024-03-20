@@ -1,7 +1,8 @@
 import random
 
-from src.tide_functions import semidiurnal_tide, NEAP_MAX
+from src.tide_model import semidiurnal_tide, NEAP_MAX
 from src.tide_plot import plot_tide
+from src.tide_tables import TideHeight
 
 tide_factors = dict(min_water_factor=2, max_water_factor=5)
 neap_level = NEAP_MAX
@@ -14,15 +15,6 @@ neaps_hw = compute_neaps_height(6)
 springs_lw = compute_springs_height(0)
 springs_hw = compute_springs_height(6)
 
-class TideHeight:
-	def __init__(self, *, day, neap_level, hw_height, lw_height, compute_func):
-		self.day = day
-		self.neap_level = neap_level
-		self.hw_height = hw_height
-		self.lw_height = lw_height
-		self.compute_func = compute_func
-
-
 # TODO: Make a generative function that goes both ways neaps <-> springs
 tide_heights = []
 tide_cycle_length = random.randint(7, 9)
@@ -34,11 +26,12 @@ for k in range(0, tide_cycle_length):
 
 	# store tide height and function
 	tide = TideHeight(
-		day=k + 1,
+		compute_func=compute_current_height,
+		day_of_month=k + 1,
 		neap_level=current_neap_level,
 		hw_height=compute_current_height(6),
 		lw_height=compute_current_height(0),
-		compute_func=compute_current_height)
+	)
 	tide_heights.append(tide)
 
 	# print tide height for the day
