@@ -88,52 +88,6 @@ def test_generate_one_cycle_from_neaps_to_springs():
 	tide_days = generate_tide_days(start_date=(reset_day() + datetime.timedelta(hours=3, minutes=10)), heights_count=0, cycle_length=8, delta=delta)
 	assert len(tide_days) == 8
 
-	assert tide_days[0].neap_level == NEAP_MAX
-	tide_day_0_hw = [t for t in tide_days[0].heights if t.type == TideHeight.HW][0]
-	tide_day_0_lw = [t for t in tide_days[0].heights if t.type == TideHeight.LW][0]
-
-	assert tide_days[1].neap_level < tide_days[0].neap_level
-	tide_day_1_hw = [t for t in tide_days[1].heights if t.type == TideHeight.HW][0]
-	tide_day_1_lw = [t for t in tide_days[1].heights if t.type == TideHeight.LW][0]
-	assert tide_day_1_hw.height > tide_day_0_hw.height
-	assert tide_day_1_lw.height < tide_day_0_lw.height
-
-	assert tide_days[2].neap_level < tide_days[1].neap_level
-	tide_day_2_hw = [t for t in tide_days[2].heights if t.type == TideHeight.HW][0]
-	tide_day_2_lw = [t for t in tide_days[2].heights if t.type == TideHeight.LW][0]
-	assert tide_day_2_hw.height > tide_day_1_hw.height
-	assert tide_day_2_lw.height < tide_day_1_lw.height
-
-	assert tide_days[3].neap_level < tide_days[2].neap_level
-	tide_day_3_hw = [t for t in tide_days[3].heights if t.type == TideHeight.HW][0]
-	tide_day_3_lw = [t for t in tide_days[3].heights if t.type == TideHeight.LW][0]
-	assert tide_day_3_hw.height > tide_day_2_hw.height
-	assert tide_day_3_lw.height < tide_day_2_lw.height
-
-	assert tide_days[4].neap_level < tide_days[3].neap_level
-	tide_day_4_hw = [t for t in tide_days[4].heights if t.type == TideHeight.HW][0]
-	tide_day_4_lw = [t for t in tide_days[4].heights if t.type == TideHeight.LW][0]
-	assert tide_day_4_hw.height > tide_day_3_hw.height
-	assert tide_day_4_lw.height < tide_day_3_lw.height
-
-	assert tide_days[5].neap_level < tide_days[4].neap_level
-	tide_day_5_hw = [t for t in tide_days[5].heights if t.type == TideHeight.HW][0]
-	tide_day_5_lw = [t for t in tide_days[5].heights if t.type == TideHeight.LW][0]
-	assert tide_day_5_hw.height > tide_day_4_hw.height
-	assert tide_day_5_lw.height < tide_day_4_lw.height
-
-	assert tide_days[6].neap_level < tide_days[5].neap_level
-	tide_day_6_hw = [t for t in tide_days[6].heights if t.type == TideHeight.HW][0]
-	tide_day_6_lw = [t for t in tide_days[6].heights if t.type == TideHeight.LW][0]
-	assert tide_day_6_hw.height > tide_day_5_hw.height
-	assert tide_day_6_lw.height < tide_day_5_lw.height
-
-	assert tide_days[7].neap_level == 0.0
-	tide_day_7_hw = [t for t in tide_days[7].heights if t.type == TideHeight.HW][0]
-	tide_day_7_lw = [t for t in tide_days[7].heights if t.type == TideHeight.LW][0]
-	assert tide_day_7_hw.height > tide_day_6_hw.height
-	assert tide_day_7_lw.height < tide_day_6_lw.height
-
 	old_neap_level = None
 	for tide in tide_days:
 		# check that neap levels are decreasing
@@ -152,7 +106,7 @@ def test_generate_one_cycle_from_neaps_to_springs():
 					prev_tide_value = tide_value
 				else:
 					print(f"HW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.1f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.1f')}")
-					assert tide_value.height > prev_tide_value.height
+					assert tide_value.height > prev_tide_value.height + 0.01
 					prev_tide_value = tide_value
 
 		# check that low water levels are decreasing
@@ -163,7 +117,7 @@ def test_generate_one_cycle_from_neaps_to_springs():
 					prev_tide_value = tide_value
 				else:
 					print(f"LW height for day {tide.date.day}, time {tide_value.time.strftime('%H%M')} is {format(tide_value.height, '.1f')}, previous was time {prev_tide_value.time.strftime('%H%M')} {format(prev_tide_value.height, '.1f')}")
-					assert tide_value.height < prev_tide_value.height
+					assert tide_value.height < prev_tide_value.height - 0.01
 					prev_tide_value = tide_value
 		print()
 
