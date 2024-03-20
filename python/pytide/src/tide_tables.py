@@ -1,4 +1,10 @@
-from src.tide_model import NEAP_MAX
+import datetime
+
+from src.tide_model import NEAP_MAX, semidiurnal_tide
+
+
+def reset_day(d=datetime.datetime.now()):
+	return d.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
 
 class TideHeight:
@@ -9,7 +15,7 @@ class TideHeight:
 	# @param time: the time of the tide height, a datetime.time() object
 	# @param height: the height of the tide, a float number representing meters
 	# @param life_cycle: the type of tide height (high or low water)
-	def __init__(self, *, time, height, life_cycle):
+	def __init__(self, *, time=datetime.datetime.now().time(), height=0.0, life_cycle=LW):
 		self.time = time
 		self.height = height
 		self.type = life_cycle
@@ -24,10 +30,10 @@ class TideDay:
 	# @param tide_date: the date of the tide, a datetime.date() object
 	# @param neap_level: the neap level of the tide, a float number between 0 (springs) and NEAP_MAX (neaps)
 	# @param heights: the tide heights for the day, a list of TideHeight objects; the constructor will sort them by time
-	def __init__(self, *, compute_func, tide_date, neap_level, heights):
+	def __init__(self, *, compute_height=lambda time: 0.0, tide_date=datetime.datetime.now().date(), neap_level=0.0, heights=[TideHeight()]):
 		self.date = tide_date
 		self.neap_level = neap_level
-		self.compute_func = compute_func
+		self.compute_height = compute_height
 		self.heights = heights
 		# sort heights by time
 		self.heights.sort(key=lambda x: x.time)
@@ -41,3 +47,111 @@ class TideDay:
 		print(f"{self.date.day}, {self.date.strftime('%a')} ({neap_level_string})")
 		[tide_height.print() for tide_height in self.heights]
 		print()
+
+
+# Adds a day to the list of tide days
+# @param a_date: the date of the tide, a datetime object
+# @param compute_current_height: the function that computes the tide height
+# @param tide_days: the list of tide days to append to
+# @param tide_heights: the tide heights for the day
+def add_heights_to_day(a_date, compute_current_height, neap_level, tide_days, tide_heights):
+	tide_day = TideDay(
+		compute_height=compute_current_height,
+		tide_date=a_date.date(),
+		neap_level=neap_level,
+		heights=tide_heights
+	)
+	tide_days.append(tide_day)
+
+
+# Generates a list of tide days
+# @param a_date: the date of the tide, a datetime object
+# @param heights_count: the number of heights to generate
+# @param cycle_length: the number of days in a neaps - springs cycle; if present, it overrides heights_count and generates a full cycle
+# @param delta: the time difference between heights
+# @param life_cycle: the type of tide height (high or low water)
+def generate_tide_days(a_date=datetime.datetime.now(), heights_count=1, cycle_length=0,
+					   delta=datetime.timedelta(hours=6, minutes=0), life_cycle=TideHeight.HW):
+
+	neap_level = NEAP_MAX
+	compute_current_height = semidiurnal_tide(
+		min_water_factor=2, max_water_factor=5, neap_factor=neap_level)
+
+	tide_days = []
+	tide_heights = []
+	old_a_date = a_date
+	current_life_cycle = life_cycle
+
+	step = 0
+	if cycle_length > 1:
+		step = neap_level / (cycle_length - 1)
+	if cycle_length > 0:
+		heights_count = cycle_length * 4
+
+	for k in range(0, heights_count):
+		tide_hour = 6 if current_life_cycle == TideHeight.HW else 0
+		tide_height = TideHeight(
+			time=a_date.time(),
+			height=compute_current_height(tide_hour),
+			life_cycle=current_life_cycle
+		)
+		tide_heights.append(tide_height)
+		current_life_cycle = TideHeight.HW if current_life_cycle == TideHeight.LW else TideHeight.LW
+
+		a_date = a_date + delta
+
+		new_date_delta = a_date - old_a_date
+		if new_date_delta.days > 0:
+			add_heights_to_day(old_a_date, compute_current_height, neap_level, tide_days, tide_heights)
+			tide_heights = []
+			old_a_date = a_date
+			neap_level = neap_level - step
+			if neap_level < 0.05:
+				neap_level = 0.0
+			compute_current_height = semidiurnal_tide(
+				min_water_factor=2, max_water_factor=5, neap_factor=neap_level)
+
+	if len(tide_heights) > 0:
+		add_heights_to_day(a_date, compute_current_height, neap_level, tide_days, tide_heights)
+
+	return tide_days
+
+
+def compute_max_hw(tide_days):
+	max_hw = 0
+	for tide_day in tide_days:
+		for tide_height in tide_day.heights:
+			if tide_height.type == TideHeight.HW and tide_height.height > max_hw:
+				max_hw = tide_height.height
+	return max_hw
+
+
+def compute_max_lw(tide_days):
+	max_lw = 0
+	for tide_day in tide_days:
+		for tide_height in tide_day.heights:
+			if tide_height.type == TideHeight.LW and tide_height.height > max_lw:
+				max_lw = tide_height.height
+	return max_lw
+
+
+def compute_springs_mean(tide_days):
+	springs_mean_values = []
+	for tide_day in tide_days:
+		if tide_day.neap_level == 0:
+			height1 = tide_day.heights[0].height
+			height2 = tide_day.heights[1].height
+			springs_mean_values.append(abs(height1 - height2))
+			break
+	return sum(springs_mean_values) / len(springs_mean_values)
+
+
+def compute_neaps_mean(tide_days):
+	neaps_mean_values = []
+	for tide_day in tide_days:
+		if tide_day.neap_level == NEAP_MAX:
+			height1 = tide_day.heights[0].height
+			height2 = tide_day.heights[1].height
+			neaps_mean_values.append(abs(height1 - height2))
+			break
+	return sum(neaps_mean_values) / len(neaps_mean_values)
