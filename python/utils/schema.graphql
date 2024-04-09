@@ -1,0 +1,23 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Notice {
+    id: ID!
+    title: String!
+}
+
+type NoticeResult {
+    success: Boolean!
+    errors: [String]
+    notice: Notice
+}
+
+type Query {
+    getNotice(id: ID!): NoticeResult!
+}
+
+type Mutation {
+    createNotice(title: String!): NoticeResult!
+}
