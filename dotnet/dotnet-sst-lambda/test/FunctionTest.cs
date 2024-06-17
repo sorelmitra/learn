@@ -14,19 +14,29 @@ public class FunctionTest(ITestOutputHelper output)
     [Fact]
     public void TestToUpperFunction()
     {
-        var encodedBody = Convert.ToBase64String("hello world"u8.ToArray());
+        var jsonInput = JsonSerializer.SerializeToUtf8Bytes(
+            new DummyInput { Title = "dummy", Code = 4 });
+        var encodedBody = Convert.ToBase64String(jsonInput);
         var apiGatewayProxyResponse = _function.FunctionHandler(new APIGatewayHttpApiV2ProxyRequest {Body = encodedBody}, _context);
-        var message = apiGatewayProxyResponse.Result.Body;
-        Assert.Equal("HELLO WORLD", message);
+        var jsonResponse = apiGatewayProxyResponse.Result.Body;
+        var dummyValue = JsonSerializer.Deserialize<DummyValue>(jsonResponse);
+        Assert.NotNull(dummyValue);
+        Assert.True(dummyValue.Success);
+        Assert.Null(dummyValue.Reason);
+        Assert.Equal("DUMMY", dummyValue.Title);
+        Assert.Equal(5, dummyValue.Code);
         Assert.Equal(200, apiGatewayProxyResponse.Result.StatusCode);
     }
 
     [Fact]
-    public void TestErrorsOut()
+    public void TestFunctionErrorsOut()
     {
         var apiGatewayProxyResponse = _function.FunctionHandler(new APIGatewayHttpApiV2ProxyRequest {Body = "I am not base64 encoded"}, _context);
-        var message = apiGatewayProxyResponse.Result.Body;
-        Assert.Matches(".*not a valid Base-64.*", message);
+        var jsonResponse = apiGatewayProxyResponse.Result.Body;
+        var dummyValue = JsonSerializer.Deserialize<DummyValue>(jsonResponse);
+        Assert.NotNull(dummyValue);
+        Assert.False(dummyValue.Success);
+        Assert.Matches(".*not a valid Base-64.*", dummyValue.Reason);
         Assert.Equal(500, apiGatewayProxyResponse.Result.StatusCode);
     }
 }

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 
@@ -6,6 +7,20 @@ using Amazon.Lambda.Core;
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace DotNetSstLambda;
+
+public class DummyInput
+{
+    public string Title { get; set; } = "";
+    public int Code { get; set; }
+}
+
+public class DummyValue
+{
+    public bool Success { get; set; }
+    public string? Reason { get; set; }
+    public string? Title { get; set; }
+    public int? Code { get; set; }
+}
 
 public class Function
 {
@@ -20,22 +35,38 @@ public class Function
         try
         {
             var base64EncodedBytes = Convert.FromBase64String(request.Body);
-            var message = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            var jsonString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            var dummyInput = JsonSerializer.Deserialize<DummyInput>(jsonString);
+            if (dummyInput == null)
+            {
+                throw new Exception($"Cannot parse JSON body <{jsonString}>");
+            }
+            var dummyValue = new DummyValue
+            {
+                Success = true,
+                Title = dummyInput.Title.ToUpper(),
+                Code = dummyInput.Code + 1
+            };
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = 200,
                 IsBase64Encoded = false,
-                Body = message.ToUpper(),
+                Body = JsonSerializer.Serialize(dummyValue),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
         catch (Exception ex)
         {
+            var dummyValue = new DummyValue
+            {
+                Success = false,
+                Reason = "Error: " + ex.Message
+            };
             return new APIGatewayHttpApiV2ProxyResponse
             {
                 StatusCode = 500,
                 IsBase64Encoded = false,
-                Body = "Error: " + ex.Message,
+                Body = JsonSerializer.Serialize(dummyValue),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
