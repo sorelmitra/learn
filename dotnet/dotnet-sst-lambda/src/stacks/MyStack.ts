@@ -7,22 +7,32 @@ export function API({ stack }: StackContext) {
   //   },
   // });
 
-  const api = new Api(stack, "api", {
+  const apiDummy = new Api(stack, "api-dummy", {
     defaults: {
       function: {
         // bind: [bus],
       },
     },
     routes: {
-      "GET /": "DotNetSstLambda::DotNetSstLambda.Function::FunctionHandler",
+      "GET /": "DotNetSstLambda::DotNetSstLambda.Dummy::Handler",
     },
   });
-  //
+
+  // const apiDummy = new Api(stack, "api-student", {
+  //   defaults: {
+  //     function: {
+  //     },
+  //   },
+  //   routes: {
+  //     "GET /": "DotNetSstLambda::DotNetSstLambda.Students::Handler",
+  //   },
+  // });
+
   // bus.subscribe("todo.created", {
   //   handler: "packages/functions/src/events/todo-created.handler",
   // });
 
   stack.addOutputs({
-    ApiEndpoint: api.url,
+    ApiEndpoint: apiDummy.url,
   });
 }

@@ -22,7 +22,7 @@ public class DummyValue
     public int? Code { get; set; }
 }
 
-public class Function
+public class Dummy
 {
     private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
     {
@@ -30,13 +30,7 @@ public class Function
         NullValueHandling = NullValueHandling.Ignore
     };
 
-    /// <summary>
-    /// A simple function that takes a string and does a ToUpper
-    /// </summary>
-    /// <param name="request">The input for the Lambda function handler to process.</param>
-    /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
-    /// <returns></returns>
-    public async Task<APIGatewayHttpApiV2ProxyResponse> FunctionHandler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public async Task<APIGatewayHttpApiV2ProxyResponse> Handler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
         try
         {

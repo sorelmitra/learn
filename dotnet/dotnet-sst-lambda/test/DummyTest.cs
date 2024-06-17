@@ -7,18 +7,18 @@ using Xunit.Abstractions;
 
 namespace DotNetSstLambda.Tests;
 
-public class FunctionTest(ITestOutputHelper output)
+public class DummyTest(ITestOutputHelper output)
 {
-    private readonly Function _function = new();
+    private readonly Dummy _dummy = new();
     private readonly TestLambdaContext _context = new();
 
     [Fact]
-    public void TestToUpperFunction()
+    public void TestReturnsJson()
     {
         var jsonInput = JsonConvert.SerializeObject(
             new DummyInput { Title = "dummy", Code = 4 });
         var encodedBody = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonInput));
-        var apiGatewayProxyResponse = _function.FunctionHandler(new APIGatewayHttpApiV2ProxyRequest {Body = encodedBody}, _context);
+        var apiGatewayProxyResponse = _dummy.Handler(new APIGatewayHttpApiV2ProxyRequest {Body = encodedBody}, _context);
         var jsonResponse = apiGatewayProxyResponse.Result.Body;
         var dummyValue = JsonConvert.DeserializeObject<DummyValue>(jsonResponse);
         Assert.NotNull(dummyValue);
@@ -30,9 +30,9 @@ public class FunctionTest(ITestOutputHelper output)
     }
 
     [Fact]
-    public void TestFunctionErrorsOut()
+    public void TestErrorsOut()
     {
-        var apiGatewayProxyResponse = _function.FunctionHandler(new APIGatewayHttpApiV2ProxyRequest {Body = "I am not base64 encoded"}, _context);
+        var apiGatewayProxyResponse = _dummy.Handler(new APIGatewayHttpApiV2ProxyRequest {Body = "I am not base64 encoded"}, _context);
         var jsonResponse = apiGatewayProxyResponse.Result.Body;
         var dummyValue = JsonConvert.DeserializeObject<DummyValue>(jsonResponse);
         Assert.NotNull(dummyValue);
