@@ -102,90 +102,9 @@ Clean-up Lambda project:
 
 - Edit `MyStack.ts`, change the `"GET /"` line to look like this: `"GET /": "DotNetSstLambda::DotNetSstLambda.Function::FunctionHandler",`
 
-### Update the Lambda Code
+### Update the Lambda and Test Code
 
-```C#
-using System.Text.Json;
-using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Lambda.Core;
-
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-
-namespace DotNetSstLambda;
-
-public class Function
-{
-    /// <summary>
-    /// A simple function that takes a string and does a ToUpper
-    /// </summary>
-    /// <param name="request">The input for the Lambda function handler to process.</param>
-    /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
-    /// <returns></returns>
-    public async Task<APIGatewayHttpApiV2ProxyResponse> FunctionHandler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
-    {
-        try
-        {
-            var base64EncodedBytes = Convert.FromBase64String(request.Body);
-            var message = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            return new APIGatewayHttpApiV2ProxyResponse
-            {
-                StatusCode = 200,
-                IsBase64Encoded = false,
-                Body = message.ToUpper(),
-                Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
-            };
-        }
-        catch (Exception ex)
-        {
-            return new APIGatewayHttpApiV2ProxyResponse
-            {
-                StatusCode = 500,
-                IsBase64Encoded = false,
-                Body = "Error: " + ex.Message,
-                Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
-            };
-        }
-    }
-}
-```
-
-### Update the Test Code
-
-```C#
-using System.Text.Json;
-using Amazon.Lambda.APIGatewayEvents;
-using Xunit;
-using Amazon.Lambda.TestUtilities;
-using Xunit.Abstractions;
-
-namespace DotNetSstLambda.Tests;
-
-public class FunctionTest(ITestOutputHelper output)
-{
-    private readonly Function _function = new();
-    private readonly TestLambdaContext _context = new();
-
-    [Fact]
-    public void TestToUpperFunction()
-    {
-        var encodedBody = Convert.ToBase64String("hello world"u8.ToArray());
-        var apiGatewayProxyResponse = _function.FunctionHandler(new APIGatewayHttpApiV2ProxyRequest {Body = encodedBody}, _context);
-        var message = apiGatewayProxyResponse.Result.Body;
-        Assert.Equal("HELLO WORLD", message);
-        Assert.Equal(200, apiGatewayProxyResponse.Result.StatusCode);
-    }
-
-    [Fact]
-    public void TestErrorsOut()
-    {
-        var apiGatewayProxyResponse = _function.FunctionHandler(new APIGatewayHttpApiV2ProxyRequest {Body = "I am not base64 encoded"}, _context);
-        var message = apiGatewayProxyResponse.Result.Body;
-        Assert.Matches(".*not a valid Base-64.*", message);
-        Assert.Equal(500, apiGatewayProxyResponse.Result.StatusCode);
-    }
-}
-```
+See `Function.cs` and `../test/FunctionTest.cs`, respectively.
 
 ### Test The Whole Thing
 
@@ -199,7 +118,7 @@ Start locally:
 
 Make a request:
 
-- Run `curl -X GET <URL> -d "hi there"`.
+- Run `curl -X GET <URL> -d -d '{"title": "dummy", "code": 4}'`.
 - You should get back `HI THERE`.
 
 Remove:

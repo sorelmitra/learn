@@ -1,7 +1,7 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -24,6 +24,12 @@ public class DummyValue
 
 public class Function
 {
+    private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
+    {
+        ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        NullValueHandling = NullValueHandling.Ignore
+    };
+
     /// <summary>
     /// A simple function that takes a string and does a ToUpper
     /// </summary>
@@ -36,7 +42,7 @@ public class Function
         {
             var base64EncodedBytes = Convert.FromBase64String(request.Body);
             var jsonString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            var dummyInput = JsonSerializer.Deserialize<DummyInput>(jsonString);
+            var dummyInput = JsonConvert.DeserializeObject<DummyInput>(jsonString);
             if (dummyInput == null)
             {
                 throw new Exception($"Cannot parse JSON body <{jsonString}>");
@@ -51,7 +57,7 @@ public class Function
             {
                 StatusCode = 200,
                 IsBase64Encoded = false,
-                Body = JsonSerializer.Serialize(dummyValue),
+                Body = JsonConvert.SerializeObject(dummyValue, _serializerSettings),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
@@ -66,7 +72,7 @@ public class Function
             {
                 StatusCode = 500,
                 IsBase64Encoded = false,
-                Body = JsonSerializer.Serialize(dummyValue),
+                Body = JsonConvert.SerializeObject(dummyValue, _serializerSettings),
                 Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
             };
         }
