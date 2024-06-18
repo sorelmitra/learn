@@ -1,5 +1,5 @@
 import { SSTConfig } from "sst";
-import { API } from "./stacks/MyStack";
+import {apiDummy, apiStudents} from "./stacks/MyStack";
 
 export default {
   config(_input) {
@@ -13,6 +13,7 @@ export default {
       runtime: "dotnet8",
       timeout: 30,
     });
-    app.stack(API);
+    app.stack(apiDummy);
+    app.stack(apiStudents);
   }
 } satisfies SSTConfig;
