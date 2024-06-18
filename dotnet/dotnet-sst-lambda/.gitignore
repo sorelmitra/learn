@@ -17,6 +17,7 @@ bin
 
 # local env files
 .env*.local
+aat.json
 
 # IDE files
 .idea

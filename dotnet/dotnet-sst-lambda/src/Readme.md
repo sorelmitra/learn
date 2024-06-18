@@ -1,14 +1,14 @@
-# SST with .NET Lambda
+# Basic SST with .NET Lambda
 
-## Steps to create a working `dotnet` Lambda with SST
+These are the steps to create a working `dotnet` Lambda with SST that returns a JSON object.
 
-### Prerequisites
+## Prerequisites
 
 Make sure you have .NET installed and its CLI available.
 
 Connect to AWS in the CLI, take note of the profile name, say `dev-profile`.
 
-### Create and Verify the SST Project
+## Create and Verify the SST Project
 
 Create:
 
@@ -36,7 +36,7 @@ Remove:
 
 Now that you've verified that the default project works, it's time to switch it to .NET.
 
-### Switch the Project to .NET
+## Switch the Project to .NET
 
 Edit `sst.config.ts`, find the `stacks(app)` declaration, and add the following at the **beginning** of it:
 
@@ -49,7 +49,7 @@ Edit `sst.config.ts`, find the `stacks(app)` declaration, and add the following 
 
 Remove `packages/*`.
 
-### Add .NET Lambda to the Project
+## Add .NET Lambda to the Project
 
 Install the template:
 
@@ -98,15 +98,15 @@ Clean-up Lambda project:
 - Remove `aws-lambda-tools-defaults.json`, as it's used to deploy the Lambda from Visual Studio, and we won't be using it.
 - Remove the ReadMe, as it contains Visual Studio-related info.
 
-### Configure the .NET Lambda with SST
+## Configure the .NET Lambda with SST
 
 - Edit `MyStack.ts`, change the `"GET /"` line to look like this: `"GET /": "DotNetSstLambda::DotNetSstLambda.Function::FunctionHandler",`
 
-### Update the Lambda and Test Code
+## Update the Lambda and Test Code
 
 See `Function.cs` and `../test/FunctionTest.cs`, respectively.
 
-### Test The Whole Thing
+## Test The Whole Thing
 
 Execute unit tests:
 
@@ -128,3 +128,25 @@ Remove:
 Deploy:
 
 - Run `AWS_PROFILE=dev-profile yarn deploy --stage dev`.
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+# .NET Lambda with SST and AAT
+
+In order to do Automatic Acceptance Testing (AAT), any software that has a data store will need to support tenants.
+
+Our demo Lambda handles Students, and it has a database (currently DynamoDB, for simplicity).  For the Students management, it offers a REST API.  Based on [this article](https://medium.com/@vivekmadurai/multi-tenancy-in-rest-api-a570d728620c), the recommended approach is to enforce tenant specification upfront, by baking it into the API path.  Therefore, the Students Lambda has the following mapping:
+
+* `/<tenant-id>/<sub-path>` -> `<env>-<tenant-id>-students` DynamoDB table, where `env` could be `dev`, `prod`, etc.
+
+There will be a `default` tenant for general usage, and an `aat` tenant for AATs.  Other tenants are not added, as our purpose is to just demonstrate the separation of AAT data from real-world data.

@@ -30,7 +30,7 @@ public class Dummy
         NullValueHandling = NullValueHandling.Ignore
     };
 
-    public async Task<APIGatewayHttpApiV2ProxyResponse> Handler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    public APIGatewayHttpApiV2ProxyResponse Handler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
         try
         {
