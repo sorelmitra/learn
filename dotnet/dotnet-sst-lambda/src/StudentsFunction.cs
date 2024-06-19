@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Newtonsoft.Json;
@@ -106,6 +107,26 @@ public class StudentsFunction
             var dbContext = GetDbContext(tenantId);
             await dbContext.SaveAsync(student);
             return RespondWithSuccess(new StudentResponse { Student = student});
+        }
+        catch (Exception ex)
+        {
+            return RespondWithError(ex);
+        }
+    }
+
+    public async Task<APIGatewayHttpApiV2ProxyResponse> GetById(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        try
+        {
+            var tenantId = Tenant.Get(request);
+            var id = Request.GetPathParamValue(request, "student-id");
+            var dbContext = GetDbContext(tenantId);
+            var student = await dbContext.LoadAsync<Student>(id);
+            if (student == null)
+            {
+                throw new Exception($"No student found for ID {id}!");
+            }
+            return RespondWithSuccess(new StudentResponse { Student = student });
         }
         catch (Exception ex)
         {

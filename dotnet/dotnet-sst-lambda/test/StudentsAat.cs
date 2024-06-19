@@ -57,6 +57,7 @@ public class StudentsAat(ITestOutputHelper output)
     {
         var httpResponseMessage = await _httpClient.GetAsync("/dummyTenant");
         var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        output.WriteLine($"Get, using the wrong tenant: {jsonString}");
         var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
         Assert.NotNull(response);
         Assert.False(response.Success);
@@ -68,6 +69,7 @@ public class StudentsAat(ITestOutputHelper output)
     {
         var httpResponseMessage = await _httpClient.PostAsync("/default/purge", new StringContent(""));
         var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        output.WriteLine($"Purge on the default Tenant: {jsonString}");
         var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
         Assert.NotNull(response);
         Assert.False(response.Success);
@@ -79,6 +81,7 @@ public class StudentsAat(ITestOutputHelper output)
     {
         var httpResponseMessage = await _httpClient.GetAsync("/aat");
         var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        output.WriteLine($"Get All Students: {jsonString}");
         var response = JsonConvert.DeserializeObject<StudentListResponse>(jsonString);
         Assert.NotNull(response);
         Assert.True(response.Success);
@@ -89,17 +92,30 @@ public class StudentsAat(ITestOutputHelper output)
     [Fact]
     public async Task TestCreateAndGet()
     {
+        // Create
         var createStudentPayload = new StringContent(
             JsonConvert.SerializeObject(
                     new CreateStudentInput { Name = "Dummy Foo" }));
         var httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
-        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-        output.WriteLine(jsonString);
-        var response = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
-        Assert.NotNull(response);
-        Assert.True(response.Success);
-        Assert.NotNull(response.Student);
-        Assert.Equal("Dummy Foo", response.Student.Name);
-        Assert.True(Guid.TryParse(response.Student.Id, out _));
+        var response = await GetValue(httpResponseMessage, "Create Student");
+
+        // Get
+        var studentId = response.Student!.Id;
+        httpResponseMessage = await _httpClient.GetAsync($"/aat/{studentId}");
+        await GetValue(httpResponseMessage, "Get Student");
+        return;
+
+        async Task<StudentResponse> GetValue(HttpResponseMessage httpResponseMessage1, string message)
+        {
+            var jsonString = await httpResponseMessage1.Content.ReadAsStringAsync();
+            output.WriteLine($"{message}: {jsonString}");
+            var studentResponse = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
+            Assert.NotNull(studentResponse);
+            Assert.True(studentResponse.Success);
+            Assert.NotNull(studentResponse.Student);
+            Assert.Equal("Dummy Foo", studentResponse.Student.Name);
+            Assert.True(Guid.TryParse(studentResponse.Student.Id, out _));
+            return studentResponse;
+        }
     }
 }
