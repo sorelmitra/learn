@@ -25,12 +25,13 @@ export function apiStudents({ stack }: StackContext) {
         environment: {
           ENV: process.env['ENV']!
         },
-        permissions: ['dynamodb:BatchWriteItem', 'dynamodb:DescribeTable', 'dynamodb:DeleteItem', 'dynamodb:GetRecords', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan']
+        permissions: ['dynamodb:BatchWriteItem', 'dynamodb:DescribeTable', 'dynamodb:DeleteItem', 'dynamodb:GetRecords', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem']
         // bind: [bus],
       },
     },
     routes: {
       "GET /{tenant-id}": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::List",
+      "POST /{tenant-id}": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::Add",
       "POST /{tenant-id}/purge": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::Purge",
     },
   });

@@ -21,7 +21,13 @@ public class ErrorResponse: IResponse
 public class StudentListResponse: IResponse
 {
     public bool Success { get; set; } = true;
-    public Student[] Students { get; set; } = [];
+    public Student[]? Students { get; set; }
+}
+
+public class StudentResponse: IResponse
+{
+    public bool Success { get; set; } = true;
+    public Student? Student { get; set; }
 }
 
 [DynamoDBTable("students")]
@@ -32,6 +38,20 @@ public class Student
 
     [DynamoDBProperty("name")]
     public string Name { get; set; } = "";
+
+    public static Student CreateFromInput(CreateStudentInput input)
+    {
+        return new Student
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = input.Name
+        };
+    }
+}
+
+public class CreateStudentInput
+{
+    public string Name = "";
 }
 
 public class StudentsFunction
@@ -51,9 +71,9 @@ public class StudentsFunction
         {
             var tenantId = Tenant.Get(request);
             var dbContext = GetDbContext(tenantId);
-            var readModels = await dbContext.ScanAsync<Student>(new List<ScanCondition>()).GetRemainingAsync();
+            var students = await dbContext.ScanAsync<Student>(new List<ScanCondition>()).GetRemainingAsync();
             var batchWork = dbContext.CreateBatchWrite<Student>();
-            batchWork.AddDeleteItems(readModels);
+            batchWork.AddDeleteItems(students);
             await batchWork.ExecuteAsync();
             return RespondWithSuccess(null);
         }
@@ -68,7 +88,24 @@ public class StudentsFunction
         try
         {
             var tenantId = Tenant.Get(request);
-            return RespondWithSuccess(new StudentListResponse());
+            return RespondWithSuccess(new StudentListResponse { Students = []});
+        }
+        catch (Exception ex)
+        {
+            return RespondWithError(ex);
+        }
+    }
+
+    public async Task<APIGatewayHttpApiV2ProxyResponse> Add(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
+    {
+        try
+        {
+            var tenantId = Tenant.Get(request);
+            var createStudentInput = Request.DeserializeBody<CreateStudentInput>(request);
+            var student = Student.CreateFromInput(createStudentInput);
+            var dbContext = GetDbContext(tenantId);
+            await dbContext.SaveAsync(student);
+            return RespondWithSuccess(new StudentResponse { Student = student});
         }
         catch (Exception ex)
         {

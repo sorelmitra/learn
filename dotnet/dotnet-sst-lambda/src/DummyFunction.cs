@@ -34,13 +34,7 @@ public class DummyFunction
     {
         try
         {
-            var base64EncodedBytes = Convert.FromBase64String(request.Body);
-            var jsonString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            var dummyInput = JsonConvert.DeserializeObject<DummyInput>(jsonString);
-            if (dummyInput == null)
-            {
-                throw new Exception($"Cannot parse JSON body <{jsonString}>");
-            }
+            var dummyInput = Request.DeserializeBase64Body<DummyInput>(request);
             var dummyValue = new DummyValue
             {
                 Success = true,

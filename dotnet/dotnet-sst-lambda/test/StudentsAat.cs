@@ -53,6 +53,28 @@ public class StudentsAat(ITestOutputHelper output)
     private readonly HttpClient _httpClient = new() { BaseAddress = new Uri(Config.Server) };
 
     [Fact]
+    public async Task TestSupportedTenants()
+    {
+        var httpResponseMessage = await _httpClient.GetAsync("/dummyTenant");
+        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
+        Assert.NotNull(response);
+        Assert.False(response.Success);
+        Assert.Matches(".*must be one of default,aat.*", response.Reason);
+    }
+
+    [Fact]
+    public async Task TestCanOnlyPurgeOnAatTenant()
+    {
+        var httpResponseMessage = await _httpClient.PostAsync("/default/purge", new StringContent(""));
+        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
+        Assert.NotNull(response);
+        Assert.False(response.Success);
+        Assert.Matches(".*can only purge on the AAT tenant.*", response.Reason);
+    }
+
+    [Fact]
     public async Task TestEmptyList()
     {
         var httpResponseMessage = await _httpClient.GetAsync("/aat");
@@ -60,12 +82,24 @@ public class StudentsAat(ITestOutputHelper output)
         var response = JsonConvert.DeserializeObject<StudentListResponse>(jsonString);
         Assert.NotNull(response);
         Assert.True(response.Success);
+        Assert.NotNull(response.Students);
         Assert.Empty(response.Students);
     }
 
-    // [Fact]
-    // public async Task TestCreateAndGet()
-    // {
-    //     var response = await _httpClient.PostAsync("/aat", new StringContent())
-    // }
+    [Fact]
+    public async Task TestCreateAndGet()
+    {
+        var createStudentPayload = new StringContent(
+            JsonConvert.SerializeObject(
+                    new CreateStudentInput { Name = "Dummy Foo" }));
+        var httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
+        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        output.WriteLine(jsonString);
+        var response = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Student);
+        Assert.Equal("Dummy Foo", response.Student.Name);
+        Assert.True(Guid.TryParse(response.Student.Id, out _));
+    }
 }
