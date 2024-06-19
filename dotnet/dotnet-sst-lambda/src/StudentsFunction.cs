@@ -89,7 +89,9 @@ public class StudentsFunction
         try
         {
             var tenantId = Tenant.Get(request);
-            return RespondWithSuccess(new StudentListResponse { Students = []});
+            var dbContext = GetDbContext(tenantId);
+            var students = await dbContext.ScanAsync<Student>([]).GetRemainingAsync();
+            return RespondWithSuccess(new StudentListResponse { Students = students.ToArray()});
         }
         catch (Exception ex)
         {

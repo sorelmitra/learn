@@ -15,7 +15,7 @@ class AatConfig
     {
         if (_config != null) return _config;
 
-        string jsonContent = File.ReadAllText(@"../../../aat.json");
+        var jsonContent = File.ReadAllText(@"../../../aat.json");
         _config = JsonConvert.DeserializeObject<AatConfig>(jsonContent)!;
         return _config;
     }
@@ -76,17 +76,17 @@ public class StudentsAat(ITestOutputHelper output)
         Assert.Matches(".*can only purge on the AAT tenant.*", response.Reason);
     }
 
-    [Fact]
-    public async Task TestEmptyList()
+    private async Task<StudentResponse> CheckStudentResponse(HttpResponseMessage httpResponseMessage1, string name, string message)
     {
-        var httpResponseMessage = await _httpClient.GetAsync("/aat");
-        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-        output.WriteLine($"Get All Students: {jsonString}");
-        var response = JsonConvert.DeserializeObject<StudentListResponse>(jsonString);
-        Assert.NotNull(response);
-        Assert.True(response.Success);
-        Assert.NotNull(response.Students);
-        Assert.Empty(response.Students);
+        var jsonString = await httpResponseMessage1.Content.ReadAsStringAsync();
+        output.WriteLine($"{message}: {jsonString}");
+        var studentResponse = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
+        Assert.NotNull(studentResponse);
+        Assert.True(studentResponse.Success);
+        Assert.NotNull(studentResponse.Student);
+        Assert.Equal(name, studentResponse.Student.Name);
+        Assert.True(Guid.TryParse(studentResponse.Student.Id, out _));
+        return studentResponse;
     }
 
     [Fact]
@@ -97,25 +97,42 @@ public class StudentsAat(ITestOutputHelper output)
             JsonConvert.SerializeObject(
                     new CreateStudentInput { Name = "Dummy Foo" }));
         var httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
-        var response = await GetValue(httpResponseMessage, "Create Student");
+        var response = await CheckStudentResponse(httpResponseMessage, "Dummy Foo", "Create Student");
 
         // Get
         var studentId = response.Student!.Id;
         httpResponseMessage = await _httpClient.GetAsync($"/aat/{studentId}");
-        await GetValue(httpResponseMessage, "Get Student");
-        return;
-
-        async Task<StudentResponse> GetValue(HttpResponseMessage httpResponseMessage1, string message)
-        {
-            var jsonString = await httpResponseMessage1.Content.ReadAsStringAsync();
-            output.WriteLine($"{message}: {jsonString}");
-            var studentResponse = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
-            Assert.NotNull(studentResponse);
-            Assert.True(studentResponse.Success);
-            Assert.NotNull(studentResponse.Student);
-            Assert.Equal("Dummy Foo", studentResponse.Student.Name);
-            Assert.True(Guid.TryParse(studentResponse.Student.Id, out _));
-            return studentResponse;
-        }
+        await CheckStudentResponse(httpResponseMessage, "Dummy Foo", "Get Student");
     }
+
+    [Fact]
+    public async Task TestList()
+    {
+        // Create
+        HttpResponseMessage? httpResponseMessage;
+        for (var i = 0; i < 2; i++)
+        {
+            var name = $"Bar Taz {i + 1}";
+            var createStudentPayload = new StringContent(
+                JsonConvert.SerializeObject(
+                    new CreateStudentInput { Name = name }));
+            httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
+            await CheckStudentResponse(httpResponseMessage, name, "Create Student");
+        }
+
+        // Get all students
+        httpResponseMessage = await _httpClient.GetAsync("/aat");
+        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        output.WriteLine($"Get All Students: {jsonString}");
+        var response = JsonConvert.DeserializeObject<StudentListResponse>(jsonString);
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.NotNull(response.Students);
+
+        HashSet<string> expectedStudents = ["Bar Taz 1", "Bar Taz 2"];
+        var actualStudents = new HashSet<string>(response.Students.Select(s => s.Name));
+        actualStudents.IntersectWith(expectedStudents);
+        Assert.Equal(expectedStudents, actualStudents);
+    }
+
 }
