@@ -22,7 +22,7 @@ public class DummyValue
     public int? Code { get; set; }
 }
 
-public class Dummy
+public class DummyFunction
 {
     private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
     {

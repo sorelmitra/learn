@@ -7,11 +7,21 @@ using Newtonsoft.Json.Serialization;
 
 namespace DotNetSstLambda;
 
-public class Response
+public interface IResponse
 {
     public bool Success { get; set; }
+}
+
+public class ErrorResponse: IResponse
+{
+    public bool Success { get; set; } = false;
     public string? Reason { get; set; }
-    public object? Payload { get; set; }
+}
+
+public class StudentListResponse: IResponse
+{
+    public bool Success { get; set; } = true;
+    public Student[] Students { get; set; } = [];
 }
 
 [DynamoDBTable("students")]
@@ -24,7 +34,7 @@ public class Student
     public string Name { get; set; } = "";
 }
 
-public class Students
+public class StudentsFunction
 {
     private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
     {
@@ -58,7 +68,7 @@ public class Students
         try
         {
             var tenantId = Tenant.Get(request);
-            return RespondWithSuccess(new Student [] { new Student {} });
+            return RespondWithSuccess(new StudentListResponse());
         }
         catch (Exception ex)
         {
@@ -79,16 +89,14 @@ public class Students
 
     private APIGatewayHttpApiV2ProxyResponse RespondWithError(Exception ex)
     {
-        var errorResponse = new Response()
-        {
-            Success = false,
-            Reason = "Error: " + ex.Message
-        };
         return new APIGatewayHttpApiV2ProxyResponse
         {
             StatusCode = 500,
             IsBase64Encoded = false,
-            Body = JsonConvert.SerializeObject(errorResponse, _serializerSettings),
+            Body = JsonConvert.SerializeObject(new ErrorResponse()
+            {
+                Reason = "Error: " + ex.Message
+            }, _serializerSettings),
             Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
         };
     }

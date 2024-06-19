@@ -53,8 +53,19 @@ public class StudentsAat(ITestOutputHelper output)
     private readonly HttpClient _httpClient = new() { BaseAddress = new Uri(Config.Server) };
 
     [Fact]
-    public void TestEmptyList()
+    public async Task TestEmptyList()
     {
-
+        var httpResponseMessage = await _httpClient.GetAsync("/aat");
+        var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+        var response = JsonConvert.DeserializeObject<StudentListResponse>(jsonString);
+        Assert.NotNull(response);
+        Assert.True(response.Success);
+        Assert.Empty(response.Students);
     }
+
+    // [Fact]
+    // public async Task TestCreateAndGet()
+    // {
+    //     var response = await _httpClient.PostAsync("/aat", new StringContent())
+    // }
 }

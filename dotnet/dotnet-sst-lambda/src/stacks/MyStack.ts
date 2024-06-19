@@ -3,7 +3,7 @@ import {Api, StackContext, Table, TableProps} from "sst/constructs";
 export function apiDummy({ stack }: StackContext) {
   const apiDummy = new Api(stack, "api-dummy", {
     routes: {
-      "GET /": "DotNetSstLambda::DotNetSstLambda.Dummy::Handler",
+      "GET /": "DotNetSstLambda::DotNetSstLambda.DummyFunction::Handler",
     },
   });
 
@@ -30,8 +30,8 @@ export function apiStudents({ stack }: StackContext) {
       },
     },
     routes: {
-      "GET /{tenant-id}": "DotNetSstLambda::DotNetSstLambda.Students::List",
-      "POST /{tenant-id}/purge": "DotNetSstLambda::DotNetSstLambda.Students::Purge",
+      "GET /{tenant-id}": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::List",
+      "POST /{tenant-id}/purge": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::Purge",
     },
   });
 
