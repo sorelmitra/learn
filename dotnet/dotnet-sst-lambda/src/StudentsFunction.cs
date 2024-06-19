@@ -19,6 +19,11 @@ public class ErrorResponse: IResponse
     public string? Reason { get; set; }
 }
 
+public class SuccessResponse : IResponse
+{
+    public bool Success { get; set; } = true;
+}
+
 public class StudentListResponse: IResponse
 {
     public bool Success { get; set; } = true;
@@ -71,12 +76,16 @@ public class StudentsFunction
         try
         {
             var tenantId = Tenant.Get(request);
+            if (tenantId != Tenant.Known[1])
+            {
+                throw new Exception("Can only purge on the AAT tenant");
+            }
             var dbContext = GetDbContext(tenantId);
             var students = await dbContext.ScanAsync<Student>(new List<ScanCondition>()).GetRemainingAsync();
             var batchWork = dbContext.CreateBatchWrite<Student>();
             batchWork.AddDeleteItems(students);
             await batchWork.ExecuteAsync();
-            return RespondWithSuccess(null);
+            return RespondWithSuccess(new SuccessResponse());
         }
         catch (Exception ex)
         {
@@ -104,7 +113,7 @@ public class StudentsFunction
         try
         {
             var tenantId = Tenant.Get(request);
-            var createStudentInput = Request.DeserializeBody<CreateStudentInput>(request);
+            var createStudentInput = Request.DeserializeBase64Body<CreateStudentInput>(request);
             var student = Student.CreateFromInput(createStudentInput);
             var dbContext = GetDbContext(tenantId);
             await dbContext.SaveAsync(student);

@@ -45,6 +45,7 @@ export function apiStudents({ stack }: StackContext) {
     },
     primaryIndex: { partitionKey: "id" },
   };
+  const defaultTable = new Table(stack, `default-${tableUnprefixedName}`, tableConfig);
   const aatTable = new Table(stack, `aat-${tableUnprefixedName}`, tableConfig);
 
   // bus.subscribe("todo.created", {
@@ -53,6 +54,7 @@ export function apiStudents({ stack }: StackContext) {
 
   stack.addOutputs({
     ApiEndpoint: apiStudents.url,
+    DefaultTableName: defaultTable.tableName,
     AatTableName: aatTable.tableName
   });
 }

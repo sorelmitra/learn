@@ -1,4 +1,6 @@
 using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -73,7 +75,7 @@ public class StudentsAat(ITestOutputHelper output)
         var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
         Assert.NotNull(response);
         Assert.False(response.Success);
-        Assert.Matches(".*can only purge on the AAT tenant.*", response.Reason);
+        Assert.Matches(new Regex(".*can only purge on the AAT tenant.*", RegexOptions.IgnoreCase), response.Reason);
     }
 
     private async Task<StudentResponse> CheckStudentResponse(HttpResponseMessage httpResponseMessage1, string name, string message)
@@ -94,8 +96,8 @@ public class StudentsAat(ITestOutputHelper output)
     {
         // Create
         var createStudentPayload = new StringContent(
-            JsonConvert.SerializeObject(
-                    new CreateStudentInput { Name = "Dummy Foo" }));
+            Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
+                    new CreateStudentInput { Name = "Dummy Foo" }))));
         var httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
         var response = await CheckStudentResponse(httpResponseMessage, "Dummy Foo", "Create Student");
 
@@ -114,8 +116,8 @@ public class StudentsAat(ITestOutputHelper output)
         {
             var name = $"Bar Taz {i + 1}";
             var createStudentPayload = new StringContent(
-                JsonConvert.SerializeObject(
-                    new CreateStudentInput { Name = name }));
+                Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
+                    new CreateStudentInput { Name = name }))));
             httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
             await CheckStudentResponse(httpResponseMessage, name, "Create Student");
         }
