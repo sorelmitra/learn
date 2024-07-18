@@ -1,5 +1,6 @@
 import { SSTConfig } from "sst";
 import {apiDummy, apiStudents} from "./stacks/MyStack";
+import {AuthStack} from "./stacks/AuthStack";
 
 export default {
   config(_input) {
@@ -19,10 +20,13 @@ export default {
       }
       app.setDefaultRemovalPolicy("destroy");
     }
+
     app.setDefaultFunctionProps({
       runtime: "dotnet8",
       timeout: 30,
     });
+
+    app.stack(AuthStack);
     app.stack(apiDummy);
     app.stack(apiStudents);
   }

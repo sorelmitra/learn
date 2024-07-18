@@ -1,4 +1,5 @@
-import {Api, Stack, StackContext, Table, TableProps} from "sst/constructs";
+import {Api, Stack, StackContext, Table, TableProps, use} from "sst/constructs";
+import {AuthStack} from "./AuthStack";
 
 const getCustomDomainValues = (stack: Stack) => {
   const externalStage = process.env.EXTERNAL_STAGE || stack.stage;
@@ -29,8 +30,18 @@ export function apiDummy({ stack }: StackContext) {
 
 export function apiStudents({ stack }: StackContext) {
   const {externalStage, hostedZone} = getCustomDomainValues(stack);
+  const { authorizer } = use(AuthStack);
   const apiStudents = new Api(stack, "api-students", {
+    authorizers: {
+      LambdaAuthorizer: {
+        type: 'lambda',
+        function: authorizer,
+        responseTypes: ['simple'],
+        resultsCacheTtl: '30 seconds',
+      },
+    },
     defaults: {
+      authorizer: "LambdaAuthorizer",
       function: {
         environment: {
           ENV: process.env['ENV']!

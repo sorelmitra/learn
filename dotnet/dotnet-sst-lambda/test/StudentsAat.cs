@@ -7,36 +7,25 @@ using Xunit.Abstractions;
 
 namespace DotNetSstLambda.Tests;
 
-class AatConfig
-{
-    public string Server { get; set; } = "https://localhost:7133";
-
-    private static AatConfig? _config;
-
-    public static AatConfig Read()
-    {
-        if (_config != null) return _config;
-
-        var jsonContent = File.ReadAllText(@"../../../aat.json");
-        _config = JsonConvert.DeserializeObject<AatConfig>(jsonContent)!;
-        return _config;
-    }
-}
-
 // ReSharper disable once ClassNeverInstantiated.Global
-public class AatFixture : IDisposable
+public class AatFixture : IAsyncLifetime
 {
-    private static readonly AatConfig Config = AatConfig.Read();
-    private readonly HttpClient _httpClient = new();
+    private static readonly AatConfig Config = AatConfig.Get();
+    private readonly HttpClient _httpClient = new() {
+        BaseAddress = new Uri(Config.Server)
+    };
 
-    public AatFixture()
+    // This is how you do an async fixture with XUnit.net
+    public async Task InitializeAsync()
     {
-        var response = _httpClient.Send(new HttpRequestMessage { Method = HttpMethod.Post, RequestUri = new Uri($"{Config.Server}aat/purge") });
+        _httpClient.DefaultRequestHeaders.Authorization = await AatAuth.GetHeaderValue();
+        var response = await _httpClient.PostAsync("/aat/purge", null);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
-    public void Dispose()
+    public Task DisposeAsync()
     {
+        return Task.CompletedTask;
     }
 }
 
@@ -49,10 +38,35 @@ public class AatFixtureCollection : ICollectionFixture<AatFixture>
 }
 
 [Collection("AatFixture")]
-public class StudentsAat(ITestOutputHelper output)
+public class StudentsAat(ITestOutputHelper output): IAsyncLifetime
 {
-    private static readonly AatConfig Config = AatConfig.Read();
-    private readonly HttpClient _httpClient = new() { BaseAddress = new Uri(Config.Server) };
+    private static readonly AatConfig Config = AatConfig.Get();
+
+#pragma warning disable CS8618 // Uninitialized non-nullable field - XUnit calls InitializeAsync(), and that initializes it
+    private HttpClient _httpClient;
+#pragma warning restore CS8618 // Uninitialized non-nullable field
+
+    // We're initializing the HTTP client with default request headers that contain a value
+    // that's obtained by calling an async method.  Because of this, we need to use
+    // lazy initialization.  The above #pragma disable is the best solution I found, as the
+    // compiler is unable to detect that the HTTP client variable is actually initialized
+    // at runtime by XUnit.net by calling InitializeAsync()
+    private readonly Lazy<Task<HttpClient>> _httpClientBuilder = new(async () => new HttpClient {
+        BaseAddress = new Uri(Config.Server),
+        DefaultRequestHeaders = { Authorization = await AatAuth.GetHeaderValue()}
+    });
+
+    // Set the HTTP client to the value we obtain by awaiting on the lazy initialization of our
+    // builder
+    public async Task InitializeAsync()
+    {
+        _httpClient = await _httpClientBuilder.Value;
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     private async Task<StudentResponse> CheckStudentResponse(HttpResponseMessage httpResponseMessage1, string name, string message)
     {
@@ -140,4 +154,26 @@ public class StudentsAat(ITestOutputHelper output)
         Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
     }
 
+    [Fact]
+    public async Task TestGetWithoutAuthorization()
+    {
+        // Get current, it should return an error
+        _httpClient.DefaultRequestHeaders.Remove("Authorization");
+        var httpResponseMessage = await _httpClient.GetAsync($"/aat");
+
+        // Check error response
+        Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
+    }
+
+    [Fact]
+    public async Task TestGetWithInvalidAuthorization()
+    {
+        // Get current, it should return an error
+        _httpClient.DefaultRequestHeaders.Remove("Authorization");
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer Malicious");
+        var httpResponseMessage = await _httpClient.GetAsync($"/aat");
+
+        // Check error response
+        Assert.Equal(HttpStatusCode.Forbidden, httpResponseMessage.StatusCode);
+    }
 }

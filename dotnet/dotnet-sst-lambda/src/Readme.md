@@ -160,3 +160,29 @@ See usage of `customDomain` and `CustomDomainUrl` in `MyStack.ts`.  Make sure to
 - Run `EXTERNAL_STAGE=dev AWS_PROFILE=dev-profile yarn dev`.
 
 Explanation: The SST's "internal" stage is the one you use under development, e.g. `sorel`.  The `EXTERNAL_STAGE` is the actual AWS stage, e.g. `dev` or `production`.  In `MyStack.ts::getCustomDomainValues()`, these values are used in order to apply your URL in the correct AWS environment, while still maintaining a suffix with your "internal" stage.
+
+## Lambda Authorizer
+
+Add an `authorizers` object to your SST Api, choose a name, e.g. `LambdaAuthorizer`, and under it add its configuration.  Then use your authorizer by name in your `defaults.authorizer` value.  See all these in action in `MyStack.ts::apiStudents()`.
+
+Define your authorizer Lambda as any other .NET Lambda.  If you don't choose a [Payload version](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-lambda-authorizer.html#http-api-lambda-authorizer.example-code), it will automatically choose the latest one (as of this writing, 2.0).  For the 2.0 Payload version, return `"isAuthorized": true/false`, paying attention to case: `"IsAuthorized": true/false` will NOT work, causing API Gateway to respond with 500 Internal Server Error, with no other explanation, and no way to debug.  See al these in action in `Authorizer.cs`.
+
+To test your setup, invoke as below:
+
+Skip `Authorization` header.  API Gateway will return `401 Unauthorized` WITHOUT calling your `Authorizer` Lambda:
+
+`curl -i -X GET -H "Content-Type: application/json" <URL>/default`
+
+Add a recognized `Authorization` header - in this case, send `Legit` instead of a true access token.  API Gateway will call your `Authorizer` Lambda, and it will see your `Legit` value and authorize it.   API Gateway will then subsequently call your Students endpoint.
+
+`curl -i -X GET -H "Content-Type: application/json" -H "Authorization: Bearer Legit" <URL>/default`
+
+Add an unrecognized `Authorization` header - e.g. send `Malicious` instead of a true access token.  API Gateway will call your `Authorizer` Lambda, and it will see your non-`Legit` value and deny it.  API Gateway will no longer call your Students endpoint, and return `403 Forbidden` instead.
+
+`curl -i -X GET -H "Content-Type: application/json" -H "Authorization: Bearer Malicious" <URL>/default`
+
+See all tests in action in `StudentsAat.cs`:
+
+* All tests by default pass `Legit` as an authorization header
+* One test specifically tests unauthorized access by passing `Malicious`.
+* Another test omits the `Authorization` header.
