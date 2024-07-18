@@ -3,18 +3,26 @@ using Amazon.Lambda.APIGatewayEvents;
 
 namespace DotNetSstLambda;
 
-public class Authorizer
+public partial class Authorizer
 {
-    public async Task<APIGatewayCustomAuthorizerV2SimpleResponse> Authorize(APIGatewayCustomAuthorizerV2Request lambdaEvent)
+    public async Task<APIGatewayCustomAuthorizerV2SimpleResponse> Authorize(APIGatewayCustomAuthorizerV2Request authorizerRequest)
     {
-        var authHeaderValue = lambdaEvent.IdentitySource[0];
+        if (authorizerRequest.IdentitySource.Count < 1)
+        {
+            return new APIGatewayCustomAuthorizerV2SimpleResponse { IsAuthorized = false };
+        }
+
+        var authHeaderValue = authorizerRequest.IdentitySource[0];
         Console.WriteLine($"Request identity source: {authHeaderValue}");
-        var token = new Regex(@"Bearer\s+").Replace(authHeaderValue, replacement:"", count: 1, startat: 0);
+        var token = MyRegex().Replace(authHeaderValue, replacement:"", count: 1, startat: 0);
         Console.WriteLine($"Token: {token}");
-        var response = new APIGatewayCustomAuthorizerV2SimpleResponse
+
+        return new APIGatewayCustomAuthorizerV2SimpleResponse
         {
             IsAuthorized = token.Equals("Legit")
         };
-        return response;
     }
+
+    [GeneratedRegex(@"Bearer\s+")]
+    private static partial Regex MyRegex();
 }

@@ -186,3 +186,5 @@ See all tests in action in `StudentsAat.cs`:
 * All tests by default pass `Legit` as an authorization header
 * One test specifically tests unauthorized access by passing `Malicious`.
 * Another test omits the `Authorization` header.
+
+See also https://stackoverflow.com/a/53508916/6239668
