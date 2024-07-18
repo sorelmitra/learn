@@ -60,10 +60,10 @@ public class StudentsAat(ITestOutputHelper output)
         output.WriteLine($"{message}: {jsonString}");
         var studentResponse = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
         Assert.NotNull(studentResponse);
-        Assert.True(studentResponse.Success);
         Assert.NotNull(studentResponse.Student);
         Assert.Equal(name, studentResponse.Student.Name);
         Assert.True(Guid.TryParse(studentResponse.Student.Id, out _));
+        Assert.Equal(HttpStatusCode.OK, httpResponseMessage1.StatusCode);
         return studentResponse;
     }
 
@@ -75,8 +75,9 @@ public class StudentsAat(ITestOutputHelper output)
         output.WriteLine($"Get, using the wrong tenant: {jsonString}");
         var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
         Assert.NotNull(response);
-        Assert.False(response.Success);
-        Assert.Matches(".*must be one of default,aat.*", response.Reason);
+        Assert.Matches(".*must be one of default,aat.*", response.Description);
+        Assert.Equal(ErrorResponse.ReasonInternal, response.Reason);
+        Assert.Equal(HttpStatusCode.InternalServerError, httpResponseMessage.StatusCode);
     }
 
     [Fact]
@@ -87,8 +88,9 @@ public class StudentsAat(ITestOutputHelper output)
         output.WriteLine($"Purge on the default Tenant: {jsonString}");
         var response = JsonConvert.DeserializeObject<ErrorResponse>(jsonString);
         Assert.NotNull(response);
-        Assert.False(response.Success);
-        Assert.Matches(new Regex(".*can only purge on the AAT tenant.*", RegexOptions.IgnoreCase), response.Reason);
+        Assert.Matches(new Regex(".*can only purge on the AAT tenant.*", RegexOptions.IgnoreCase), response.Description);
+        Assert.Equal(ErrorResponse.ReasonInternal, response.Reason);
+        Assert.Equal(HttpStatusCode.InternalServerError, httpResponseMessage.StatusCode);
     }
 
     [Fact]
@@ -128,13 +130,14 @@ public class StudentsAat(ITestOutputHelper output)
         output.WriteLine($"Get All Students: {jsonString}");
         var response = JsonConvert.DeserializeObject<StudentListResponse>(jsonString);
         Assert.NotNull(response);
-        Assert.True(response.Success);
         Assert.NotNull(response.Students);
 
         HashSet<string> expectedStudents = ["Bar Taz 1", "Bar Taz 2"];
         var actualStudents = new HashSet<string>(response.Students.Select(s => s.Name));
         actualStudents.IntersectWith(expectedStudents);
         Assert.Equal(expectedStudents, actualStudents);
+
+        Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
     }
 
 }

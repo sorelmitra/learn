@@ -24,8 +24,6 @@ public class DummyFunctionTest(ITestOutputHelper output)
         var jsonResponse = apiGatewayProxyResponse.Body;
         var dummyValue = JsonConvert.DeserializeObject<DummyValue>(jsonResponse);
         Assert.NotNull(dummyValue);
-        Assert.True(dummyValue.Success);
-        Assert.Null(dummyValue.Reason);
         Assert.Equal("DUMMY", dummyValue.Title);
         Assert.Equal(5, dummyValue.Code);
         Assert.Equal(200, apiGatewayProxyResponse.StatusCode);
@@ -41,10 +39,10 @@ public class DummyFunctionTest(ITestOutputHelper output)
                     new DummyInput { Title = "dummy" })
             }, _context);
         var jsonResponse = apiGatewayProxyResponse.Body;
-        var dummyValue = JsonConvert.DeserializeObject<DummyValue>(jsonResponse);
+        var dummyValue = JsonConvert.DeserializeObject<ErrorResponse>(jsonResponse);
         Assert.NotNull(dummyValue);
-        Assert.Matches(".*missing Code in input.*", dummyValue.Reason);
-        Assert.Equal(500, apiGatewayProxyResponse.StatusCode);
-        Assert.False(dummyValue.Success);
+        Assert.Matches(".*missing Code in input.*", dummyValue.Description);
+        Assert.Equal(ErrorResponse.ReasonInvalidArg, dummyValue.Reason);
+        Assert.Equal(400, apiGatewayProxyResponse.StatusCode);
     }
 }

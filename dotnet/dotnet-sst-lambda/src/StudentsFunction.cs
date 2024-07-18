@@ -1,59 +1,11 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace DotNetSstLambda;
-
-public interface IResponse
-{
-    public bool Success { get; set; }
-}
-
-public class ErrorResponse: IResponse
-{
-    public bool Success { get; set; } = false;
-    public string? Reason { get; set; }
-}
-
-public class SuccessResponse : IResponse
-{
-    public bool Success { get; set; } = true;
-}
-
-public class StudentListResponse: IResponse
-{
-    public bool Success { get; set; } = true;
-    public Student[]? Students { get; set; }
-}
-
-public class StudentResponse: IResponse
-{
-    public bool Success { get; set; } = true;
-    public Student? Student { get; set; }
-}
-
-[DynamoDBTable("students")]
-public class Student
-{
-    [DynamoDBHashKey("id")]
-    public string Id { get; set; } = "";
-
-    [DynamoDBProperty("name")]
-    public string Name { get; set; } = "";
-
-    public static Student CreateFromInput(CreateStudentInput input)
-    {
-        return new Student
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = input.Name
-        };
-    }
-}
 
 public class CreateStudentInput
 {
@@ -85,11 +37,11 @@ public class StudentsFunction
             var batchWork = dbContext.CreateBatchWrite<Student>();
             batchWork.AddDeleteItems(students);
             await batchWork.ExecuteAsync();
-            return RespondWithSuccess(new SuccessResponse());
+            return Responder.WithSuccess(null);
         }
         catch (Exception ex)
         {
-            return RespondWithError(ex);
+            return Responder.WithError(description:ex.Message);
         }
     }
 
@@ -100,11 +52,11 @@ public class StudentsFunction
             var tenantId = Tenant.Get(request);
             var dbContext = GetDbContext(tenantId);
             var students = await dbContext.ScanAsync<Student>([]).GetRemainingAsync();
-            return RespondWithSuccess(new StudentListResponse { Students = students.ToArray()});
+            return Responder.WithSuccess(new StudentListResponse { Students = students.ToArray()});
         }
         catch (Exception ex)
         {
-            return RespondWithError(ex);
+            return Responder.WithError(description:ex.Message);
         }
     }
 
@@ -117,11 +69,11 @@ public class StudentsFunction
             var student = Student.CreateFromInput(createStudentInput);
             var dbContext = GetDbContext(tenantId);
             await dbContext.SaveAsync(student);
-            return RespondWithSuccess(new StudentResponse { Student = student});
+            return Responder.WithSuccess(new StudentResponse { Student = student});
         }
         catch (Exception ex)
         {
-            return RespondWithError(ex);
+            return Responder.WithError(description:ex.Message);
         }
     }
 
@@ -137,37 +89,12 @@ public class StudentsFunction
             {
                 throw new Exception($"No student found for ID {id}!");
             }
-            return RespondWithSuccess(new StudentResponse { Student = student });
+            return Responder.WithSuccess(new StudentResponse { Student = student });
         }
         catch (Exception ex)
         {
-            return RespondWithError(ex);
+            return Responder.WithError(description:ex.Message);
         }
-    }
-
-    private APIGatewayHttpApiV2ProxyResponse RespondWithSuccess(object? payload)
-    {
-        return new APIGatewayHttpApiV2ProxyResponse
-        {
-            StatusCode = 200,
-            IsBase64Encoded = false,
-            Body = JsonConvert.SerializeObject(payload, _serializerSettings),
-            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
-        };
-    }
-
-    private APIGatewayHttpApiV2ProxyResponse RespondWithError(Exception ex)
-    {
-        return new APIGatewayHttpApiV2ProxyResponse
-        {
-            StatusCode = 500,
-            IsBase64Encoded = false,
-            Body = JsonConvert.SerializeObject(new ErrorResponse()
-            {
-                Reason = "Error: " + ex.Message
-            }, _serializerSettings),
-            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
-        };
     }
 
     private DynamoDBContext GetDbContext(string tenantId)
