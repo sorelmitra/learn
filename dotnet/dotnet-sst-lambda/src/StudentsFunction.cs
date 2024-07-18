@@ -113,7 +113,7 @@ public class StudentsFunction
         try
         {
             var tenantId = Tenant.Get(request);
-            var createStudentInput = Request.DeserializeBase64Body<CreateStudentInput>(request);
+            var createStudentInput = Request.DeserializeBody<CreateStudentInput>(request);
             var student = Student.CreateFromInput(createStudentInput);
             var dbContext = GetDbContext(tenantId);
             await dbContext.SaveAsync(student);

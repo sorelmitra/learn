@@ -3,15 +3,12 @@ using Amazon.Lambda.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
-
 namespace DotNetSstLambda;
 
 public class DummyInput
 {
     public string Title { get; set; } = "";
-    public int Code { get; set; }
+    public int? Code { get; set; }
 }
 
 public class DummyValue
@@ -34,7 +31,11 @@ public class DummyFunction
     {
         try
         {
-            var dummyInput = Request.DeserializeBase64Body<DummyInput>(request);
+            var dummyInput = Request.DeserializeBody<DummyInput>(request);
+            if (dummyInput.Code == null)
+            {
+                throw new Exception("missing Code in input!");
+            }
             var dummyValue = new DummyValue
             {
                 Success = true,

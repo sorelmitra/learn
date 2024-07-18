@@ -118,7 +118,7 @@ Start locally:
 
 Make a request:
 
-- Run `curl -X GET <URL> -d -d '{"title": "dummy", "code": 4}'`.
+- Run `curl -X GET -H "Content-Type: application/json" <URL> -d '{"title": "dummy", "code": 4}'`.
 - You should get back `HI THERE`.
 
 Remove:

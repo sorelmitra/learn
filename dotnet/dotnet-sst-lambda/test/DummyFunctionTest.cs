@@ -15,10 +15,12 @@ public class DummyFunctionTest(ITestOutputHelper output)
     [Fact]
     public void TestReturnsJson()
     {
-        var jsonInput = JsonConvert.SerializeObject(
-            new DummyInput { Title = "dummy", Code = 4 });
-        var encodedBody = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonInput));
-        var apiGatewayProxyResponse = _dummyFunction.Handler(new APIGatewayHttpApiV2ProxyRequest {Body = encodedBody}, _context);
+        var apiGatewayProxyResponse = _dummyFunction.Handler(
+            new APIGatewayHttpApiV2ProxyRequest
+            {
+                Body = JsonConvert.SerializeObject(
+                    new DummyInput { Title = "dummy", Code = 4 })
+            }, _context);
         var jsonResponse = apiGatewayProxyResponse.Body;
         var dummyValue = JsonConvert.DeserializeObject<DummyValue>(jsonResponse);
         Assert.NotNull(dummyValue);
@@ -32,12 +34,17 @@ public class DummyFunctionTest(ITestOutputHelper output)
     [Fact]
     public void TestErrorsOut()
     {
-        var apiGatewayProxyResponse = _dummyFunction.Handler(new APIGatewayHttpApiV2ProxyRequest {Body = "I am not base64 encoded"}, _context);
+        var apiGatewayProxyResponse = _dummyFunction.Handler(
+            new APIGatewayHttpApiV2ProxyRequest
+            {
+                Body = JsonConvert.SerializeObject(
+                    new DummyInput { Title = "dummy" })
+            }, _context);
         var jsonResponse = apiGatewayProxyResponse.Body;
         var dummyValue = JsonConvert.DeserializeObject<DummyValue>(jsonResponse);
         Assert.NotNull(dummyValue);
-        Assert.False(dummyValue.Success);
-        Assert.Matches(".*not a valid Base-64.*", dummyValue.Reason);
+        Assert.Matches(".*missing Code in input.*", dummyValue.Reason);
         Assert.Equal(500, apiGatewayProxyResponse.StatusCode);
+        Assert.False(dummyValue.Success);
     }
 }

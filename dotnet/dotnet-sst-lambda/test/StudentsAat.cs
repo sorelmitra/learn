@@ -54,6 +54,19 @@ public class StudentsAat(ITestOutputHelper output)
     private static readonly AatConfig Config = AatConfig.Read();
     private readonly HttpClient _httpClient = new() { BaseAddress = new Uri(Config.Server) };
 
+    private async Task<StudentResponse> CheckStudentResponse(HttpResponseMessage httpResponseMessage1, string name, string message)
+    {
+        var jsonString = await httpResponseMessage1.Content.ReadAsStringAsync();
+        output.WriteLine($"{message}: {jsonString}");
+        var studentResponse = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
+        Assert.NotNull(studentResponse);
+        Assert.True(studentResponse.Success);
+        Assert.NotNull(studentResponse.Student);
+        Assert.Equal(name, studentResponse.Student.Name);
+        Assert.True(Guid.TryParse(studentResponse.Student.Id, out _));
+        return studentResponse;
+    }
+
     [Fact]
     public async Task TestSupportedTenants()
     {
@@ -78,26 +91,13 @@ public class StudentsAat(ITestOutputHelper output)
         Assert.Matches(new Regex(".*can only purge on the AAT tenant.*", RegexOptions.IgnoreCase), response.Reason);
     }
 
-    private async Task<StudentResponse> CheckStudentResponse(HttpResponseMessage httpResponseMessage1, string name, string message)
-    {
-        var jsonString = await httpResponseMessage1.Content.ReadAsStringAsync();
-        output.WriteLine($"{message}: {jsonString}");
-        var studentResponse = JsonConvert.DeserializeObject<StudentResponse>(jsonString);
-        Assert.NotNull(studentResponse);
-        Assert.True(studentResponse.Success);
-        Assert.NotNull(studentResponse.Student);
-        Assert.Equal(name, studentResponse.Student.Name);
-        Assert.True(Guid.TryParse(studentResponse.Student.Id, out _));
-        return studentResponse;
-    }
-
     [Fact]
     public async Task TestCreateAndGet()
     {
         // Create
         var createStudentPayload = new StringContent(
-            Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
-                    new CreateStudentInput { Name = "Dummy Foo" }))));
+            JsonConvert.SerializeObject(
+                    new CreateStudentInput { Name = "Dummy Foo" }));
         var httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
         var response = await CheckStudentResponse(httpResponseMessage, "Dummy Foo", "Create Student");
 
@@ -116,8 +116,8 @@ public class StudentsAat(ITestOutputHelper output)
         {
             var name = $"Bar Taz {i + 1}";
             var createStudentPayload = new StringContent(
-                Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
-                    new CreateStudentInput { Name = name }))));
+                JsonConvert.SerializeObject(
+                    new CreateStudentInput { Name = name }));
             httpResponseMessage = await _httpClient.PostAsync("/aat", createStudentPayload);
             await CheckStudentResponse(httpResponseMessage, name, "Create Student");
         }
