@@ -141,7 +141,9 @@ Deploy:
 
 ---
 
-# .NET Lambda with SST and AAT
+# Advanced Topics
+
+## .NET Lambda with SST and AAT
 
 In order to do Automatic Acceptance Testing (AAT), any software that has a data store will need to support tenants.
 
@@ -150,3 +152,11 @@ Our demo Lambda handles Students, and it has a database (currently DynamoDB, for
 * `/<tenant-id>/<sub-path>` -> `<env>-<tenant-id>-students` DynamoDB table, where `env` could be `dev`, `prod`, etc.
 
 There will be a `default` tenant for general usage, and an `aat` tenant for AATs.  Other tenants are not added, as our purpose is to just demonstrate the separation of AAT data from real-world data.
+
+## Custom URL
+
+See usage of `customDomain` and `CustomDomainUrl` in `MyStack.ts`.  Make sure to start locally like this:
+
+- Run `EXTERNAL_STAGE=dev AWS_PROFILE=dev-profile yarn dev`.
+
+Explanation: The SST's "internal" stage is the one you use under development, e.g. `sorel`.  The `EXTERNAL_STAGE` is the actual AWS stage, e.g. `dev` or `production`.  In `MyStack.ts::getCustomDomainValues()`, these values are used in order to apply your URL in the correct AWS environment, while still maintaining a suffix with your "internal" stage.

@@ -1,24 +1,34 @@
-import {Api, StackContext, Table, TableProps} from "sst/constructs";
+import {Api, Stack, StackContext, Table, TableProps} from "sst/constructs";
+
+const getCustomDomainValues = (stack: Stack) => {
+  const externalStage = process.env.EXTERNAL_STAGE || stack.stage;
+  const stagePrefix = externalStage === 'prod' ? '' : `${externalStage}.`;
+  const hostedZone = `${stagePrefix}goodleap.com`;
+  return {externalStage, hostedZone};
+};
 
 export function apiDummy({ stack }: StackContext) {
+  const {externalStage, hostedZone} = getCustomDomainValues(stack);
   const apiDummy = new Api(stack, "api-dummy", {
     routes: {
       "GET /": "DotNetSstLambda::DotNetSstLambda.DummyFunction::Handler",
+    },
+    customDomain: {
+      domainName: `dummy-service${
+          stack.stage === externalStage ? '' : '-' + stack.stage
+      }.${hostedZone}`,
+      hostedZone: hostedZone,
     },
   });
 
   stack.addOutputs({
     ApiEndpoint: apiDummy.url,
+    CustomDomainUrl: (apiDummy as unknown as { customDomainUrl: string }).customDomainUrl || '',
   });
 }
 
 export function apiStudents({ stack }: StackContext) {
-  // const bus = new EventBus(stack, "bus", {
-  //   defaults: {
-  //     retries: 10,
-  //   },
-  // });
-
+  const {externalStage, hostedZone} = getCustomDomainValues(stack);
   const apiStudents = new Api(stack, "api-students", {
     defaults: {
       function: {
@@ -26,7 +36,6 @@ export function apiStudents({ stack }: StackContext) {
           ENV: process.env['ENV']!
         },
         permissions: ['dynamodb:BatchWriteItem', 'dynamodb:DescribeTable', 'dynamodb:DeleteItem', 'dynamodb:GetItem', 'dynamodb:GetRecords', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem']
-        // bind: [bus],
       },
     },
     routes: {
@@ -34,6 +43,12 @@ export function apiStudents({ stack }: StackContext) {
       "POST /{tenant-id}": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::Add",
       "GET /{tenant-id}/{student-id}": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::GetById",
       "POST /{tenant-id}/purge": "DotNetSstLambda::DotNetSstLambda.StudentsFunction::Purge",
+    },
+    customDomain: {
+      domainName: `dummy-students-service${
+          stack.stage === externalStage ? '' : '-' + stack.stage
+      }.${hostedZone}`,
+      hostedZone: hostedZone,
     },
   });
 
@@ -48,13 +63,10 @@ export function apiStudents({ stack }: StackContext) {
   const defaultTable = new Table(stack, `default-${tableUnprefixedName}`, tableConfig);
   const aatTable = new Table(stack, `aat-${tableUnprefixedName}`, tableConfig);
 
-  // bus.subscribe("todo.created", {
-  //   handler: "packages/functions/src/events/todo-created.handler",
-  // });
-
   stack.addOutputs({
     ApiEndpoint: apiStudents.url,
     DefaultTableName: defaultTable.tableName,
-    AatTableName: aatTable.tableName
+    AatTableName: aatTable.tableName,
+    CustomDomainUrl: (apiStudents as unknown as { customDomainUrl: string }).customDomainUrl || '',
   });
 }
