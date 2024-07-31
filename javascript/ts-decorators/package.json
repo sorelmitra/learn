@@ -1,5 +1,5 @@
 {
-  "name": "dep-injection",
+  "name": "ts-decorators",
   "version": "1.0.0",
   "description": "Doing dependency injection with TypeScript's decorators",
   "main": "index.js",
