@@ -1,0 +1,30 @@
+{
+  "name": "dep-injection",
+  "version": "1.0.0",
+  "description": "Doing dependency injection with TypeScript's decorators",
+  "main": "index.js",
+  "author": "Sorel Mitra",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "cross-env webpack --config webpack.dev.js --stats-error-details",
+    "build-prod": "cross-env webpack --config webpack.prod.js --stats-error-details",
+    "start": "cross-env webpack --config webpack.dev.js --stats-error-details",
+    "start-prod": "cross-env NODE_OPTIONS=--enable-source-maps node dist/bundle.js --stats-error-details",
+    "run": "tsc run"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "dotenv-webpack": "^8.1.0",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "nodemon-webpack-plugin": "^4.8.2",
+    "typescript": "^5.5.4",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "ts-loader": "^9.5.1"
+  }
+}

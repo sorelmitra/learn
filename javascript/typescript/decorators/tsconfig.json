@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noEmit": false,
+    "noImplicitAny": false,
+    "lib": ["es2019", "es2020.bigint", "es2020.string", "es2020.symbol.wellknown", "dom", "ES2020.Promise"],
+    "module": "commonjs",
+    "target": "es2019",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["cdk", "aat", "sample"]
+}
