@@ -40,6 +40,7 @@ botagg/src/postgres/ssl
 **/node_modules/**/*
 npm-debug.*
 appium.log
+bundle.js
 
 # Python
 __pycache__
