@@ -1,0 +1,11 @@
+{
+  "name": "npm-lib-sample",
+  "version": "1.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "description": "Small library sample with NPMJS",
+  "author": "Sorel Mitra <sorelmitra@yahoo.com>",
+  "license": "MIT",
+  "dependencies": {
+  }
+}

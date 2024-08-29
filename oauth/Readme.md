@@ -22,7 +22,7 @@ Trying to learn about OAuth.
 
 [8] The password anti-pattern: https://arstechnica.com/information-technology/2010/01/oauth-and-oauth-wrap-defeating-the-password-anti-pattern/
 
-[9] Udemy "Oauth 2 Simplified" Course: https://goodleap.udemy.com/course/oauth-2-simplified/learn/lecture/23718056#overview
+[9] Udemy "Oauth 2 Simplified" Course: https://udemy.com/course/oauth-2-simplified/learn/lecture/23718056#overview
 
 
 

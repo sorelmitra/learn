@@ -4,7 +4,7 @@ import {AuthStack} from "./AuthStack";
 const getCustomDomainValues = (stack: Stack) => {
   const externalStage = process.env.EXTERNAL_STAGE || stack.stage;
   const stagePrefix = externalStage === 'prod' ? '' : `${externalStage}.`;
-  const hostedZone = `${stagePrefix}goodleap.com`;
+  const hostedZone = `${stagePrefix}dummy.com`;
   return {externalStage, hostedZone};
 };
 
