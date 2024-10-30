@@ -5,10 +5,19 @@
   "main": "",
   "author": "Sorel Mitra",
   "license": "MIT",
+  "scripts": {
+    "local-sns-start": "REGION=us-west-2 QUEUE_URLS=http://localhost:9334/queue/queue-local.fifo,http://localhost:9344/queue/queue-local.fifo nodemon sns/local-sns.js"
+  },
   "dependencies": {
+    "@aws-sdk/client-sqs": "^3.649.0",
     "@fast-csv/parse": "^4.3.6",
     "amazon-cognito-identity-js": "^5.2.7",
     "aws-sdk": "^2.1081.0",
-    "commander": "^9.0.0"
+    "commander": "^9.0.0",
+    "express": "^4.21.0",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

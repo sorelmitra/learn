@@ -1,5 +1,0 @@
-{
-	"scripts": {
-		"tex-build": "cd TeX && make"
-	}
-}
