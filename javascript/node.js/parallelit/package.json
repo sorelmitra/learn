@@ -1,0 +1,13 @@
+{
+  "name": "parallelit",
+  "version": "1.0.0",
+  "description": "Parallelize It! A tool for doing Node.JS tasks in parallel",
+  "main": "index.js",
+  "author": "Sorel Mitra <sorelmitra@yahoo.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@fast-csv/format": "^4.3.5",
+    "@fast-csv/parse": "^4.3.6",
+    "commander": "^9.4.1"
+  }
+}
