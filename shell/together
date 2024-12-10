@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# thanks to http://unix.stackexchange.com/a/358209/50703 for the help on this one
+
+name=$1
+shift
+
+# not sure why we use the -g option
+# default-shell is here to prevent tmux from inheriting say the fish shell, which will break the && exit
+export command; command="tmux new -s $name \; set-option -g default-shell '$(which zsh)'"
+
+for arg in "$@"
+do
+   command="$command \; send-keys '$arg' C-m \; split-window"
+done
+
+command="$command\; kill-pane"
+
+eval "$command"
