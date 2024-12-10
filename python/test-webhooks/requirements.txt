@@ -1,0 +1,5 @@
+verifit >= 5.0.2
+
+python-dotenv
+flask
+requests
