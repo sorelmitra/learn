@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map Plotter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app-container">
+  <!-- The toolbar -->
+  <div class="map-toolbar">
+    <!-- Static toolbar, i.e. with predefined buttons -->
+    <div class="map-tools-static">
+    </div>
+
+    <!-- Dynamic toolbar, i.e. containging a generated list of buttons, one for each type of plot -->
+    <div id="map-tools-container" class="map-tools-dynamic">
+    </div>
+  </div>
+
+  <!-- The canvas used for loading the map and for plotting on it -->
+  <div class="map-table-container">
+    <canvas id="map-table"></canvas>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

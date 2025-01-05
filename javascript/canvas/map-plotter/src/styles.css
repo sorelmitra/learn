@@ -1,0 +1,64 @@
+body {
+  background-color: black;
+}
+
+.map-table-container {
+  display: flex;
+  width: min-content;
+  border: 10px solid IndianRed;
+  border-radius: 10px;
+}
+
+#map-table {
+  border: 0;
+  background-color: wheat;
+}
+
+.map-tools-static {
+  display: flex;
+  flex-direction: row;
+}
+
+.map-tools-dynamic {
+  display: flex;
+  flex-direction: row;
+}
+
+.map-toolbar {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 5px;
+}
+
+.map-tool-button {
+  margin: 0;
+  margin-right: 4px;
+  padding: 0;
+  border-radius: 7px;
+  border: 2px;
+  overflow: hidden;
+  font-size: 0;
+}
+
+.map-tool-button-static {
+  background-color: DarkOliveGreen;
+  width: 32px;
+  height: 32px;
+}
+
+.map-tool-button-canvas {
+  background-color: DarkOliveGreen;
+}
+
+.map-tool-button-canvas:hover {
+  background-color: YellowGreen;
+}
+
+.map-tool-button-canvas-inverse {
+  background-color: wheat;
+}
+
+.map-tool-button-canvas-inverse:hover {
+  background-color: wheat;
+}
+

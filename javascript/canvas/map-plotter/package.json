@@ -1,0 +1,16 @@
+{
+  "name": "bubbles",
+  "version": "0.1",
+  "description": "bubble up!",
+  "main": "local-server.js",
+  "author": "Sorel",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "nodemon"
+  },
+  "devDependencies": {
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9"
+  }
+}
