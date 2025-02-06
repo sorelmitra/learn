@@ -5,6 +5,7 @@ export enum PaymentsProcessorName {
 }
 
 export enum PaymentMethodName {
+  Success = 'Success',
   AchNotAuthorized = 'AchNotAuthorized',
 }
 
@@ -14,8 +15,9 @@ export interface PaymentsProcessor {
 }
 
 export type PaymentsProcessorAndId = {
-  processor: PaymentsProcessor,
-  processorId: string,
+  processor: PaymentsProcessor;
+  processorId: string;
 };
 
-export const makeId = (proc: PaymentsProcessorName) => (processorId: string) => `${proc}_${processorId}`;
+export const makeId = (proc: PaymentsProcessorName) => (processorId: string) =>
+  `${proc}_${processorId}`;

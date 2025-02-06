@@ -1,17 +1,24 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { CreatePaymentInput, Payment } from '../dto/payments.dto';
-import { makeId, PaymentMethodName, PaymentsProcessor, PaymentsProcessorName } from '../processor/payments-processor';
-
-type PaymentMethodMapping = { payment_method?: string, payment_method_types?: string[] };
+import { CreatePaymentInput, Payment, PaymentStatusName } from '../dto/payments.dto';
+import {
+  makeId,
+  PaymentMethodName,
+  PaymentsProcessor,
+  PaymentsProcessorName,
+} from '../processor/payments-processor';
+import {
+  getStripePaymentMethods,
+  getStripeStatusMappings,
+  PaymentMethodMapping,
+} from './stripe-mappings';
 
 @Injectable()
 export class StripeService implements PaymentsProcessor {
   private stripe: Stripe;
-  private stripePaymentMethods = new Map<PaymentMethodName, PaymentMethodMapping>([
-    [PaymentMethodName.AchNotAuthorized, { payment_method: 'pm_usBankAccount_debitNotAuthorized', payment_method_types: ['us_bank_account'] }],
-  ]);
+  private stripePaymentMethods = getStripePaymentMethods();
+  private stripeStatusMappings = getStripeStatusMappings();
 
   constructor(
     private readonly logger: Logger,
@@ -34,15 +41,10 @@ export class StripeService implements PaymentsProcessor {
       amount: this.toStripeInt(input.amount),
       currency: 'USD',
       capture_method: 'automatic',
-      ...this.toStripePaymentMethod(input.paymentMethod),
+      ...this.toStripePaymentMethod(input.method),
     };
-    this.logger.debug(
-      'Stripe create payment intent input',
-      stripePaymentIntentInput,
-    );
-    const response = await this.stripe.paymentIntents.create(
-      stripePaymentIntentInput,
-    );
+    this.logger.debug('Stripe create payment intent input', stripePaymentIntentInput);
+    const response = await this.stripe.paymentIntents.create(stripePaymentIntentInput);
     this.logger.debug('Stripe create payment intent response', response);
     return this.mapStripeResponseToPayment(response);
   }
@@ -54,7 +56,18 @@ export class StripeService implements PaymentsProcessor {
   }
 
   private mapStripeResponseToPayment(response: Stripe.Response<Stripe.PaymentIntent>): Payment {
-    return { id: this.makeId(response.id) };
+    return {
+      id: this.makeId(response.id),
+      status: this.mapStripeStatus(response.status),
+    };
+  }
+
+  private mapStripeStatus(stripeStatus: string): PaymentStatusName {
+    const status = this.stripeStatusMappings.get(stripeStatus);
+    if (!status) {
+      throw new HttpException(`Unknown Stripe status ${stripeStatus}`, HttpStatus.BAD_REQUEST);
+    }
+    return status;
   }
 
   private makeId(id: string): string {

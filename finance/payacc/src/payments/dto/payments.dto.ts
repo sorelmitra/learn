@@ -7,9 +7,17 @@ export class CreatePaymentInput {
 
   @IsEnum(PaymentMethodName)
   @IsOptional()
-  paymentMethod?: PaymentMethodName;
+  method?: PaymentMethodName;
+}
+
+export enum PaymentStatusName {
+  Open = 'Open',
+  Pending = 'Pending',
+  Succeeded = 'Succeeded',
+  Failed = 'Failed',
 }
 
 export class Payment {
   id: string;
+  status: PaymentStatusName;
 }

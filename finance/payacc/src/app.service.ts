@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreatePaymentInput, Payment } from './payments/dto/payments.dto';
-import {
-  PaymentsProcessorService,
-} from './payments/processor/payments-processor.service';
+import { PaymentsProcessorService } from './payments/processor/payments-processor.service';
 import { PaymentsProcessorName } from './payments/processor/payments-processor';
 
 @Injectable()

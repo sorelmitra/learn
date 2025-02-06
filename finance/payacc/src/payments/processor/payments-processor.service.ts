@@ -1,6 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { StripeService } from '../stripe/stripe.service';
-import { PaymentsProcessor, PaymentsProcessorAndId, PaymentsProcessorName } from './payments-processor';
+import {
+  PaymentsProcessor,
+  PaymentsProcessorAndId,
+  PaymentsProcessorName,
+} from './payments-processor';
 
 @Injectable()
 export class PaymentsProcessorService {
@@ -11,14 +15,9 @@ export class PaymentsProcessorService {
   ]);
 
   get(proc: PaymentsProcessorName): PaymentsProcessor {
-    const processor = this.processorsMap.get(
-      proc ?? PaymentsProcessorName.STRIPE,
-    );
+    const processor = this.processorsMap.get(proc ?? PaymentsProcessorName.STRIPE);
     if (!processor) {
-      throw new HttpException(
-        `Unknown processor ${proc}`,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`Unknown processor ${proc}`, HttpStatus.BAD_REQUEST);
     }
     return processor;
   }
@@ -28,11 +27,14 @@ export class PaymentsProcessorService {
     const proc = matches?.at(1);
     const processorId = matches?.at(2);
     if (!proc || !processorId) {
-      throw new HttpException(`Payment ID ${id} does not match the '<processor-name>_<processor-id>' format`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `Payment ID ${id} does not match the '<processor-name>_<processor-id>' format`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return {
       processor: this.get(proc as PaymentsProcessorName),
       processorId,
-    }
+    };
   }
 }
