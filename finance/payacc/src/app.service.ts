@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreatePaymentInput, Payment } from './payments/dto/payments.dto';
 import {
-  PaymentsProcessorName,
   PaymentsProcessorService,
 } from './payments/processor/payments-processor.service';
+import { PaymentsProcessorName } from './payments/processor/payments-processor';
 
 @Injectable()
 export class AppService {
@@ -25,5 +25,10 @@ export class AppService {
 
   getHello(): string {
     return 'Hello World!';
+  }
+
+  async confirmPayment(id: string): Promise<Payment> {
+    const { processor, processorId } = this.paymentsProcessorService.getFromPaymentId(id);
+    return processor.confirmPayment(processorId);
   }
 }

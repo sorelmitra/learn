@@ -2,11 +2,16 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { CreatePaymentInput, Payment } from '../dto/payments.dto';
-import { PaymentsProcessor } from '../processor/payments-processor';
+import { makeId, PaymentMethodName, PaymentsProcessor, PaymentsProcessorName } from '../processor/payments-processor';
+
+type PaymentMethodMapping = { payment_method?: string, payment_method_types?: string[] };
 
 @Injectable()
 export class StripeService implements PaymentsProcessor {
   private stripe: Stripe;
+  private stripePaymentMethods = new Map<PaymentMethodName, PaymentMethodMapping>([
+    [PaymentMethodName.AchNotAuthorized, { payment_method: 'pm_usBankAccount_debitNotAuthorized', payment_method_types: ['us_bank_account'] }],
+  ]);
 
   constructor(
     private readonly logger: Logger,
@@ -27,7 +32,9 @@ export class StripeService implements PaymentsProcessor {
   async createPayment(input: CreatePaymentInput): Promise<Payment> {
     const stripePaymentIntentInput: Stripe.PaymentIntentCreateParams = {
       amount: this.toStripeInt(input.amount),
-      currency: 'RON',
+      currency: 'USD',
+      capture_method: 'automatic',
+      ...this.toStripePaymentMethod(input.paymentMethod),
     };
     this.logger.debug(
       'Stripe create payment intent input',
@@ -37,7 +44,30 @@ export class StripeService implements PaymentsProcessor {
       stripePaymentIntentInput,
     );
     this.logger.debug('Stripe create payment intent response', response);
-    return { id: response.id };
+    return this.mapStripeResponseToPayment(response);
+  }
+
+  async confirmPayment(processorId: string): Promise<Payment> {
+    const response = await this.stripe.paymentIntents.confirm(processorId);
+    this.logger.debug(`Stripe confirm payment intent ${processorId} response`, response);
+    return this.mapStripeResponseToPayment(response);
+  }
+
+  private mapStripeResponseToPayment(response: Stripe.Response<Stripe.PaymentIntent>): Payment {
+    return { id: this.makeId(response.id) };
+  }
+
+  private makeId(id: string): string {
+    return makeId(PaymentsProcessorName.STRIPE)(id);
+  }
+
+  private toStripePaymentMethod(paymentMethod?: PaymentMethodName): PaymentMethodMapping {
+    if (!paymentMethod) return {};
+    const mapping = this.stripePaymentMethods.get(paymentMethod);
+    if (!mapping) {
+      throw new HttpException(`Unknown payment method ${paymentMethod}`, HttpStatus.BAD_REQUEST);
+    }
+    return mapping;
   }
 
   private toStripeInt(amount: number) {

@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { CreatePaymentInput, Payment } from './payments/dto/payments.dto';
-import { PaymentsProcessorName } from './payments/processor/payments-processor.service';
+import { PaymentsProcessorName } from './payments/processor/payments-processor';
 
 @Controller()
 export class AppController {
@@ -18,5 +18,10 @@ export class AppController {
     @Body() input: CreatePaymentInput,
   ): Promise<Payment> {
     return this.appService.createPayment({ input, proc });
+  }
+
+  @Patch('/payments/:id/confirm')
+  async confirmPayment(@Param('id') id: string) {
+    return this.appService.confirmPayment(id);
   }
 }
