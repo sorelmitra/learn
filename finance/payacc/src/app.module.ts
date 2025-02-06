@@ -2,6 +2,8 @@ import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PaymentsProcessorService } from './payments/processor/payments-processor.service';
+import { StripeService } from './payments/stripe/stripe.service';
 
 @Module({
   imports: [
@@ -10,6 +12,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, Logger, ConfigService],
+  providers: [AppService, Logger, ConfigService, PaymentsProcessorService, StripeService],
 })
 export class AppModule {}
