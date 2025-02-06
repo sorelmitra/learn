@@ -58,6 +58,12 @@ export class StripeService implements PaymentsProcessor {
     return this.mapStripeResponseToPayment(response);
   }
 
+  async getPayment(processorId: string): Promise<Payment> {
+    const response = await this.stripe.paymentIntents.retrieve(processorId);
+    this.logger.debug(`Stripe get payment intent ${processorId} response`, response);
+    return this.mapStripeResponseToPayment(response);
+  }
+
   async confirmPayment(processorId: string): Promise<Payment> {
     const response = await this.stripe.paymentIntents.confirm(processorId);
     this.logger.debug(`Stripe confirm payment intent ${processorId} response`, response);

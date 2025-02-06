@@ -28,6 +28,13 @@ export class AppController {
     return this.appService.updatePayment({ id, input });
   }
 
+  @Get('/payments/:id')
+  async getPayment(
+    @Param('id') id: string
+  ): Promise<Payment> {
+    return this.appService.getPayment(id);
+  }
+
   @Patch('/payments/:id/confirm')
   async confirmPayment(@Param('id') id: string) {
     return this.appService.confirmPayment(id);

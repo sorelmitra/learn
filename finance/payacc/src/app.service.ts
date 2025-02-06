@@ -30,6 +30,11 @@ export class AppService {
     return processor.updatePayment({ processorId, input });
   }
 
+  async getPayment(id: string): Promise<Payment> {
+    const { processor, processorId } = this.paymentsProcessorService.getFromPaymentId(id);
+    return processor.getPayment(processorId);
+  }
+
   async confirmPayment(id: string): Promise<Payment> {
     const { processor, processorId } = this.paymentsProcessorService.getFromPaymentId(id);
     return processor.confirmPayment(processorId);
