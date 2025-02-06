@@ -12,6 +12,12 @@ import { StripeService } from './payments/stripe/stripe.service';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, Logger, ConfigService, PaymentsProcessorService, StripeService],
+  providers: [
+    AppService,
+    Logger,
+    ConfigService,
+    PaymentsProcessorService,
+    StripeService,
+  ],
 })
 export class AppModule {}

@@ -13,7 +13,10 @@ export class AppController {
   }
 
   @Post('/payments')
-  async createPayment(@Query('proc') proc: PaymentsProcessorName, @Body() input: CreatePaymentInput): Promise<Payment> {
+  async createPayment(
+    @Query('proc') proc: PaymentsProcessorName,
+    @Body() input: CreatePaymentInput,
+  ): Promise<Payment> {
     return this.appService.createPayment({ input, proc });
   }
 }
