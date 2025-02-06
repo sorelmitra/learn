@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { CreatePaymentInput, Payment, PaymentStatusName } from '../dto/payments.dto';
+import { CreatePaymentInput, Payment, PaymentStatusName, UpdatePaymentInput } from '../dto/payments.dto';
 import {
   makeId,
   PaymentMethodName,
@@ -46,6 +46,15 @@ export class StripeService implements PaymentsProcessor {
     this.logger.debug('Stripe create payment intent input', stripePaymentIntentInput);
     const response = await this.stripe.paymentIntents.create(stripePaymentIntentInput);
     this.logger.debug('Stripe create payment intent response', response);
+    return this.mapStripeResponseToPayment(response);
+  }
+
+  async updatePayment({ processorId, input }: { processorId: string; input: UpdatePaymentInput; }): Promise<Payment> {
+    const response = await this.stripe.paymentIntents.update(processorId, {
+      amount: input.amount ? this.toStripeInt(input.amount) : undefined,
+      ...this.toStripePaymentMethod(input.method),
+    });
+    this.logger.debug(`Stripe update payment intent ${processorId} response`, response);
     return this.mapStripeResponseToPayment(response);
   }
 

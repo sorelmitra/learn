@@ -10,6 +10,16 @@ export class CreatePaymentInput {
   method?: PaymentMethodName;
 }
 
+export class UpdatePaymentInput {
+  @IsNumber()
+  @IsOptional()
+  amount?: number;
+
+  @IsEnum(PaymentMethodName)
+  @IsOptional()
+  method?: PaymentMethodName;
+}
+
 export enum PaymentStatusName {
   Open = 'Open',
   Pending = 'Pending',

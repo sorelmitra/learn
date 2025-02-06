@@ -1,4 +1,4 @@
-import { CreatePaymentInput, Payment } from '../dto/payments.dto';
+import { CreatePaymentInput, Payment, UpdatePaymentInput } from '../dto/payments.dto';
 
 export enum PaymentsProcessorName {
   STRIPE = 'stripe',
@@ -11,6 +11,7 @@ export enum PaymentMethodName {
 
 export interface PaymentsProcessor {
   createPayment(input: CreatePaymentInput): Promise<Payment>;
+  updatePayment({ processorId, input }: { processorId: string; input: UpdatePaymentInput; }): Promise<Payment>;
   confirmPayment(processorId: string): Promise<Payment>;
 }
 
