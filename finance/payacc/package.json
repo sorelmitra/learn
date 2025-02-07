@@ -13,6 +13,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "start:stripe:events:local-forwarding": "stripe listen --api-key 'sk_test_51Qp98nFwcFop6SdQXVIRpGXFEqUu1aQPKbneuw1qbZY3AJlbJ3u4QOHwQFRwbXLp6JNk9xDlr05URFIwPChLdi3L00nLyZyY0c' --forward-to http://localhost:3013/webhook/stripe",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

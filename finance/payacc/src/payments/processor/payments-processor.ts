@@ -12,7 +12,13 @@ export enum PaymentMethodName {
 export interface PaymentsProcessor {
   getPayment(processorId: string): Promise<Payment>;
   createPayment(input: CreatePaymentInput): Promise<Payment>;
-  updatePayment({ processorId, input }: { processorId: string; input: UpdatePaymentInput; }): Promise<Payment>;
+  updatePayment({
+    processorId,
+    input,
+  }: {
+    processorId: string;
+    input: UpdatePaymentInput;
+  }): Promise<Payment>;
   confirmPayment(processorId: string): Promise<Payment>;
 }
 

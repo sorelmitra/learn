@@ -25,7 +25,7 @@ export class AppService {
     return processor.createPayment(input);
   }
 
-  async updatePayment({ id, input }: { id: string; input: UpdatePaymentInput; }): Promise<Payment> {
+  async updatePayment({ id, input }: { id: string; input: UpdatePaymentInput }): Promise<Payment> {
     const { processor, processorId } = this.paymentsProcessorService.getFromPaymentId(id);
     return processor.updatePayment({ processorId, input });
   }
