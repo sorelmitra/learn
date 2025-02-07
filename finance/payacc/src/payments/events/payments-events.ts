@@ -1,13 +1,17 @@
-import { Customer } from "../dto/customers.dto";
-import { PaymentMethodType } from "../dto/payments.dto";
+import { Customer } from '../dto/customers.dto';
+import { PaymentMethod } from '../dto/payments.dto';
 
-export enum PaymentEventName {}
+export enum PaymentEventName {
+  PaymentCreated = 'PaymentCreated',
+  PaymentFailed = 'PaymentFailed',
+  PaymentSucceeded = 'PaymentSucceeded',
+}
 
 export type PaymentEvent = {
-	id: string;
-	name: PaymentEventName;
-	created: Date;
-	customer: Customer;
-	amount: number;
-	method?: PaymentMethodType;
+  id: string;
+  name: PaymentEventName;
+  created: Date;
+  amount: number;
+  customer?: Customer;
+  method?: PaymentMethod;
 };

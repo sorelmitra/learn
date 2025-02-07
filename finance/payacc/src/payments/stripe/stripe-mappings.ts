@@ -33,6 +33,4 @@ export const getStripeStatusMappings = () =>
   ]);
 
 export const getStripePaymentMethodTypeMappings = () =>
-  new Map<string, PaymentMethodType>([
-    ['us_bank_account', PaymentMethodType.UsBankAccount],
-  ]);
+  new Map<string, PaymentMethodType>([['us_bank_account', PaymentMethodType.UsBankAccount]]);

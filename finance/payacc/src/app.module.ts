@@ -6,6 +6,10 @@ import { PaymentsProcessorService } from './payments/processor/payments-processo
 import { StripeService } from './payments/stripe/stripe.service';
 import { StripeWebhookService } from './payments/stripe/webhook/stripe-webhook.service';
 import { QueueService } from './common/queue/queue.service';
+import { StripeEventHandlerFactory } from './payments/stripe/events/stripe-event-handler-factory';
+import { StripeEventHandlerPaymentIntentCreated } from './payments/stripe/events/stripe-event-handler-payment-intent-created';
+import { StripeEventHandlerPaymentIntentFailed } from './payments/stripe/events/stripe-event-handler-payment-intent-failed';
+import { StripeEventHandlerPaymentIntentSucceeded } from './payments/stripe/events/stripe-event-handler-payment-intent-succeeded';
 
 @Module({
   imports: [
@@ -21,6 +25,10 @@ import { QueueService } from './common/queue/queue.service';
     PaymentsProcessorService,
     StripeService,
     StripeWebhookService,
+    StripeEventHandlerFactory,
+    StripeEventHandlerPaymentIntentCreated,
+    StripeEventHandlerPaymentIntentFailed,
+    StripeEventHandlerPaymentIntentSucceeded,
     QueueService,
   ],
 })

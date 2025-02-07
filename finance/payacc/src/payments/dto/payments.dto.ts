@@ -10,7 +10,7 @@ export enum PaymentMethodComboInput {
 export class CreatePaymentInput {
   @IsNumber()
   amount: number;
-  
+
   @IsObject()
   @ValidateNested()
   @Type(() => CustomerInput)

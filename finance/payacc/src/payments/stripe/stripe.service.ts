@@ -9,11 +9,7 @@ import {
   PaymentStatusName,
   UpdatePaymentInput,
 } from '../dto/payments.dto';
-import {
-  makeId,
-  PaymentsProcessor,
-  PaymentsProcessorName,
-} from '../processor/payments-processor';
+import { makeId, PaymentsProcessor, PaymentsProcessorName } from '../processor/payments-processor';
 import {
   getStripePaymentMethods,
   getStripePaymentMethodTypeMappings,
@@ -57,7 +53,7 @@ export class StripeService implements PaymentsProcessor {
     this.logger.debug('Stripe create payment intent input', stripePaymentIntentInput);
     const response = await this.stripe.paymentIntents.create(stripePaymentIntentInput);
     this.logger.debug('Stripe create payment intent response', response);
-    return this.mapStripeResponseToPayment(response);
+    return this.mapStripePaymentIntentToPayment(response);
   }
 
   async updatePayment({
@@ -72,19 +68,19 @@ export class StripeService implements PaymentsProcessor {
       ...this.toStripePaymentMethodCombo(input.methodCombo),
     });
     this.logger.debug(`Stripe update payment intent ${processorId} response`, response);
-    return this.mapStripeResponseToPayment(response);
+    return this.mapStripePaymentIntentToPayment(response);
   }
 
   async getPayment(processorId: string): Promise<Payment> {
     const response = await this.stripe.paymentIntents.retrieve(processorId);
     this.logger.debug(`Stripe get payment intent ${processorId} response`, response);
-    return this.mapStripeResponseToPayment(response);
+    return this.mapStripePaymentIntentToPayment(response);
   }
 
   async confirmPayment(processorId: string): Promise<Payment> {
     const response = await this.stripe.paymentIntents.confirm(processorId);
     this.logger.debug(`Stripe confirm payment intent ${processorId} response`, response);
-    return this.mapStripeResponseToPayment(response);
+    return this.mapStripePaymentIntentToPayment(response);
   }
 
   private async ensureCustomerExists(customer: CustomerInput) {
@@ -95,7 +91,7 @@ export class StripeService implements PaymentsProcessor {
   }
 
   private async findCustomer(customer: CustomerInput) {
-    const response = await this.stripe.customers.search({query: `email: "${customer.email}"`});
+    const response = await this.stripe.customers.search({ query: `email: "${customer.email}"` });
     if (response?.data?.length > 1) {
       const errorMessage = `Found more than one customers for ${customer.email}`;
       this.logger.error(errorMessage, response.data);
@@ -113,20 +109,25 @@ export class StripeService implements PaymentsProcessor {
       name: customer.name,
     };
   }
-  
-  private async mapStripeResponseToPayment(response: Stripe.Response<Stripe.PaymentIntent>): Promise<Payment> {
+
+  async mapStripePaymentIntentToPayment(
+    stripePaymentIntent: Stripe.PaymentIntent,
+  ): Promise<Payment> {
     return {
-      id: this.makeId(response.id),
-      amount: this.fromStripeInt(response.amount),
-      status: this.mapStripeStatus(response.status),
-      customer: await this.mapStripeCustomer(response.customer),
-      method: await this.getPaymentMethod(response.payment_method),
+      id: this.makeId(stripePaymentIntent.id),
+      amount: this.fromStripeInt(stripePaymentIntent.amount),
+      status: this.mapStripeStatus(stripePaymentIntent.status),
+      customer: await this.mapStripeCustomer(stripePaymentIntent.customer),
+      method: await this.getPaymentMethod(stripePaymentIntent.payment_method),
     };
   }
 
-  private async getPaymentMethod(paymentMethodResponse: string | Stripe.PaymentMethod | null): Promise<PaymentMethod | undefined> {
+  private async getPaymentMethod(
+    paymentMethodResponse: string | Stripe.PaymentMethod | null,
+  ): Promise<PaymentMethod | undefined> {
     if (!paymentMethodResponse) return undefined;
-    if (typeof paymentMethodResponse === 'object') return this.mapStripePaymentMethod(paymentMethodResponse);
+    if (typeof paymentMethodResponse === 'object')
+      return this.mapStripePaymentMethod(paymentMethodResponse);
     const stripePaymentMethod = await this.stripe.paymentMethods.retrieve(paymentMethodResponse);
     return this.mapStripePaymentMethod(stripePaymentMethod);
   }
@@ -134,9 +135,15 @@ export class StripeService implements PaymentsProcessor {
   private mapStripePaymentMethod(stripePaymentMethod: Stripe.PaymentMethod): PaymentMethod {
     const paymentMethodType = this.stripePaymentMethodTypeMappings.get(stripePaymentMethod.type);
     if (!paymentMethodType) {
-      throw new HttpException(`Unmapped payment method type ${paymentMethodType}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `Unmapped payment method type ${paymentMethodType}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    this.logger.debug(`Mapping Stripe payment method ${stripePaymentMethod.id} from`, stripePaymentMethod);
+    this.logger.debug(
+      `Mapping Stripe payment method ${stripePaymentMethod.id} from`,
+      stripePaymentMethod,
+    );
     const details = stripePaymentMethod[stripePaymentMethod.type];
     return {
       type: paymentMethodType,
@@ -146,13 +153,17 @@ export class StripeService implements PaymentsProcessor {
     };
   }
 
-  private async mapStripeCustomer(stripeCustomerResponse: string | Stripe.Customer | Stripe.DeletedCustomer | null): Promise<Customer | undefined> {
+  private async mapStripeCustomer(
+    stripeCustomerResponse: string | Stripe.Customer | Stripe.DeletedCustomer | null,
+  ): Promise<Customer | undefined> {
     let stripeCustomer: Stripe.Customer;
     if (!stripeCustomerResponse) return undefined;
     if (typeof stripeCustomerResponse === 'object') {
       stripeCustomer = stripeCustomerResponse as Stripe.Customer;
     } else {
-      stripeCustomer = await this.stripe.customers.retrieve(stripeCustomerResponse) as Stripe.Customer;
+      stripeCustomer = (await this.stripe.customers.retrieve(
+        stripeCustomerResponse,
+      )) as Stripe.Customer;
     }
 
     return {
@@ -170,11 +181,13 @@ export class StripeService implements PaymentsProcessor {
     return status;
   }
 
-  private makeId(id: string): string {
+  makeId(id: string): string {
     return makeId(PaymentsProcessorName.STRIPE)(id);
   }
 
-  private toStripePaymentMethodCombo(paymentMethod?: PaymentMethodComboInput): StripePaymentMethodCombo {
+  private toStripePaymentMethodCombo(
+    paymentMethod?: PaymentMethodComboInput,
+  ): StripePaymentMethodCombo {
     if (!paymentMethod) return {};
     const mapping = this.stripePaymentMethods.get(paymentMethod);
     if (!mapping) {
