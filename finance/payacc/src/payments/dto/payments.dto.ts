@@ -1,7 +1,11 @@
 import { IsEnum, IsNumber, IsObject, IsOptional, ValidateNested } from 'class-validator';
-import { PaymentMethodName } from '../processor/payments-processor';
 import { Customer, CustomerInput } from './customers.dto';
 import { Type } from 'class-transformer';
+
+export enum PaymentMethodComboInput {
+  AchSuccess = 'AchSuccess',
+  AchNotAuthorized = 'AchNotAuthorized',
+}
 
 export class CreatePaymentInput {
   @IsNumber()
@@ -12,9 +16,9 @@ export class CreatePaymentInput {
   @Type(() => CustomerInput)
   customer: CustomerInput;
 
-  @IsEnum(PaymentMethodName)
+  @IsEnum(PaymentMethodComboInput)
   @IsOptional()
-  method?: PaymentMethodName;
+  methodCombo?: PaymentMethodComboInput;
 }
 
 export class UpdatePaymentInput {
@@ -22,9 +26,9 @@ export class UpdatePaymentInput {
   @IsOptional()
   amount?: number;
 
-  @IsEnum(PaymentMethodName)
+  @IsEnum(PaymentMethodComboInput)
   @IsOptional()
-  method?: PaymentMethodName;
+  methodCombo?: PaymentMethodComboInput;
 }
 
 export enum PaymentStatusName {
@@ -34,9 +38,21 @@ export enum PaymentStatusName {
   Failed = 'Failed',
 }
 
+export enum PaymentMethodType {
+  UsBankAccount = 'UsBankAccount',
+}
+
+export class PaymentMethod {
+  type: PaymentMethodType;
+  lastFour?: string;
+  bankName?: string;
+  routingNumber?: string;
+}
+
 export class Payment {
   id: string;
   amount: number;
   status: PaymentStatusName;
   customer?: Customer;
+  method?: PaymentMethod;
 }

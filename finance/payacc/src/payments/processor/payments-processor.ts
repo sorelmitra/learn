@@ -4,11 +4,6 @@ export enum PaymentsProcessorName {
   STRIPE = 'stripe',
 }
 
-export enum PaymentMethodName {
-  Success = 'Success',
-  AchNotAuthorized = 'AchNotAuthorized',
-}
-
 export interface PaymentsProcessor {
   getPayment(processorId: string): Promise<Payment>;
   createPayment(input: CreatePaymentInput): Promise<Payment>;

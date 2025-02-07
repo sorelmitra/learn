@@ -1,22 +1,21 @@
-import { PaymentStatusName } from '../dto/payments.dto';
-import { PaymentMethodName } from '../processor/payments-processor';
+import { PaymentMethodComboInput, PaymentMethodType, PaymentStatusName } from '../dto/payments.dto';
 
-export type PaymentMethodMapping = {
+export type StripePaymentMethodCombo = {
   payment_method?: string;
   payment_method_types?: string[];
 };
 
 export const getStripePaymentMethods = () =>
-  new Map<PaymentMethodName, PaymentMethodMapping>([
+  new Map<PaymentMethodComboInput, StripePaymentMethodCombo>([
     [
-      PaymentMethodName.Success,
+      PaymentMethodComboInput.AchSuccess,
       {
         payment_method: 'pm_usBankAccount_success',
         payment_method_types: ['us_bank_account'],
       },
     ],
     [
-      PaymentMethodName.AchNotAuthorized,
+      PaymentMethodComboInput.AchNotAuthorized,
       {
         payment_method: 'pm_usBankAccount_debitNotAuthorized',
         payment_method_types: ['us_bank_account'],
@@ -31,4 +30,9 @@ export const getStripeStatusMappings = () =>
     ['processing', PaymentStatusName.Pending],
     ['failed', PaymentStatusName.Failed],
     ['succeeded', PaymentStatusName.Succeeded],
+  ]);
+
+export const getStripePaymentMethodTypeMappings = () =>
+  new Map<string, PaymentMethodType>([
+    ['us_bank_account', PaymentMethodType.UsBankAccount],
   ]);
