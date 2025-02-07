@@ -1,5 +1,5 @@
 import { StripeEvent } from 'src/payments/dto/stripe.dto';
-import { PaymentEvent, PaymentEventName } from 'src/payments/events/payments-events';
+import { PaymentEvent } from 'src/payments/events/payments-events';
 import Stripe from 'stripe';
 import { StripeService } from '../stripe.service';
 import { Payment } from 'src/payments/dto/payments.dto';
@@ -11,7 +11,9 @@ export abstract class StripeEventHandler {
 
   abstract handle(event: StripeEvent): Promise<PaymentEvent>;
 
- async getPaymentFromStripePaymentIntent(stripePaymentIntent: Stripe.PaymentIntent): Promise<Payment> {
+  async getPaymentFromStripePaymentIntent(
+    stripePaymentIntent: Stripe.PaymentIntent,
+  ): Promise<Payment> {
     return this.stripeService.mapStripePaymentIntentToPayment(stripePaymentIntent);
   }
 
