@@ -18,6 +18,7 @@ import {
   getStripeStatusMappings,
   PaymentMethodMapping,
 } from './stripe-mappings';
+import { Customer, CustomerInput } from '../dto/customers.dto';
 
 @Injectable()
 export class StripeService implements PaymentsProcessor {
@@ -42,10 +43,12 @@ export class StripeService implements PaymentsProcessor {
   }
 
   async createPayment(input: CreatePaymentInput): Promise<Payment> {
+    const customer = await this.ensureCustomerExists(input.customer);
     const stripePaymentIntentInput: Stripe.PaymentIntentCreateParams = {
       amount: this.toStripeInt(input.amount),
       currency: 'USD',
       capture_method: 'automatic',
+      customer: customer.id,
       ...this.toStripePaymentMethod(input.method),
     };
     this.logger.debug('Stripe create payment intent input', stripePaymentIntentInput);
@@ -81,10 +84,55 @@ export class StripeService implements PaymentsProcessor {
     return this.mapStripeResponseToPayment(response);
   }
 
-  private mapStripeResponseToPayment(response: Stripe.Response<Stripe.PaymentIntent>): Payment {
+  private async ensureCustomerExists(customer: CustomerInput) {
+    const existingCustomer = await this.findCustomer(customer);
+    if (existingCustomer) return existingCustomer;
+
+    return await this.stripe.customers.create(this.mapCustomerToStripe(customer));
+  }
+
+  private async findCustomer(customer: CustomerInput) {
+    const response = await this.stripe.customers.search({query: `email: "${customer.email}"`});
+    if (response?.data?.length > 1) {
+      const errorMessage = `Found more than one customers for ${customer.email}`;
+      this.logger.error(errorMessage, response.data);
+      throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+    if (!response?.data?.length) {
+      return undefined;
+    }
+    return response.data[0];
+  }
+
+  private mapCustomerToStripe(customer: CustomerInput): Stripe.CustomerCreateParams | undefined {
+    return {
+      email: customer.email,
+      name: customer.name,
+    };
+  }
+  
+  private async mapStripeResponseToPayment(response: Stripe.Response<Stripe.PaymentIntent>): Promise<Payment> {
     return {
       id: this.makeId(response.id),
+      amount: this.fromStripeInt(response.amount),
       status: this.mapStripeStatus(response.status),
+      customer: await this.mapStripeCustomer(response.customer),
+    };
+  }
+
+  private async mapStripeCustomer(stripeCustomerResponse: string | Stripe.Customer | Stripe.DeletedCustomer | null): Promise<Customer | undefined> {
+    let stripeCustomer: Stripe.Customer;
+    if (!stripeCustomerResponse) return undefined;
+    if (typeof stripeCustomerResponse === 'object') {
+      stripeCustomer = stripeCustomerResponse as Stripe.Customer;
+    } else {
+      stripeCustomer = await this.stripe.customers.retrieve(stripeCustomerResponse) as Stripe.Customer;
+    }
+
+    return {
+      id: this.makeId(stripeCustomer.id),
+      email: stripeCustomer.email ?? 'missing email',
+      name: stripeCustomer.name ?? 'missing name',
     };
   }
 
@@ -107,6 +155,10 @@ export class StripeService implements PaymentsProcessor {
       throw new HttpException(`Unknown payment method ${paymentMethod}`, HttpStatus.BAD_REQUEST);
     }
     return mapping;
+  }
+
+  private fromStripeInt(amount: number) {
+    return Number(amount / 100);
   }
 
   private toStripeInt(amount: number) {

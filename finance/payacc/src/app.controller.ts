@@ -7,7 +7,10 @@ import { StripeWebhookService } from './payments/stripe/webhook/stripe-webhook.s
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly stripeWebhookService: StripeWebhookService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly stripeWebhookService: StripeWebhookService,
+  ) {}
 
   @Get('/health')
   getHello(): string {

@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PaymentsProcessorService } from './payments/processor/payments-processor.service';
 import { StripeService } from './payments/stripe/stripe.service';
 import { StripeWebhookService } from './payments/stripe/webhook/stripe-webhook.service';
+import { QueueService } from './common/queue/queue.service';
 
 @Module({
   imports: [
@@ -13,6 +14,14 @@ import { StripeWebhookService } from './payments/stripe/webhook/stripe-webhook.s
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, Logger, ConfigService, PaymentsProcessorService, StripeService, StripeWebhookService],
+  providers: [
+    AppService,
+    Logger,
+    ConfigService,
+    PaymentsProcessorService,
+    StripeService,
+    StripeWebhookService,
+    QueueService,
+  ],
 })
 export class AppModule {}
