@@ -20,6 +20,6 @@ export class StripeWebhookService {
     const handler = this.stripeEventHandlerFactory.create(stripeEvent.type);
     if (!handler) return;
     const event = await handler.handle(stripeEvent);
-    this.logger.debug(`Payment event`, event);
+    this.queueService.add(event);
   }
 }
