@@ -21,6 +21,13 @@ export const getStripePaymentMethods = () =>
         payment_method_types: ['us_bank_account'],
       },
     ],
+    [
+      PaymentMethodComboInput.CardSuccess,
+      {
+        payment_method: 'pm_card_amex',
+        payment_method_types: ['card'],
+      },
+    ],
   ]);
 
 export const getStripeStatusMappings = () =>
@@ -33,4 +40,7 @@ export const getStripeStatusMappings = () =>
   ]);
 
 export const getStripePaymentMethodTypeMappings = () =>
-  new Map<string, PaymentMethodType>([['us_bank_account', PaymentMethodType.UsBankAccount]]);
+  new Map<string, PaymentMethodType>([
+    ['us_bank_account', PaymentMethodType.UsBankAccount],
+    ['card', PaymentMethodType.Card],
+  ]);

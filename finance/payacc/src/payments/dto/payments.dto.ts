@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 export enum PaymentMethodComboInput {
   AchSuccess = 'AchSuccess',
   AchNotAuthorized = 'AchNotAuthorized',
+  CardSuccess = 'CardSuccess',
 }
 
 export class CreatePaymentInput {
@@ -40,6 +41,7 @@ export enum PaymentStatusName {
 
 export enum PaymentMethodType {
   UsBankAccount = 'UsBankAccount',
+  Card = "Card",
 }
 
 export class PaymentMethod {
