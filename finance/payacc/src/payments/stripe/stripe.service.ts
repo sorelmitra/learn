@@ -44,11 +44,16 @@ export class StripeService implements PaymentsProcessor {
 
   async createPayment(input: CreatePaymentInput): Promise<Payment> {
     const customer = await this.ensureCustomerExists(input.customer);
+    const accountId = this.configService.get<string>('STRIPE_CONNECTED_ACCOUNT_ID');
     const stripePaymentIntentInput: Stripe.PaymentIntentCreateParams = {
       amount: this.toStripeInt(input.amount),
       currency: 'USD',
       capture_method: 'automatic',
       customer: customer.id,
+      on_behalf_of: accountId,
+      transfer_data: accountId ? {
+        destination: accountId,
+      } : undefined,
       ...this.toStripePaymentMethodCombo(input.methodCombo),
     };
     this.logger.debug('Stripe create payment intent input', stripePaymentIntentInput);
@@ -120,7 +125,19 @@ export class StripeService implements PaymentsProcessor {
       status: this.mapStripeStatus(stripePaymentIntent.status),
       customer: await this.mapStripeCustomer(stripePaymentIntent.customer),
       method: await this.getPaymentMethod(stripePaymentIntent.payment_method),
+      onBehalfOf: this.getOnBehalfOf(stripePaymentIntent.on_behalf_of),
     };
+  }
+  
+  private getOnBehalfOf(onBehalfOf: string | Stripe.Account | null): string | undefined {
+    if (onBehalfOf === null) {
+      return undefined;
+    }
+    if (typeof onBehalfOf === 'object') {
+      const onBehalfOfObject = onBehalfOf as Stripe.Account;
+      return this.makeId(onBehalfOfObject.id);
+    }
+    return this.makeId(onBehalfOf);
   }
 
   private async getPaymentMethod(

@@ -57,4 +57,5 @@ export class Payment {
   status: PaymentStatusName;
   customer?: Customer;
   method?: PaymentMethod;
+  onBehalfOf?: string;
 }
