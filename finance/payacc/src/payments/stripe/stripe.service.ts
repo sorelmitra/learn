@@ -25,12 +25,14 @@ export class StripeService implements PaymentsProcessor {
   private stripePaymentMethods = getStripePaymentMethods();
   private stripeStatusMappings = getStripeStatusMappings();
   private stripePaymentMethodTypeMappings = getStripePaymentMethodTypeMappings();
+  private accountId?: string;
 
   constructor(
     private readonly logger: Logger,
     private readonly configService: ConfigService,
   ) {
     const stripeKey = this.configService.get<string>('STRIPE_KEY');
+    this.accountId = this.configService.get<string>('STRIPE_CONNECTED_ACCOUNT_ID');
     if (!stripeKey) {
       throw new HttpException(
         `Missing Stripe API Key in config!`,
@@ -38,22 +40,17 @@ export class StripeService implements PaymentsProcessor {
       );
     }
     this.logger.debug(`Stripe API Key ${stripeKey}`);
-    this.stripe = new Stripe(stripeKey);
+    this.stripe = new Stripe(stripeKey, { stripeAccount: this.accountId });
     this.logger.log(`Stripe client created`);
   }
 
   async createPayment(input: CreatePaymentInput): Promise<Payment> {
     const customer = await this.ensureCustomerExists(input.customer);
-    const accountId = this.configService.get<string>('STRIPE_CONNECTED_ACCOUNT_ID');
     const stripePaymentIntentInput: Stripe.PaymentIntentCreateParams = {
       amount: this.toStripeInt(input.amount),
       currency: 'USD',
       capture_method: 'automatic',
       customer: customer.id,
-      on_behalf_of: accountId,
-      transfer_data: accountId ? {
-        destination: accountId,
-      } : undefined,
       ...this.toStripePaymentMethodCombo(input.methodCombo),
     };
     this.logger.debug('Stripe create payment intent input', stripePaymentIntentInput);
