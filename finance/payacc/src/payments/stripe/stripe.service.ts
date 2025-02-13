@@ -9,7 +9,7 @@ import {
   PaymentStatusName,
   UpdatePaymentInput,
 } from '../dto/payments.dto';
-import { makeId, PaymentsProcessor, PaymentsProcessorName } from '../processor/payments-processor';
+import { PaymentsProcessor, PaymentsProcessorName } from '../processor/payments-processor';
 import {
   getStripePaymentMethods,
   getStripePaymentMethodTypeMappings,
@@ -17,6 +17,7 @@ import {
   StripePaymentMethodCombo as StripePaymentMethodCombo,
 } from './stripe-mappings';
 import { Customer, CustomerInput } from '../dto/customers.dto';
+import { makeId } from 'src/common/utils/utils';
 
 @Injectable()
 export class StripeService implements PaymentsProcessor {
@@ -126,8 +127,9 @@ export class StripeService implements PaymentsProcessor {
     paymentMethodResponse: string | Stripe.PaymentMethod | null,
   ): Promise<PaymentMethod | undefined> {
     if (!paymentMethodResponse) return undefined;
-    if (typeof paymentMethodResponse === 'object')
+    if (typeof paymentMethodResponse === 'object') {
       return this.mapStripePaymentMethod(paymentMethodResponse);
+    }
     const stripePaymentMethod = await this.stripe.paymentMethods.retrieve(paymentMethodResponse);
     return this.mapStripePaymentMethod(stripePaymentMethod);
   }

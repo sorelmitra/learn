@@ -21,6 +21,3 @@ export type PaymentsProcessorAndId = {
   processor: PaymentsProcessor;
   processorId: string;
 };
-
-export const makeId = (proc: PaymentsProcessorName) => (processorId: string) =>
-  `${proc}_${processorId}`;

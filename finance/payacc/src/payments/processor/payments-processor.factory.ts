@@ -7,7 +7,7 @@ import {
 } from './payments-processor';
 
 @Injectable()
-export class PaymentsProcessorService {
+export class PaymentsProcessorFactory {
   constructor(private stripeService: StripeService) {}
 
   private processorsMap = new Map<PaymentsProcessorName, PaymentsProcessor>([

@@ -2,7 +2,7 @@ import * as util from 'util';
 import { Injectable, Logger } from '@nestjs/common';
 import { StripeEvent } from 'src/payments/dto/stripe.dto';
 import { QueueService } from 'src/common/queue/queue.service';
-import { StripeEventHandlerFactory } from '../events/stripe-event-handler-factory';
+import { StripeEventHandlerFactory } from '../events/stripe-event-handler.factory';
 
 @Injectable()
 export class StripeWebhookService {
