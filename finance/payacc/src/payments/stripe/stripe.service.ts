@@ -142,13 +142,13 @@ export class StripeService implements PaymentsProcessor {
   ): Promise<PaymentMethod | undefined> {
     if (!paymentMethodResponse) return undefined;
     if (typeof paymentMethodResponse === 'object') {
-      return this.mapStripePaymentMethod(paymentMethodResponse);
+      return this.getStripePaymentMethodDetails(paymentMethodResponse);
     }
     const stripePaymentMethod = await this.stripe.paymentMethods.retrieve(paymentMethodResponse);
-    return this.mapStripePaymentMethod(stripePaymentMethod);
+    return this.getStripePaymentMethodDetails(stripePaymentMethod);
   }
 
-  private mapStripePaymentMethod(stripePaymentMethod: Stripe.PaymentMethod): PaymentMethod {
+  private getStripePaymentMethodDetails(stripePaymentMethod: Stripe.PaymentMethod): PaymentMethod {
     const paymentMethodType = this.stripePaymentMethodTypeMappings.get(stripePaymentMethod.type);
     if (!paymentMethodType) {
       throw new HttpException(
@@ -156,10 +156,7 @@ export class StripeService implements PaymentsProcessor {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    this.logger.debug(
-      `Mapping Stripe payment method ${stripePaymentMethod.id} from`,
-      stripePaymentMethod,
-    );
+    this.logger.debug(`Getting Stripe payment method details from ${stripePaymentMethod.id} of type ${stripePaymentMethod.type}`);
     const details = stripePaymentMethod[stripePaymentMethod.type];
     return {
       type: paymentMethodType,
