@@ -41,7 +41,7 @@ export enum PaymentStatusName {
 
 export enum PaymentMethodType {
   UsBankAccount = 'UsBankAccount',
-  Card = "Card",
+  Card = 'Card',
 }
 
 export class PaymentMethod {

@@ -125,13 +125,13 @@ export class StripeService implements PaymentsProcessor {
       onBehalfOf: this.getOnBehalfOf(stripePaymentIntent.on_behalf_of),
     };
   }
-  
+
   private getOnBehalfOf(onBehalfOf: string | Stripe.Account | null): string | undefined {
     if (onBehalfOf === null) {
       return undefined;
     }
     if (typeof onBehalfOf === 'object') {
-      const onBehalfOfObject = onBehalfOf as Stripe.Account;
+      const onBehalfOfObject = onBehalfOf;
       return this.makeId(onBehalfOfObject.id);
     }
     return this.makeId(onBehalfOf);
@@ -156,7 +156,9 @@ export class StripeService implements PaymentsProcessor {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    this.logger.debug(`Getting Stripe payment method details from ${stripePaymentMethod.id} of type ${stripePaymentMethod.type}`);
+    this.logger.debug(
+      `Getting Stripe payment method details from ${stripePaymentMethod.id} of type ${stripePaymentMethod.type}`,
+    );
     const details = stripePaymentMethod[stripePaymentMethod.type];
     return {
       type: paymentMethodType,
