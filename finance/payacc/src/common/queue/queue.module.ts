@@ -1,18 +1,21 @@
 import { Logger, Module } from '@nestjs/common';
-import { QueueService } from './queue.service';
-import { CommonModule } from '../common.module';
-import { AccountingProcessorFactory } from 'src/accounting/accounting-processor/accounting-processor.factory';
 import { AccountingModule } from 'src/accounting/accounting.module';
+import { PaymentAccountingEventHandlerFactory } from 'src/accounting/events/payment-events/accounting-payment-event-handler.factory';
+import { CommonModule } from '../common.module';
+import { QueueService } from './queue.service';
 
 @Module({
   imports: [CommonModule, AccountingModule],
   providers: [
     {
       provide: QueueService,
-      inject: [Logger, AccountingProcessorFactory],
-      useFactory: (logger: Logger, accountingProcessorFactory: AccountingProcessorFactory) => {
+      inject: [Logger, PaymentAccountingEventHandlerFactory],
+      useFactory: (
+        logger: Logger,
+        accountingEventHandlerFactory: PaymentAccountingEventHandlerFactory,
+      ) => {
         const queueService = new QueueService(logger);
-        queueService.register(accountingProcessorFactory);
+        queueService.register(accountingEventHandlerFactory);
         return queueService;
       },
     },

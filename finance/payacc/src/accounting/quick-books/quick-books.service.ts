@@ -4,7 +4,13 @@ import { AccountingProcessor } from '../accounting-processor/accounting-processo
 
 @Injectable()
 export class QuickBooksService extends AccountingProcessor {
-  handle(event: PaymentEvent): Promise<void> {
+  handlePaymentFailed(event: PaymentEvent): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  handlePaymentSucceeded(event: PaymentEvent): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  handlePaymentCreated(event: PaymentEvent): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }

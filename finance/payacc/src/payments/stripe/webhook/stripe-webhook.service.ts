@@ -19,6 +19,7 @@ export class StripeWebhookService {
     );
     const handler = this.stripeEventHandlerFactory.create(stripeEvent.type);
     if (!handler) return;
+    // Convert Stripe Event to internal PaymentEvent before queuing it up
     const event = await handler.handle(stripeEvent);
     this.queueService.add(event);
   }
