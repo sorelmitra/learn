@@ -5,9 +5,9 @@ export enum AccountingProcessorName {
 }
 
 export abstract class AccountingProcessor {
+  abstract handlePaymentCreated(event: PaymentEvent): Promise<void>;
   abstract handlePaymentFailed(event: PaymentEvent): Promise<void>;
   abstract handlePaymentSucceeded(event: PaymentEvent): Promise<void>;
-  abstract handlePaymentCreated(event: PaymentEvent): Promise<void>;
 }
 
 export type AccountingProcessorAndId = {

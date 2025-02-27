@@ -46,3 +46,13 @@ $ yarn run start:dev
 # production mode
 $ yarn run start:prod
 ```
+
+# Development
+
+## Tasks
+
+✅ receive events from Stripe
+✅ send to in-service queue
+✅ use NestJS task scheduling to send to accounting wrapper
+send to QuickBooks
+
