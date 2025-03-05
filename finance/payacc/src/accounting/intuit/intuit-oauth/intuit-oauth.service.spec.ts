@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IntuitOauthService } from './intuit-oauth.service';
+import { IntuitOAuthService } from './intuit-oauth.service';
 
 describe('IntuitOauthService', () => {
-  let service: IntuitOauthService;
+  let service: IntuitOAuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [IntuitOauthService],
+      providers: [IntuitOAuthService],
     }).compile();
 
-    service = module.get<IntuitOauthService>(IntuitOauthService);
+    service = module.get<IntuitOAuthService>(IntuitOAuthService);
   });
 
   it('should be defined', () => {

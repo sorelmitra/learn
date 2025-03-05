@@ -12,7 +12,7 @@ import {
 import { PaymentAccountingEventHandlerFactory } from './events/payment-events/accounting-payment-event-handler.factory';
 import { IntuitConnectionService } from './intuit/intuit-connection/intuit-connection.service';
 import { QuickBooksService } from './quick-books/quick-books.service';
-import { IntuitOauthService } from './intuit/intuit-oauth/intuit-oauth.service';
+import { IntuitOAuthService } from './intuit/intuit-oauth/intuit-oauth.service';
 
 @Module({
   imports: [CommonModule],
@@ -36,14 +36,14 @@ import { IntuitOauthService } from './intuit/intuit-oauth/intuit-oauth.service';
     },
     IntuitConnectionService,
     AccountingConnectionFactory,
-    IntuitOauthService,
+    IntuitOAuthService,
   ],
   exports: [
     AccountingProcessorFactory,
     PaymentAccountingEventHandlerFactory,
     IntuitConnectionService,
     AccountingConnectionFactory,
-    IntuitOauthService,
+    IntuitOAuthService,
   ],
 })
 export class AccountingModule {}

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
 import { AccountingConnectionProcessorName } from './accounting/accounting-connection/accounting-connection-processor';
 import { AccountingConnectionService } from './accounting/accounting-connection/accounting-connection.service';
-import { IntuitOauthService as IntuitOAuthService } from './accounting/intuit/intuit-oauth/intuit-oauth.service';
+import { IntuitOAuthService as IntuitOAuthService } from './accounting/intuit/intuit-oauth/intuit-oauth.service';
 import { AppService } from './app.service';
 import { CreatePaymentInput, Payment, UpdatePaymentInput } from './payments/dto/payments.dto';
 import { StripeEvent } from './payments/dto/stripe.dto';
