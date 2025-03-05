@@ -47,6 +47,11 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
+## Connect to QuickBooks
+
+Point your browser to `http://localhost:3013/accounting/connection`, enter your QuickBooks credentials.  The app will respond with a success message.
+
+
 # Development
 
 ## Tasks

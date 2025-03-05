@@ -4,6 +4,10 @@ import { AccountingProcessor } from '../accounting-processor/accounting-processo
 
 @Injectable()
 export class QuickBooksService extends AccountingProcessor {
+  constructor() {
+    super();
+  }
+
   async handlePaymentCreated(event: PaymentEvent): Promise<void> {
     throw new Error('Method not implemented.');
   }

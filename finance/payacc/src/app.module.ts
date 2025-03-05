@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AccountingConnectionService } from './accounting/accounting-connection/accounting-connection.service';
 import { AccountingModule } from './accounting/accounting.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,6 +12,6 @@ import { StripeModule } from './payments/stripe/stripe.module';
 @Module({
   imports: [ScheduleModule.forRoot(), StripeModule, CommonModule, QueueModule, AccountingModule],
   controllers: [AppController],
-  providers: [AppService, PaymentsProcessorFactory],
+  providers: [AppService, PaymentsProcessorFactory, AccountingConnectionService],
 })
 export class AppModule {}

@@ -1,15 +1,20 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Res } from '@nestjs/common';
+import { AccountingConnectionProcessorName } from './accounting/accounting-connection/accounting-connection-processor';
+import { AccountingConnectionService } from './accounting/accounting-connection/accounting-connection.service';
+import { IntuitOauthService as IntuitOAuthService } from './accounting/intuit/intuit-oauth/intuit-oauth.service';
 import { AppService } from './app.service';
 import { CreatePaymentInput, Payment, UpdatePaymentInput } from './payments/dto/payments.dto';
-import { PaymentsProcessorName } from './payments/processor/payments-processor';
 import { StripeEvent } from './payments/dto/stripe.dto';
+import { PaymentsProcessorName } from './payments/processor/payments-processor';
 import { StripeWebhookService } from './payments/stripe/webhook/stripe-webhook.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
+    private readonly accountingConnectionService: AccountingConnectionService,
     private readonly stripeWebhookService: StripeWebhookService,
+    private readonly intuitOAuthService: IntuitOAuthService,
   ) {}
 
   @Get('/health')
@@ -46,5 +51,23 @@ export class AppController {
   @Post('/webhook/stripe')
   async receiveStripeWebhook(@Body() event: StripeEvent) {
     return this.stripeWebhookService.receive(event);
+  }
+
+  @Get('/accounting/connection')
+  async connectToAccountingProvider(
+    @Query('processor') processorName: AccountingConnectionProcessorName,
+    @Res() res,
+  ) {
+    const url = await this.accountingConnectionService.connect(processorName);
+    res.status(302).redirect(url);
+  }
+
+  @Get('/oauth/callback/intuit')
+  async receiveIntuitOAuthCallback(
+    @Query('code') code: string,
+    @Query('realmId') realmId?: string,
+    @Query('state') state?: string,
+  ) {
+    return this.intuitOAuthService.performAuthorizationCodeGrant(code, realmId, state);
   }
 }
