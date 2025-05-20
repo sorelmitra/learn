@@ -8,10 +8,10 @@
 # to generate a diagram once.
 
 PLANTUML_JAR ?= /Users/sorel/Applications/plantuml-1.2025.2.jar
+IMG_DIR ?= ./images
 
 watch-%:
-	fswatch -o $*.puml | xargs -n1 -I{} java -jar $(PLANTUML_JAR) $*.puml
+	fswatch -o $*.puml | xargs -n1 -I{} java -jar $(PLANTUML_JAR) -output $(IMG_DIR) $*.puml
 
 generate:
-	java -jar $(PLANTUML_JAR) $(FILE)
-
+	java -jar $(PLANTUML_JAR) -output $(IMG_DIR) $(FILE)
