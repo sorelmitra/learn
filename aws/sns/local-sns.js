@@ -2,7 +2,7 @@
 
 Usage:
 
-AWS_PROFILE=test-profile REGION=us-west-2 QUEUE_URLS=http://localhost:9334/queue/queue-local.fifo,http://localhost:9344/queue/queue-local.fifo nodemon aat/tools/local-sns.js
+AWS_PROFILE=test-profile REGION=us-west-2 QUEUE_URLS=http://localhost:9334/queue/queue-local.fifo,http://localhost:9344/queue/queue-local.fifo npx nodemon aat/tools/local-sns.js
 
 One-time setup:
 
