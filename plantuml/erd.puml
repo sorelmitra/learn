@@ -1,0 +1,28 @@
+@startuml temp
+
+left to right direction
+
+entity "expenses" {
+  * id : serial4
+  --
+  travel_authorization_id : int4
+  description : varchar(255)
+}
+
+entity "travel_authorizations" {
+  * some_other_id: int4
+  * id : int4
+  --
+  first_name : varchar(255)
+}
+
+entity "stops" {
+  * id : serial4
+  --
+  travel_authorization_id : int4
+}
+
+expenses::travel_authorization_id ||--o{ travel_authorizations::id
+stops::travel_authorization_id }o--|| travel_authorizations::id
+
+@enduml
