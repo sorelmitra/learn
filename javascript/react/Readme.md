@@ -1,6 +1,6 @@
 # Quick Start
 
-## Create the root for micro-frontends
+## 1. Create the root for micro-frontends
 
 Run and follow the prompts, choose the default options:
 
@@ -37,9 +37,9 @@ Add `--port 8500` to both `start*` commands.
 
 Now run `build` and `start`. Both should work.
 
-## Register the new micro-frontend with the root
+## 2. Register the new micro-frontend with the root
 
-### Add shared dependencies
+### 2.a. Add shared dependencies
 
 In `src/index.ejs` locate the following piece of code:
 
@@ -71,7 +71,7 @@ And add the following inside `imports`:
 
 > but it gave me `LOADING_SOURCE_CODE: Failed to resolve module specifier "react-dom/client"`.  I managed to fix it after iterating several times with ChatGPT o4-mini-high, which suggested changing my CDN for JS.  Since what I have for now is a `dev` version, I'm sure that for production another solution would be required.
 
-### Add import for your MFE application
+### 2.b. Add import for your MFE application
 
 In `src/index.ejs` locate the following piece of code (note the `isLocal` thing):
 
@@ -97,7 +97,7 @@ Now add the following inside `imports`:
 
 (!) Pay attention to the syntax with these imports!  It looks like JavaScript, but it doesn't allow a comma at the end of the object / array, so more probably it is a JSON.
 
-### Register your MFE application
+### 2.c. Register your MFE application
 
 Look for `src/microfrontend-layout.html`. If it exists, then you're using single-spa Layout Engine.
 
@@ -120,6 +120,12 @@ where `@organization/app-name` is the same name you used for the import step abo
 #### If NOT using single-spa Layout Engine
 
 Remove the code for registering `@single-spa/welcome` as an application from `src/*root-config.ts` and add code for registering your `@organization/app-name` app.
+
+## 3. Run everything
+
+Start `acme-root`: `cd acme-root && yarn run start`.  This needs `ancient-lag` to run in order for the MFE to be loaded.  Order in which you start them does not matter, but when you load the page, both need to be started.
+
+Start `ancient-lag`: `cd ancient-lag && yarn run start`.
 
 # References
 
