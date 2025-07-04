@@ -1,0 +1,11 @@
+{
+  "extends": "ts-config-single-spa",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "declarationDir": "dist",
+    "module": "ES2022",
+  },
+  "files": ["src/AcmeInc-AncientLag.tsx"],
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.test*"],
+}
