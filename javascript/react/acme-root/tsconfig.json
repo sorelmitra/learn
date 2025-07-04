@@ -1,0 +1,11 @@
+{
+  "extends": "ts-config-single-spa",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "declarationDir": "dist",
+    "module": "ES2022",
+  },
+  "files": ["src/AcmeInc-root-config.ts"],
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.test*"],
+}

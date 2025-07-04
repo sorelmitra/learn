@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Root Config</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: localhost:*; script-src 'unsafe-inline' 'unsafe-eval' https: localhost:*; connect-src https: localhost:* ws://localhost:*; style-src 'unsafe-inline' https:; object-src 'none';">
+  <meta name="importmap-type" use-injector />
+  <!-- If you wish to turn off import-map-overrides for specific environments (prod), uncomment the line below -->
+  <!-- More info at https://github.com/single-spa/import-map-overrides/blob/main/docs/configuration.md#domain-list -->
+  <!-- <meta name="import-map-overrides-domains" content="denylist:prod.example.com" /> -->
+
+  <!-- Shared dependencies go into this import map -->
+  <script type="injector-importmap">
+    {
+      "imports": {
+        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@6.0.3/lib/es2015/esm/single-spa.min.js",
+        "react": "https://esm.sh/react@19.0.0?dev",
+        "react-dom": "https://esm.sh/react-dom@19.0.0?dev",
+        "react-dom/client": "https://esm.sh/react-dom@19.0.0/client?dev"
+      }
+    }
+  </script>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/single-spa@6.0.3/lib/es2015/esm/single-spa.min.js" as="module">
+
+  <!-- Add your organization's prod import map URL to this script's src  -->
+  <!-- <script type="injector-importmap" src="/importmap.json"></script> -->
+
+  <% if (isLocal) { %>
+  <script type="injector-importmap">
+    {
+      "imports": {
+        "@AcmeInc/root-config": "//localhost:9000/AcmeInc-root-config.js",
+        "@single-spa/welcome": "https://cdn.jsdelivr.net/npm/single-spa-welcome/dist/single-spa-welcome.min.js",
+        "@AcmeInc/AncientLag": "//localhost:8500/AcmeInc-AncientLag.js"
+      }
+    }
+  </script>
+  <% } %>
+
+  <script src="https://cdn.jsdelivr.net/npm/import-map-overrides@5.1.1/dist/import-map-overrides.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@single-spa/import-map-injector@2.0.1/lib/import-map-injector.js"></script>
+</head>
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <main></main>
+  <script>
+    window.importMapInjector.initPromise.then(() => {
+      import('@AcmeInc/root-config');
+    });
+  </script>
+  <import-map-overrides-full show-when-local-storage="devtools" dev-libs></import-map-overrides-full>
+</body>
+</html>
