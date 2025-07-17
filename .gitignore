@@ -5,7 +5,6 @@
 **/build
 
 # Java
-**/.idea
 **/*.class
 **/*.pyc
 **/*.pch
@@ -71,3 +70,8 @@ verifit/venv
 **/*.class
 
 *.synctex.gz
+
+# IDEs
+**/.idea
+**/*.sublime-project
+**/*.sublime-workspace
