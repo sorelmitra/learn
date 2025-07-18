@@ -1,4 +1,4 @@
-import { House, HouseListItem, HouseFeature } from '../dto/house';
+import { House, HouseListItem } from '../dto/house';
 import { getRawHouses } from '../database/house.repo';
 import { NotFoundException } from '../exceptions';
 
