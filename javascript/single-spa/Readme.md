@@ -1,4 +1,4 @@
-# Quick Start
+# Quick Start with Single SPA
 
 ## 1. Create the root for micro-frontends
 
@@ -126,6 +126,16 @@ Remove the code for registering `@single-spa/welcome` as an application from `sr
 Start `acme-root`: `cd acme-root && yarn run start`.  This needs `ancient-lag` to run in order for the MFE to be loaded.  Order in which you start them does not matter, but when you load the page, both need to be started.
 
 Start `ancient-lag`: `cd ancient-lag && yarn run start`.
+
+---
+
+# Acme-Backend
+
+This is a minimalist backend for use with the React demo app (ancient-lag).  It features a house REST API.
+
+Start it by cd-ing to `acme-backend` and running `yarn run start` or `yarn run watch`.
+
+---
 
 # References
 
