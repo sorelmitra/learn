@@ -8,7 +8,8 @@ tmux new-session -d -s devsh-acme -n stuff
 # Type <Prefix> : kill-session <Enter> in order to kill them all
 
 tmux new-window -n Acme-Backend -c ~/1data/s/sorelmitra/learn/javascript/single-spa/acme-backend
-tmux send-keys "yarn run start" Enter
+tmux send-keys "yarn run build" Enter
+tmux send-keys "yarn run watch" Enter
 
 tmux new-window -n Acme-Root -c ~/1data/s/sorelmitra/learn/javascript/single-spa/acme-root
 tmux send-keys "yarn run start" Enter
