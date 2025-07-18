@@ -1,0 +1,24 @@
+{
+  "name": "acme-backend",
+  "version": "1.0.0",
+  "description": "Backend support for the mighty Single SPA + React demo",
+  "main": "dist/app.js",
+  "author": "Sorel Mitra",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "compile": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "watch": "nodemon src/app.ts"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
