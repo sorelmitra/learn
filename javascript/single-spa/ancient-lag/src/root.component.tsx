@@ -1,3 +1,5 @@
+import { MainPage } from "./main/main-page.component";
+
 export default function Root(props) {
-  return <section>{props.name} is mounted!</section>;
+  return <MainPage/>;
 }

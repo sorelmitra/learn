@@ -4,6 +4,8 @@
     "jsx": "react-jsx",
     "declarationDir": "dist",
     "module": "ES2022",
+    "target": "ES2022",
+    "lib": ["DOM", "ES2022"]
   },
   "files": ["src/AcmeInc-AncientLag.tsx"],
   "include": ["src/**/*"],

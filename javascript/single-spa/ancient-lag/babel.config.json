@@ -1,11 +1,21 @@
 {
   "presets": [
-    "@babel/preset-env",
     [
-      "@babel/preset-react", 
+      "@babel/preset-env",
       {
-        "runtime": "automatic"
+        // 1. Target only environments with ES module support (i.e. modern browsers/Node)
+        "targets": { "esmodules": true },
+
+        // 2. Exclude the transforms that turn async functions into generator/regenerator code
+        "exclude": [
+          "transform-regenerator",
+          "transform-async-to-generator"
+        ]
       }
+    ],
+    [
+      "@babel/preset-react",
+      { "runtime": "automatic" }
     ],
     "@babel/preset-typescript"
   ],
@@ -14,6 +24,7 @@
       "@babel/plugin-transform-runtime",
       {
         "useESModules": true,
+        // We don’t want regenerator-runtime imported, since we’re not transforming to generators
         "regenerator": false
       }
     ]
@@ -21,9 +32,10 @@
   "env": {
     "test": {
       "presets": [
-        ["@babel/preset-env", {
-          "targets": "current node"
-        }]
+        [
+          "@babel/preset-env",
+          { "targets": "current node" }
+        ]
       ]
     }
   }

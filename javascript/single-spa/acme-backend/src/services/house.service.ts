@@ -1,8 +1,8 @@
-import { House, HouseListItem } from '../dto/house';
+import { House, HouseBasicInfo } from '../dto/house';
 import { getRawHouses } from '../database/house.repo';
 import { NotFoundException } from '../exceptions';
 
-export const getAllHouses = (): HouseListItem[] => {
+export const getAllHouses = (): HouseBasicInfo[] => {
 	return getRawHouses().map(h => ({ id: h.id, address: h.address, price: h.price }));
 };
 

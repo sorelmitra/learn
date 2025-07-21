@@ -7,7 +7,7 @@ export type HouseAddress = {
 	postalCode?: string;
 };
 
-export type HouseListItem = {
+export type HouseBasicInfo = {
 	id: string;
 	address: HouseAddress;
 	price: number;
@@ -18,7 +18,7 @@ export enum HouseFeature {
 	BIG_BACKYARD = 'BIG_BACKYARD',
 }
 
-export type House = HouseListItem & {
+export type House = HouseBasicInfo & {
 	picturePaths?: string[];
 	features?: HouseFeature[];
 };
