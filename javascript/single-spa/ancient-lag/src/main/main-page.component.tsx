@@ -7,10 +7,8 @@ export const MainPage = () => {
   const [ allHouses, setAllHouses ] = useState([]);
   useEffect(() => {
     (async () => {
-      console.log("XXXXXXXX", "fetching data");
       const response = await fetch("http://localhost:9500/houses"); // TODO have a config for this
       data = await response.json();
-      console.log("XXXXXXXX", data);
       setAllHouses(data);
     })();
   }, []);
