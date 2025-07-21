@@ -1,10 +1,18 @@
 import express from 'express';
+import cors from 'cors';
 
 import { getAllHouses, getHouseById } from './services/house.service';
 import { asyncErrorHandler, errorHandlingMiddleware } from './exceptions';
 
 const app = express();
 const port = 9500;
+
+app.use(cors({
+  origin: 'http://localhost:9000', // allow only this origin
+  methods: ['GET','POST','PUT','DELETE'], // allowed HTTP methods
+  allowedHeaders: ['*'], // allowed headers
+  credentials: true, // if you need cookies/auth
+}));
 
 app.get('/health', (req, res) => {
   res.send('Hello World!');
