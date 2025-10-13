@@ -1,0 +1,14 @@
+#!/bin/sh
+APP=/usr/local/vim70/bin/gvim
+PARAMS='--remote-send "<Esc>"'
+if [ $# -gt 0 ]
+then
+  PARAMS='--remote-silent'
+fi
+CMD="$APP --servername GVIM1 $PARAMS $*"
+$CMD
+if [ $? -ne 0 ]
+then
+  $APP
+fi
+

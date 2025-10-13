@@ -1,0 +1,24 @@
+## Task Checklist
+
+- ( ) (BE) System tests
+- ( ) (BE) Unit tests
+- ( ) (BE) Implement
+- ( ) (BE) Dev Test
+- ( ) (BE) Sync with parent branch
+- ( ) (BE) Fix lint errors and failing unit tests
+- ( ) (BE) PR 
+- ( ) (BE) PR resolve change requests
+- ( ) (BE) PR Merge
+- ( ) (BE) Smoke test depending on the area you changed
+- ( ) (FE) Implement
+- ( ) (FE) Dev Test
+- ( ) (FE) Update schema from BE
+- ( ) (FE) Sync with parent branch
+- ( ) (FE) Fix lint errors and failing unit tests
+- ( ) (FE) PR 
+- ( ) (FE) PR resolve change requests
+- ( ) (FE) PR Wait for BE changes to reach DEV stage
+- ( ) (FE) PR Merge
+- ( ) (FE) Smoke test depending on the area you changed
+- ( ) Move to Ready for QA
+- ( ) (Release) Add ticket to page

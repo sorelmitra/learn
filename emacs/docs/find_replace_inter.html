@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html><head><meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="keywords" content="emacs, emacs tutorial, find-dired, grep">
+<link rel="stylesheet" type="text/css" href="../lang.css">
+<title>Interactively Find and Replace String Patterns on Multiple Files</title>
+<script type="text/javascript">var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-10884311-2']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+</head>
+<body>
+
+<div class="nav">▲ <a href="emacs.html">Emacs Tutorial</a>.</div>
+
+<h1>Interactively Find and Replace String Patterns on Multiple Files</h1>
+<div class="amzx">Xah Recommends:<br><a href="http://www.amazon.com/dp/B002FQJT3Q/?tag=xahh-20"><img src="http://xahlee.org/i/Kindle_in_a_hand.jpg" alt="Kindle" width="90" height="110"></a><br>Amazon Kindle. Read books under the sun. <a href="http://xahlee.org/comp/Kindle_iPad_and_all_that_jazz.html">Review</a></div>
+
+<p>Xah Lee, 2006-06, 2009-08, 2009-09-29</p>
+
+<p>Suppose you need to do find and replace of a string pattern, for the hundreds of files in a directory. However, you do not want to replace all of them. You need to look at it in a case-by-case basis. What can you do?</p>
+
+<p>Answer: emacs.</p>
+
+<h2>Solution Summery</h2>
+
+<ul>
+<li>Call “dired” to list files in dir, or call “find-dired” if you need all subdirs.</li>
+<li>Mark the files you want. You can mark by regex by typing 【<kbd>%</kbd> <kbd>m</kbd>】.</li>
+<li>Type 【<kbd>Q</kbd>】 to call “dired-do-query-replace-regexp”.</li>
+<li>Type your find regex and replace string. (see: <a href="emacs_regex.html">common elisp regex pattern</a>.)</li>
+<li>For each occurance, type 【<kbd>y</kbd>】 to replace, 【<kbd>n</kbd>】 to skip, 【<kbd>!</kbd>】 for replacing all occurances in current file. Type 【<kbd>Ctrl</kbd>+<kbd>g</kbd>】 to abort the whole operation.</li>
+<li>To do the replacement on all files without further asking, type 【<kbd>Y</kbd>】. To skip all possible replacement on the rest of the current file, type 【<kbd>N</kbd>】. (These are Emacs 23 only)</li>
+<li>Call “ibuffer” to list all opened files.</li>
+<li>Type 【<kbd>*</kbd> <kbd>u</kbd>】 to mark all unsaved files, type 【<kbd>S</kbd>】 to save all marked files, type 【<kbd>D</kbd>】 to close them all.</li>
+</ul>
+
+<h2>Step-by-Step Guide for Emacs Beginners</h2>
+
+<h3>Select Target Files</h3>
+
+<p>Start emacs by typing “emacs” in the command line interface prompt. (Or, double click the Emacs icon if you are in a Graphics User Interface environment)</p>
+
+<h4>Selecting Files In A Directory</h4>
+
+<p>First you need to select the files you want to do the replace. Use the graphical menu “File‣Open Directory”. Emacs will ask you for a directory path. Type the directory path, then press Enter.</p>
+
+<p>Now, you will be shown the list of files, and now you need to “mark” the files you want the regex find-replace to work on. You mark a file by moving the cursor to the file you want, then press “m”. Unmark it by pressing “u”. (To list subdirectories, move your cursor to the directory and press “i”. The subdirectory's content will be listed at the bottom.)  To mark all files by a regex, type “%m”, then type your regex pattern. For example, if you want to mark all html files, then type “%m” then “\.html$”.
+(You can find a list of the mark commands in the graphical menu “Mark” (this menu appears when you are in the dired mode).)
+</p>
+
+<h4>Selecting Files In A Directory And All Its Subdirectories</h4>
+
+<p>If you want to do find and replace on files inside a directory, including hundreds of subdirectories, here's a method to select all these files. 
+</p>
+
+<p>Press the 【<kbd>Esc</kbd>】 key, then press the x key, then type “find-dired”. (then press Enter) Then, type a directory name, e.g. 〔/Users/mary/myfiles〕</p>
+
+<p>Emacs will ask you with the prompt “Run find (with args): ”. If you need to do the replacement on all html files, then type “-name "*html"”. If you don't care about what kind of file but simply all files under that dir, then give “-type f”.</p>
+
+<p>Now, mark the files as described above.</p>
+
+<h3>Interactive Find & Replace</h3>
+
+<p>Now, you are ready to do the interactive find replace. For
+simplicity, let's say you just want to replace the word “quick” by
+“super”. Now, type 【<kbd>Esc</kbd> <kbd>x</kbd> dired-do-query-replace-regexp】. It will
+prompt you for the regex string and the replacement string. Type
+“quick”, enter, then “super”.</p>
+
+<p>Now, emacs will use your pattern and check the files, and stop and show you whenever a match occurred. When this happens, emacs will prompt you, and you have a choice of making the change or skip the change. To make the change, type “y”. To skip, type “n”. If you simply want emacs to go ahead and make all such changes to the current file, type “!”.
+</p>
+
+<p>
+If you want to cancel the whole operation without saving any changes you've made, type 【<kbd>Ctrl</kbd>+<kbd>g</kbd>】, then exit emacs using the menu “File‣Exit Emacs”.</p>
+
+<h3>Saving the Changed Files</h3>
+
+<p>Now, after you went through the above ordeal. There is one more
+step you need to do, and that is saving the changed files.</p>
+
+<p>If you are using emacs version 22 or later, then type 【<kbd>Esc</kbd> <kbd>x</kbd> ibuffer】 to go
+into a buffer listing mode, then type “*u” to mark all unsaved files,
+then type “S” to save them all. (that's shift-s)</p>
+
+<p>If you are using a emacs version 21, then you can do this: type 【<kbd>Esc</kbd> <kbd>x</kbd> list-buffer】, then move the cursor to the file you want to save and type “s”. It will mark the file for later save action. Type “u” to unmark. Once you are done, type “x” to execute the saving of all files marked for save. (in emacs, opened file is called “buffer”. Disregard other things there.)</p>
+
+<p>Alternative to the above options, you can also type 【<kbd>Esc</kbd> <kbd>x</kbd> save-some-buffers】. Then emacs will display each unsaved file and ask if you want it saved.</p>
+
+<hr>
+<p>Note: emacs's regex is not exactly the same as Perl's. For a summary and common patterns, see:
+<a href="emacs_regex.html">Emacs Regex</a>.
+</p>
+
+<div class="rltd">
+<ul>
+<li><a href="../perl-python/findreplace_regex.html">regex find replace with Perl or Python in one shot</a></li>
+<li><a href="rename_file_pattern.html">Emacs: Rename Files Interactively by Pattern (regex; wdired)</a></li>
+<li><a href="emacs_unix.html">Emacs Shell Tutorial (bash, cmd.exe, PowerShell)</a></li>
+</ul>
+</div>
+
+<div class="dnt0c7af">Was this page useful? If so, please do donate $3, thank you <a href="http://xahlee.org/thanks.html">donors!</a><form action="https://www.paypal.com/cgi-bin/webscr" method="post"><div><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="hosted_button_id" value="8127788"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit"><img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1"></div></form></div>
+
+<div id="disqus_thread"></div><script type="text/javascript">(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='http://xahlee.disqus.com/embed.js';(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);})();</script><noscript>Enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=xahlee">comments.</a></noscript><a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="ftr"><div class="sig"></div><div class="x10"><a href="http://xahlee.org/">Home</a></div><div class="x20"><a href="http://xahlee.org/terms.html">Terms of Use</a></div><div class="x30"><a href="http://xahlee.org/about.html">About</a></div><div class="x40"><a href="http://xahlee.org/ads.html">Advertise</a></div><div class="x50"><a href="http://xahlee.org/subscribe.html">Subscribe</a></div><div class="x60"><form method="get" action="http://www.google.com/custom"><div><a href="http://www.google.com/"><img src="http://www.google.com/uds/css/small-logo.png" alt="Google"></a><input type="hidden" name="domains" value="xahlee.org"><input type="text" name="q" size="31" maxlength="255" value="Search XahLee.org here"><input type="submit" name="sa" value="Search"><input type="hidden" name="sitesearch" value="xahlee.org"><input type="hidden" name="forid" value="1"><input type="hidden" name="ie" value="UTF-8"><input type="hidden" name="oe" value="UTF-8"><input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;FORID:1;"><input type="hidden" name="hl" value="en"></div></form></div></div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script><script type="text/javascript" src="http://xahlee.org/xlomain.js"></script>
+
+<div class="dstp">2005-10</div>
+<div class="cpr">© 2005 by Xah Lee.</div>
+
+
+</body>
+</html>

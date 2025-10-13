@@ -1,0 +1,9 @@
+Diff between a remote and a local file:
+
+ssh [login]@[host] "cat [remote file]" | diff - [local file]
+
+The same with vimdiff:
+
+vimdiff /path/to/file scp://remotehost//path/to/file
+
+For scp, the two "//" are important, and you have to use full path, "~" will not work.

@@ -1,0 +1,7 @@
+Running Multiple Python Versions in Mac OSX: Use ASDF https://asdf-vm.com.
+
+For psycopg2, do the following in a terminal:
+
+brew install openssl
+brew install libpq
+PATH="/opt/homebrew/opt/libpq/bin:$PATH" LDFLAGS="-L/opt/homebrew/opt/libpq/lib" CPPFLAGS="-I/opt/homebrew/opt/libpq/include" pip install psycopg2

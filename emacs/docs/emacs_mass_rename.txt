@@ -1,0 +1,10 @@
+emacs: Renaming multiple files at once with a regular expression
+
+M-x dired
+(navigate to the folder)
+M-x wdired-change-to-wdired-mode
+M-x replace-regexp
+(enter search and replace expressions)
+C-c C-c
+
+Which writes out the changes to the directory. 

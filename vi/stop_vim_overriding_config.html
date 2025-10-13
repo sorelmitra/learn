@@ -1,0 +1,440 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+ <head>
+  <title> How to stop vim from overriding your configuration </title>
+  <meta name="description"
+        content="Stop vim plugins from overriding your configuration"/>
+  <meta name="keywords"
+        content="gentoo, vim, autoindent, vimrc, comments, auto, indent, override, config, configuration"/>
+  <link rel="stylesheet" type="text/css" href="/css/article.css"/>
+  <style type="text/css">
+    p.centered_image {
+        text-align: center;
+        margin-top: 0px;
+        margin-bottom: 0px;
+        padding: 0px;
+    }
+
+    img {
+        border: solid black 1px;
+    }
+   </style>
+ </head>
+ <body>
+
+  <div class="content">
+  
+   <div class="header">
+    <span class="header_title">
+     <h1> How to stop vim from overriding your configuration </h1>
+    </span>
+    <div class="header_date">
+     16/1/2008
+    </div>
+   </div>
+  
+   <div id="intro" class="content_block">
+    
+    <h2> Introduction </h2>
+
+    <p>
+    I'm really grateful to the developers who've made vim such a great
+    tool that it's been indispensable to me for over a decade.  I
+    appreciate its utility, its minimalism and the fact that I can sit
+    in front of virtually any UNIX machine and be comfortable and
+    productive.
+    </p>
+    <p>
+    It has saddened me greatly that modern versions of the program install
+    with the infuriating behaviour of overriding preferences defined in
+    ~/.vimrc.
+    </p>
+    <p>
+    This article briefly outlines vim's configuration system with an eye
+    to working around this behaviour.  The discussion is based on the
+    Gentoo install, but I see no reason why other installation layouts
+    shouldn't be conceptually similar.  I may update this article as I
+    use other machines and have to sanitise their vim configurations.
+    </p>
+    <p>
+    If this article doesn't shed light on your configuration issue, vim's
+    set-verbose may be a good start.  We type:
+    <div class="code">
+     <code>
+      <pre>
+:verbose set formatoptions
+      </pre>
+     </code>
+    </div>
+    and vim responds with:
+    <div class="code">
+     <code>
+      <pre>
+  formatoptions=tcrq
+          Last set from /usr/share/vim/vim70/ftplugin/perl.vim
+      </pre>
+     </code>
+    </div>
+    showing that the ftplugin perl.vim is overriding our chosen
+    formatoptions.
+   </div>
+
+   <div id="solution" class="content_block">
+    
+    <h2> The problem explained, and a solution </h2>
+
+    <p>
+    The root of the problem seems to be that vim now has the notion of
+    configuration based on filetype via plugins: vim configuration files
+    that are loaded when a file of a given type is opened with the editor.
+    Because the plugin configurations are loaded after the global and
+    user rc files, settings are overridden and woe ensues.
+    </p>
+
+    <p>
+    The simple and totalitarian fix is to completely disable the filetype
+    plugins.  Simply place the following at the end of your ~/.vimrc:
+    </p>
+    <div class="code">
+     <code>
+      <pre>
+" Disable all filetype specific behaviour
+filetype off
+      </pre>
+     </code>
+    </div>
+
+    <p>
+    This has the unfortunate effect of turning syntax highlighting off -
+    and activating syntax highlighting has the unfortunate effect of
+    reactivating filetype-driven behaviour.  A more useful approach
+    is to specifically turn off the indentation and plugin behaviour
+    in ~/.vimrc:
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>
+" Disable filetype-based indentation settings
+filetype indent off
+
+" Disable loading filetype-based general configuration
+filetype plugin off
+
+" These may be combined for brevity (disabling both)
+filetype plugin indent off
+      </pre>
+     </code>
+    </div>
+
+    <p>
+    Once this has been done, syntax highlighting will still operate,
+    the filetype plugins and indentation settings will not be loaded and
+    your ~/.vimrc settings will not be overridden; now you simply have
+    the task of turning off whichever features your package maintainer
+    has helpfully enabled (in /etc/vim/vimrc) that you dislike.
+    </p>
+
+    <p>
+    Some of the filetype plugin configuration that we've disabled may
+    be useful, however - we'd rather just have a method to set
+    the configuration options we like without them being overridden.
+    To get some understanding of how we can do this, let's quickly run
+    through how vim is configured.
+    </p>
+
+   </div>
+    
+  
+   <div id="global" class="content_block">
+    
+    <h2> The global configuration file: /etc/vim/vimrc </h2>
+
+    <p>
+    The /etc/vim/vimrc file holds the system wide vim configuration
+    provided by the package maintainer.  I imagine that other systems
+    might install a file like this as /etc/vimrc or /usr/local/etc/vimrc.
+    </p>
+
+    <p>
+    Unfortunately, the default setting of vim under Gentoo is to fold
+    functions in this file when opened by a user.  You can expand
+    the folded functions with <code>zo</code> (o for open) and close
+    them again with <code>zc</code> (c for close), or simply turn off
+    folding with <code>:set nofoldenable</code> if you would like to
+    read the file.  It looks like the folding is enabled by a modeline,
+    which are not executed by root as a security measure.
+    </p>
+
+    <p>
+    Gentoo provides a nice way to override or extend the contents of
+    this file on a system wide basis: /etc/vim/vimrc.local.  The local
+    file is simply included at the end of /etc/vim/vimrc:
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>" {{{ vimrc.local
+if filereadable("/etc/vim/vimrc.local")
+  source /etc/vim/vimrc.local
+endif
+" }}}
+      </pre>
+     </code>
+    </div>
+   </div>
+
+   <div id="user" class="content_block">
+    
+    <h2> The user configuration file: ~/.vimrc </h2>
+    
+    <p>
+    The local configuration file allows us to override settings in the
+    global config file, as per the standard behaviour of rc files.
+    </p>
+
+    <p>
+    This is how I generally set vim up to behave:
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>
+" ~/.vimrc
+" Per-user vim configuration
+
+" Enable vim enhancements
+set nocompatible
+
+" Don't highlight search terms
+set nohlsearch
+
+" My preferred autoindent features
+filetype indent off
+set autoindent
+set nocindent
+
+" Insert spaces when the tab key is hit
+set expandtab
+
+" Tab spacing of 4
+set tabstop=4
+
+" Configure behaviour of the backspace key in insert mode
+set backspace=indent,eol
+
+" Alternative syntax highlighting colours for a dark background
+syntax on
+set background=dark
+      </pre>
+     </code>
+    </div>
+
+   </div>
+
+   <div id="ftplugin" class="content_block">
+
+    <h2> The filetype plugin configuration files: $VIM/ftplugin </h2>
+
+    <p>
+    File type plugins (ftplugins) enable the execution of extra
+    configuration commands when files of a given type are opened.
+    It seems that the developers of the distributed file type plugins
+    think that it is reasonable for these files to do things by default
+    like configure their favourite indentation mode and turn on comment
+    autoprefixing, along with various other surprising options.
+    </p>
+
+    <p>
+    Configuration files for ftplugins live under $VIM/ftplugin; for
+    my version of vim under Gentoo, that is /usr/share/vim/vim71/ftplugin.
+    The configuration file for filetype based indentation is located
+    at $VIM/ftplugin/indent.vim.
+    </p>
+
+    <p>
+    File type plugins are enabled via the command:
+    <div class="code">
+     <code>
+      <pre>
+filetype plugin on
+      </pre>
+     </code>
+    </div>
+
+    somewhere in your vim configuration, and may similarly be disabled
+    using:
+
+    <div class="code">
+     <code>
+      <pre>
+filetype plugin off
+      </pre>
+     </code>
+    </div>
+
+    </p>
+
+   </div>
+
+   <div id="after" class="content_block">
+
+    <h2>
+     Running commands after the filetype plugin configuration:
+     ~/.vim/after/ftplugin/vim.vim
+    </h2>
+
+    <p>
+    Simply disabling the file type plugins to avoid their annoying
+    behaviour is a seductive solution, but we should consider that some of
+    the options enabled in the filetype plugins might be genuinely useful.
+    </p>
+
+    <p>
+    An alternative option of editing the systemwide plugin files is
+    initially attractive, but suffers from the drawbacks of:
+    <ul>
+     <li> affecting all users, </li>
+     <li> being overwritten during software upgrades, and </li>
+     <li> being unusable on a shared machine. </li>
+    </ul>
+    </p>
+
+    <p>
+    A better solution is available.  Vim provides the opportunity to
+    execute configuration commands subsequent to the execution of the
+    ftplugins via its default inclusion of two "after" paths in its
+    runtimepath variable:
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>
+runtimepath=~/.vim,/usr/share/vim/vimfiles,/usr/share/vim/vim71,
+        /usr/share/vim/vimfiles/after,~/.vim/after
+      </pre>
+     </code>
+    </div>
+
+    <p>
+    By providing files in these directories for vim to execute, we can
+    have commands executed after the vim runtime executes.  In order to
+    override the effects of specific commands in ftplugins, we can add
+    a file that will be executed after that plugin.
+    </p>
+    
+    <p>
+    For example, to override the behaviour of the vim config file
+    type plugin, we can create ~/.vim/after/ftplugin/vim.vim with the
+    following contents:
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>
+" ~/.vim/after/ftplugin/vim.vim
+" Execute commands after the vim config filetype handler has been run
+
+" Make sure automatic continuation of comments is disabled
+" Aggregating these doesn't seem to work consistently
+setlocal formatoptions-=o formatoptions-=r
+      </pre>
+     </code>
+    </div>
+
+    <p>
+    This does the job of allowing us to use the editor as we know it and
+    love it, while taking advantage of whatever niceties the ftplugin
+    author has provided us with.
+    </p>
+
+    <p>
+    The problem now, of course, is that since we <strong>always</strong>
+    want to disable these particular options, we need to create one of
+    these file type handlers for every type of file we ever expect to
+    encounter.  This would be a maintenance headache, but we can create
+    one central "after" configuration file and use symbolic links to
+    make this painless.
+    </p>
+    
+    <p>
+    Making one link to our config file for each ftplugin should work
+    nicely.  Using a bourne shell (eg. /bin/sh):
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>
+# At the (bourne) shell prompt
+mkdir -p ~/.vim/after/ftplugin
+rm -i ~/.vim/after/ftplugin/*
+for file in /usr/share/vim/vim71/ftplugin/*.vim
+do
+    ln -s ~/.vimrc-after ~/.vim/after/ftplugin/`basename $file`
+done
+    </div>
+
+    <p>
+    Now create ~/.vimrc-after, which will be executed after any ftplugin
+    is run!
+    </p>
+
+    <div class="code">
+     <code>
+      <pre>
+" ~/.vimrc-after
+" Execute commands after vim's file type plugins have been run
+
+" Make sure automatic continuation of comments is disabled
+" Aggregating these doesn't seem to work consistently
+setlocal formatoptions-=o formatoptions-=r
+
+" My preferred autoindent features
+set autoindent
+set nocindent
+      </pre>
+     </code>
+    </div>
+   </div>
+
+   <div id="conclusion" class="content_block">
+
+    <h2> Conclusion </h2>
+
+    <p>
+    We now have two ways to disable those options that just seem to keep
+    resurrecting themselves:
+    </p>
+    <ul>
+     <li><code>filetype indent plugin off</code>, and</li>
+     <li>~/.vimrc-after</li>
+    </ul>
+
+    <p>
+    I'll close by mentioning the Big Bertha of manual formatting in vim:
+    </p>
+    
+    <div class="code">
+     <code>
+      <pre>
+:set paste
+      </pre>
+     </code>
+    </div>
+
+    <p>
+    Paste mode is designed to allow pasting into a terminal and disables
+    all automatic formatting and keyboard handling functions.
+    </p>
+   </div>
+
+   <div class="email">
+    <script language="javascript">
+    <!--
+     var email = 'malcolm' + '@' + 'peox.net';
+     document.write('<a href="mailto:' +  email + '">' + email + '</a>');
+     // -->
+    </script>
+   </div>
+ </body>
+</html>

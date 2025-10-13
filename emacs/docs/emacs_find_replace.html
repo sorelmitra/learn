@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html><head><meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="keywords" content="emacs, regex replace, find replace">
+<link rel="stylesheet" type="text/css" href="../lang.css">
+<title>Find and Replace with Emacs</title>
+<script type="text/javascript">var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-10884311-2']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();</script>
+</head>
+<body>
+
+<div class="nav">▲ <a href="emacs.html">Emacs Tutorial</a>.</div>
+
+<h1>Find and Replace with Emacs</h1>
+<div class="amzx">Xah Recommends:<br><a href="http://www.amazon.com/dp/B002FQJT3Q/?tag=xahh-20"><img src="http://xahlee.org/i/Kindle_in_a_hand.jpg" alt="Kindle" width="90" height="110"></a><br>Amazon Kindle. Read books under the sun. <a href="http://xahlee.org/comp/Kindle_iPad_and_all_that_jazz.html">Review</a></div>
+
+<p>Xah Lee, 2008-03</p>
+
+<p>This page shows you how to use emacs to do find and replace operations, and tells you how to do case-sensitive or case-insensitive match or replacement, and how to force captured regex text pattern into upper or lower case.</p>
+
+<h2>Emacs's Find and Replace Commands</h2>
+
+<p>Here are the emacs find and replace commands. These are also under the graphical menu “Edit‣Replace”.</p>
+
+<table class="nrm">
+<tr><th>Command Name</th><th>keybard shortcut</th><th>Target</th><th>Purpose</th></tr>
+<tr><td>query-replace</td><td>【<kbd>Alt</kbd>+<kbd>%</kbd>】</td><td>region, or cursor point to end</td><td>interactive find and replace</td></tr>
+<tr><td>query-replace-regexp</td><td>【<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>%</kbd>】</td><td>region, or cusor point to end</td><td>interactive find and replace with regex pattern</td></tr>
+<tr><td>dired-do-query-replace-regexp</td><td>In dired, <kbd>Q</kbd>, or menu “Operate‣Query Replace in Files...”</td><td>marked files in dired</td><td>interactive find and replace with regex pattern on multiple files</td></tr>
+</table>
+
+<p>For example, to use query-replace, type 【<kbd>Alt</kbd>+<kbd>%</kbd>】, then type your search string, then type your replacement string.</p>
+
+<p>When a query command ask you for confirmation, type <kbd>y</kbd> (or <kbd>Space</kbd>) to do the replacement, type <kbd>n</kbd> to skip, type <kbd>!</kbd> to do all remaining replacements without asking, type <kbd>q</kbd> to exit.</p>
+
+<p>For tutorial on how to use dired-do-query-replace-regexp, see
+<a href="find_replace_inter.html">Interactively Find and Replace String Patterns on Multiple Files</a>.</p>
+
+<p>Emacs also have commands replace-string and replace-regexp. They are the non-interactive versions of query-replace and query-replace-regexp. They do all replacements in one-shot without asking confirmation for each replacement.</p>
+
+<h2>Case Sensitivity in Search String</h2>
+
+<p>By default, search is not case sensitive; however, if your search string contains a capital letter, search is automatically case sensitive.</p>
+
+<p>To make your search absolutely case-sensitive, you need to set the variable “case-fold-search” to true. You can do this by keyboard or by menu. For menu, go to “Options‣Case-Insensitive Search”. The menu is a toggle. A checkmark in front of the menu means it is on.</p>
+
+<h3>case-fold-search variable</h3>
+
+<p>Technically, the case sensitivity is controlled by the variable case-fold-search. You can set this variable to true or false by typing 【<kbd>Alt</kbd>+<kbd>x</kbd> set-variable】, then the variable name, then give a value “t” or “nil”.</p>
+
+<p>To see what the current value is, type 【<kbd>Alt</kbd>+<kbd>x</kbd> describe-variable】 then give the variable name. There is also a command toggle-case-fold-search, which toggles the value of case-fold-search.</p>
+
+<h2>Case in Replacement String</h2>
+
+<p>By default, the case of the replaced text is smartly dependent on the matched text. For example, suppose your search string is “here”, and your replacement string is “dragon” (and assume you are using default emacs setup so that it will match both “here”, “Here”, “HERE”). Now, when emacs found “here”, the replacement will be “dragon”, when emacs found “Here”, the replacement will be “Dragon”, when emacs found “HERE”, the replacement will be “DRAGON”.</p>
+
+<h3>case-replace variable</h3>
+
+<p>If you want the letter case of your replacement string be exactly as you have it, you need to set the variable case-replace to “nil”. Type 【<kbd>Alt</kbd>+<kbd>x</kbd> set-variable】 then the variable name.</p>
+
+<h2>Force Case of Matched Text</h2>
+
+<p>Sometimes you need to do regex search to find a pattern, and have the case of the pattern be changed. For example, suppose in your html code you have:</p>
+
+<pre class="html">
+&lt;<span class="function-name">p</span>&gt;once upon a time ...&lt;/<span class="function-name">p</span>&gt;
+
+&lt;<span class="function-name">P</span>&gt;There is a dragon who lived in ...&lt;/<span class="function-name">P</span>&gt;
+
+&lt;<span class="function-name">p</span>&gt;princess Tana is still waiting ...&lt;/<span class="function-name">p</span>&gt;
+</pre>
+
+<p>You want to make sure that all paragraphs starts with a capital letter. So, you use a pattern that catches the first letter after &lt;p&gt;, like this 「&lt;p&gt;\([a-z]\)」. By default, emacs will match both “&lt;P&gt;” and “&lt;p&gt;”.</p>
+
+<p>To make your captured pattern upper case, give your replacement string this
+expression: 「&lt;p&gt;\,(upcase \1)」. The 「\,」 tells emacs that what follows
+should be a lisp expression. The 「(upcase \1)」 is a lisp expression. The 「upcase」 is a lisp function and the 「\1」 means the 1st captured string in your regex pattern. If you want lower case, use 「downcase」 in place of 「upcase」.</p>
+
+<p>For a more complex example in using the 「\,」 in replacement, see: <a href="lisp_regex_replace_func.html">Regex Replace with a Function in Emacs Lisp</a>.</p>
+
+<p><span class="ref"><a href="../emacs_manual/Search.html">(info "(emacs) Search")</a></span></p>
+
+<div class="rltd">
+<ul>
+<li><a href="find_replace_inter.html">Interactively Find and Replace String Patterns on Multiple Files</a></li>
+<li><a href="emacs_regex.html">Emacs Regex</a></li>
+<li><a href="../perl-python/findreplace_regex.html">Perl-Python: Find and Replace By Regex Text Patterns</a></li>
+</ul>
+</div>
+
+<div class="dnt0c7af">Was this page useful? If so, please do donate $3, thank you <a href="http://xahlee.org/thanks.html">donors!</a><form action="https://www.paypal.com/cgi-bin/webscr" method="post"><div><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="hosted_button_id" value="8127788"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit"><img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1"></div></form></div>
+
+<div id="disqus_thread"></div><script type="text/javascript">(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='http://xahlee.disqus.com/embed.js';(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);})();</script><noscript>Enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=xahlee">comments.</a></noscript><a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+<div class="ftr"><div class="sig"></div><div class="x10"><a href="http://xahlee.org/">Home</a></div><div class="x20"><a href="http://xahlee.org/terms.html">Terms of Use</a></div><div class="x30"><a href="http://xahlee.org/about.html">About</a></div><div class="x40"><a href="http://xahlee.org/ads.html">Advertise</a></div><div class="x50"><a href="http://xahlee.org/subscribe.html">Subscribe</a></div><div class="x60"><form method="get" action="http://www.google.com/custom"><div><a href="http://www.google.com/"><img src="http://www.google.com/uds/css/small-logo.png" alt="Google"></a><input type="hidden" name="domains" value="xahlee.org"><input type="text" name="q" size="31" maxlength="255" value="Search XahLee.org here"><input type="submit" name="sa" value="Search"><input type="hidden" name="sitesearch" value="xahlee.org"><input type="hidden" name="forid" value="1"><input type="hidden" name="ie" value="UTF-8"><input type="hidden" name="oe" value="UTF-8"><input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;FORID:1;"><input type="hidden" name="hl" value="en"></div></form></div></div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script><script type="text/javascript" src="http://xahlee.org/xlomain.js"></script>
+
+<div class="dstp">2007-08</div>
+<div class="cpr">© 2007 by Xah Lee.</div>
+
+
+</body>
+</html>

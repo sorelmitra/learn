@@ -4,7 +4,7 @@ The app from `blue-jay-bird` logs in via Auth0 -> Okta Trial, and then can acces
 
 ## Okta Configuration
 
-The Okta part of the integration was done in Okta Trial -> Applications -> Blue Jay Bird, screenshots in the `okta-trial` folder.  Key items:
+The Okta part of the integration was done in Okta Trial -> Applications -> Blue Jay Bird, procedure in `okta-trial.md`.  Key items:
 
 - This is an OIDC app.
 - The `Sign-in redirect URIs` points to the Auth0's login callback endpoint, which I discovered by using `Try Connection` in the latter.
@@ -19,7 +19,7 @@ Auth0 -> (our test tenant) ->
 	-> Authentication -> Social -> `okta-trial-5286963`
 	-> Applications -> `BlueJayBird Okta Trial`
 
-Screenshots in the `auth0-okta` folder.
+See procedure in `config-auth0-okta.md`, headings 'A' and 'B'.
 
 Key points for the Social connection:
 

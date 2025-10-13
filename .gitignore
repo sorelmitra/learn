@@ -1,9 +1,3 @@
-**/node_modules
-
-**/target
-**/bin
-**/build
-
 # Java
 **/*.class
 **/*.pyc
@@ -18,15 +12,7 @@
 **/*.out
 **/*.toc
 
-**/autom4te.cache
-android/**/gen
-dot/*.svg
-
-**/.bpmn
-**/*.log
-
-# Botagg
-# Security
+# SSL / Certificates
 botagg/src/postgres/ssl
 *.jks
 *.p12
@@ -40,6 +26,8 @@ botagg/src/postgres/ssl
 npm-debug.*
 appium.log
 bundle.js
+package-lock.json
+yarn.lock
 
 # Python
 __pycache__
@@ -49,27 +37,19 @@ botagg/src/chatapi/db.sqlite3
 
 # Build
 **/build
+**/target
+**/bin
+**/autom4te.cache
+android/**/gen
+dot/*.svg
+**/.bpmn
+**/*.log
 
 # Configuration
 botagg/src/chatmob/.env
 botagg/src/chatbotapi/.env
 botagg/src/samplebot/.env
 botagg/src/chatapi/chatapisite/settings.py
-verifit/venv
-
-# Edu
-*~
-.DS_Store
-**/*.suo
-**/Debug
-**/ipch
-**/*.sdf
-**/*.opensdf
-**/*.VC.opendb
-**/*.vcxproj.user
-**/*.class
-
-*.synctex.gz
 
 # IDEs
 **/.idea
