@@ -71,7 +71,7 @@ The app will automatically connect to Stripe given the correct `STRIPE_KEY` is s
 First start the events local forwarding:
 
 ```shell
-STRIPE_KEY=sk_test_51Qp98nFwcFop6SdQx0W3CO7zIGDhhVM5hWEhNEFzPzeFQ1U1IMKAtKRGd9486PTd9L9ctk0594IAawsqUSv0dABN0035BfOj1N && stripe listen --api-key ${STRIPE_KEY} --forward-to http://localhost:3013/webhook/stripe
+STRIPE_KEY=<Stripe Test-Key> && stripe listen --api-key ${STRIPE_KEY} --forward-to http://localhost:3013/webhook/stripe
 ```
 
 Now start the app: `npm run start:dev`.

@@ -1,0 +1,93 @@
+#
+#
+# Sample .screenrc file, copy to ~/.screenrc
+# Features friendly keyboard shortcuts and 
+# commands to start multiple windows.
+#
+#
+
+# http://delicious.com/search?p=screenrc
+
+# Don't display the copyright page
+startup_message off
+
+# tab-completion flash in heading bar
+vbell off
+
+# keep scrollback n lines
+defscrollback 100000
+
+# Ignore character case in searches
+ignorecase on
+
+# Doesn't fix scrollback problem on xterm because if you scroll back
+# all you see is the other terminals history.
+# termcapinfo xterm|xterms|xs|rxvt ti@:te@
+
+# These will let you use
+bind -c selectHighs 0 select 10 # these three commands are
+bind -c selectHighs 1 select 11 # added to the command-class
+bind -c selectHighs 2 select 12 # selectHighs
+bind -c selectHighs 3 select 13
+bind -c selectHighs 4 select 14
+bind -c selectHighs 5 select 15
+
+bind - command -c selectHighs   # bind the hyphen to
+                                # command-class selectHighs
+
+# Map easier keys to prev and next window, and copy mode
+# References:
+# https://www.gnu.org/software/screen/manual/html_node/Bindkey.html
+# https://www.gnu.org/software/screen/manual/html_node/Input-Translation.html#index-input-translation
+bindkey -d -k k9 copy
+# Determine the Escape Sequence for Shift+F4:
+# - Open your terminal emulator.
+# - Press Ctrl+V, then press Shift+F4.
+# This will display the escape sequence associated with Shift+F4 in that terminal, e.g. ^[[1;2S.
+# Now bind it in your .screenrc file, e.g bindkey "^[[1;2S" select 4
+bindkey -d "^[[19;2~" prev # Shift+F8
+bindkey -d "^[[19~" next # F8
+# Achieves the same as the above line
+# bindkey -d -k k4 next
+
+screen -t stuff         0
+
+screen -t Service C     1
+stuff "cd ~/1data/s/my-projects/service-c && git branch && git pull; npm install; STAGE=dev npm run start:api \015"
+
+screen -t Service P     2
+stuff "cd ~/1data/s/my-projects/service-p && git branch && git pull; npm install; STAGE=dev npm run start:api \015"
+
+screen -t Service A     3
+stuff "cd ~/1data/s/my-projects/service-a && git branch && git pull; npm install; STAGE=dev npm run start:api \015"
+
+screen -t Service B     4
+stuff "cd ~/1data/s/my-projects/service-b && git branch && git pull; npm install; STAGE=dev npm run start:api \015"
+
+screen -t Fwd-Stripe    5
+# This one assumes that on localhost:8731 there's a service
+# capable of receiving Stripe Webhooks
+stuff "STRIPE_KEY=<Stripe Test-Key> && stripe listen --api-key \${STRIPE_KEY} --forward-to http://localhost:8731/webhook/stripe/local \015"
+
+screen -t Fwd-SNS       6
+stuff "cd ~/1data/s/sorelmitra/learn/aws/sns && AWS_PROFILE=test-profile REGION=us-west-2 QUEUE_URLS=http://localhost:9334/queue/queue-local.fifo,http://localhost:9344/queue/queue-local.fifo node local-sns.js \015"
+
+sessionname pay
+
+shelltitle "$ |bash"
+
+# THIS IS THE PRETTY BIT
+# Change the hardstatus settings to give an window list at the bottom of the
+# screen, with the time and date and with the current window highlighted
+# Reference: https://www.gnu.org/software/screen/manual/html_node/String-Escapes.html#String-Escapes
+
+hardstatus             alwayslastline
+
+# Work with the Screen that ships with macOS
+# hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %d/%m %{W}%c %{g}]'
+
+# Works with the HomeBrew Screen
+# For certain Dark color themes
+# hardstatus string '%{0;15}[ %H ][%= %?%-Lw%?%{9;0}(%n*%f%t%?(%u)%?)%{-}%?%+Lw%? %=][ %{4;15}%d/%m %{5;15}%c %{0;3}]'
+# For my current Dark color theme, also works for Light colors
+hardstatus string '%{0;11}[ %H ][%= %?%-Lw%?%{15;1}(%n*%f%t%?(%u)%?)%{-}%?%+Lw%? %=][ %{2;11}%d/%m %{4;11}%c %{0;11}]'
