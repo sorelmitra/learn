@@ -17,4 +17,4 @@ COUNT=5 FAILURES=0; for (( i = 1; i <= $COUNT; i++ )); do; npm run aat; res=$?; 
 
 # Run the same command (in this case `npm run aat`) COUNT times.
 # Stop at first failure.
-COUNT=5; STATUS="PASS"; for (( i = 1; i <= $COUNT; i++ )); do; npm run aat; res=$?; if [ $res != 0 ]; then; STATUS="FAIL"; fi; echo "\n\n\n\n\n\n\n===\nExecution number $i / $COUNT: $STATUS\n===\n\n\n"; if [ $res != 0 ]; then; i=$((i+1)); break; fi; echo "Sleeping a bit ..."; sleep 1; done; echo "Ran $((i-1)) / $COUNT tests: $STATUS."
+COUNT=5; STATUS="PASS"; for (( i = 1; i <= $COUNT; i++ )); do; npm run aat; res=$?; if [ $res != 0 ]; then; STATUS="FAIL"; fi; echo "\n\n\n\n\n\n\n===\nExecution number $i / $COUNT: $STATUS\n===\n\n\n"; if [ $res != 0 ]; then; i=$((i+1)); break; fi; echo "Sleeping a bit ..."; sleep 10; done; echo "Ran $((i-1)) / $COUNT tests: $STATUS."
